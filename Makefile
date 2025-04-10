@@ -12,6 +12,9 @@ up:
 down:
 	docker compose down
 
+logs:
+	docker compose logs -f backend frontend
+
 migration-autogenerate:
 	docker compose run backend python -m alembic revision --autogenerate
 
