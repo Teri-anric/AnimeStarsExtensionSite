@@ -1,16 +1,25 @@
-.PHONY: frontend-api-client-build up-prod up down
+.PHONY: frontend-api-client-build build up down migration-autogenerate migration-upgrade clear
 
 frontend-api-client-build:
 	cd frontend && npm run generate-api-client && cd ..
 
-up-prod:
-	docker compose up -d
+build:
+	docker compose build
 
 up:
 	docker compose up -d
 
 down:
 	docker compose down
+
+migration-autogenerate:
+	docker compose run backend python -m alembic revision --autogenerate
+
+migration-upgrade:
+	docker compose run backend python -m alembic upgrade head
+
+migration-down:
+	docker compose run backend python -m alembic downgrade -1
 
 clear:
 	find . -name "*.pyc" -delete

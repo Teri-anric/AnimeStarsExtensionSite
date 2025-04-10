@@ -8,7 +8,7 @@ x-backend-app: &backend-app
   env_file:
     - .env
   environment:
-    - DATABASE_HOST=db
+    - DATABASE__HOST=db
 
 x-frontend-app: &frontend-app
   build:
@@ -34,12 +34,6 @@ services:
     command: python -m uvicorn app.web:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
-    depends_on:
-      - db
-
-  migrate:
-    <<: *backend-app
-    command: python -m alembic ${MIGRATION_COMMAND}
     depends_on:
       - db
 

@@ -19,6 +19,14 @@ class DatabaseSettings(BaseSettings):
             port=self.port,
         )
 
+    @property
+    def sync_url(self) -> URL:
+        return URL.create(
+            "postgresql",
+            username=self.user,
+            password=self.password,
+        )
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")
