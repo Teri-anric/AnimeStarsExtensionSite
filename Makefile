@@ -16,7 +16,7 @@ logs:
 	docker compose logs -f backend frontend
 
 migration-autogenerate:
-	docker compose run backend python -m alembic revision --autogenerate
+	docker compose run --remove-orphans backend python -m alembic revision --autogenerate
 
 migration-upgrade:
 	docker compose run backend python -m alembic upgrade head

@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker, AsyncSession
+
 from ..config import settings
+
 
 def get_engine(db_url: str = None) -> Engine:
     if db_url is None:

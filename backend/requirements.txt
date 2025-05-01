@@ -6,3 +6,5 @@ psycopg2-binary
 pydantic-settings
 python-dotenv
 black
+beautifulsoup4
+httpx

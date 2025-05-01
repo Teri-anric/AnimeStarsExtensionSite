@@ -50,15 +50,26 @@ services:
     volumes:
       - ./db:/var/lib/postgresql/data
 
-  nginx:
-    build:
-      context: nginx
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-      - "443:443"
+    nginx:
+      build:
+        context: nginx
+        dockerfile: Dockerfile
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      depends_on:
+        - backend
+        - frontend
+
+  proxy:
+    image: mitmproxy/mitmproxy
+    command: mitmdump --mode socks5 --listen-host 0.0.0.0 --listen-port 8080 --set block_global=false --set ssl_insecure=true
+    restart: unless-stopped
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - backend
-      - frontend
+      - ./.mitmproxy:/home/mitmproxy/.mitmproxy
+    expose:
+      - 8080
+    networks:
+      - animestars-network

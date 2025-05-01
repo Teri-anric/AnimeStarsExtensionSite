@@ -1,14 +1,19 @@
-from sqlalchemy import Column, String, Enum, Integer, ForeignKey
+import uuid
+
+from sqlalchemy import Column, String, Enum, UUID, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 from ...enum import CardType, CardCollection
-from ..base import Base
+from ..base import Base, TimestampMixin
 from .user import AnimestarsUser
+from .summary_card_users import SummaryCardUsers
 
 
-class Card(Base):
+class Card(Base, TimestampMixin):
     __tablename__ = "animestars_cards"
 
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(UUID, primary_key=True, default=uuid.uuid4)
+
+    card_id: int = Column(Integer, nullable=False, index=True, unique=True)
 
     name: str = Column(String, nullable=False)
     rank: CardType = Column(Enum(CardType), nullable=False)
@@ -21,6 +26,12 @@ class Card(Base):
     image: str = Column(String, nullable=False)
     mp4: str = Column(String, nullable=True)
     webm: str = Column(String, nullable=True)
+
+    summary_card_users = relationship(
+        SummaryCardUsers,
+        back_populates="card",
+        cascade="all, delete",
+    )
 
     author_user = relationship(
         AnimestarsUser,

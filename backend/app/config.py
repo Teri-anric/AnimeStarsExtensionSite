@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine.url import URL
-
+from pydantic import Field
 
 class DatabaseSettings(BaseSettings):
     user: str
@@ -17,6 +17,7 @@ class DatabaseSettings(BaseSettings):
             password=self.password,
             host=self.host,
             port=self.port,
+            database=self.db,
         )
 
     @property
@@ -25,12 +26,22 @@ class DatabaseSettings(BaseSettings):
             "postgresql",
             username=self.user,
             password=self.password,
+            host=self.host,
+            port=self.port,
+            database=self.db,
         )
+
+
+class ParserSettings(BaseSettings):
+    proxy: str | None = None
+    base_url: str | None = None
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")
+
     database: DatabaseSettings
+    parser: ParserSettings = Field(default_factory=ParserSettings)
 
 
 settings = Settings()

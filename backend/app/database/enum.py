@@ -22,3 +22,8 @@ class CardState(Enum):
     LOCKED = "locked"
     FRIENDS_ONLY = "friends_only"
     TROPHY = "trophy"
+
+
+class SummaryCardState(Enum):
+    LOCKED = "locked"
+    UNLOCKED = "unlocked"
