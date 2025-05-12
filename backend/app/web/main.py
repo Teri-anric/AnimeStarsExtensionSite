@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .api import router as api_router
 
-app = FastAPI()
+app = FastAPI(title="Anime Stars", description="Unofficial Anime Stars API")
 app.include_router(api_router)
 
 

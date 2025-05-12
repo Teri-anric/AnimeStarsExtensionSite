@@ -1,6 +1,8 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine.url import URL
 from pydantic import Field
+from secrets import token_hex
+
 
 class DatabaseSettings(BaseSettings):
     user: str
@@ -37,11 +39,18 @@ class ParserSettings(BaseSettings):
     base_url: str | None = None
 
 
+class AuthSettings(BaseSettings):
+    secret_key: str = token_hex(32)
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")
 
     database: DatabaseSettings
     parser: ParserSettings = Field(default_factory=ParserSettings)
+    auth: AuthSettings = Field(default_factory=AuthSettings)
 
 
 settings = Settings()
