@@ -1,11 +1,62 @@
+@import './styles/components/auth.css';
+@import './styles/components/header.css';
+@import './styles/components/app-layout.css';
+@import './styles/components/random-gif.css';
+
 :root {
+  /* Background Colors */
+  --bg:  #171818;
+  --bg-2: #191a1b;
+
+  --bg-image: url('/images/bg.png');
+
+  /* Text Colors */
+  --tt: #161616;
+  --tt-2: #9da5b1;
+  --tt-3: #777;
+
+  /* State Colors */
+  --rating-bg-green: #eefbf3;
+  --rating-bg-red: #fff1f1;
+
+  /* Border Colors */
+  --bdc: #191a1b;
+  --bdc-darker: #b1b1b1;
+  --bdc-3: rgba(255,255,255,0.15);
+
+  /* Accent Colors */
+  --accent: #9e294f;
+  --accent-s: #772ce8;
+  --accent-darker: #f06102;
+  --accent-green: #4CAF50;
+  --accent-red: #F44336;
+  --accent-grass: #8BC34A;
+  --accent-gray: #9E9E9E;
+  --accent-gold: #FFC107;
+  --accent-2: #2196F3;
+  --accent-black-v: rgba(0,0,0,0.1);
+
+  /* UI Colors */
+  --ui-bg: #191a1b;
+  --ui-bg-2: #191a1b;
+  --ui-bg-3: #191a1b;
+  --ui-bg-accent: #333;
+  --ui-text-color-on-accent: #fff;
+  --ui-bdc: #191a1b;
+
+  /* Other Variables */
+  --indent: 50px;
+  --indent-negative: -50px;
+  --main-border-radius: 8px;
+
+  /* Font and Base Styles */
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: dark;
+  color: var(--tt);
+  background-color: var(--bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,13 +64,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -28,6 +78,18 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  color: var(--tt);
+  background-color: var(--bg);
+}
+
+a {
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: var(--accent-s);
 }
 
 h1 {
@@ -36,33 +98,23 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
+  border-radius: var(--main-border-radius);
+  border: 1px solid var(--bdc);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--ui-bg);
+  color: var(--tt);
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
-  border-color: #646cff;
+  border-color: var(--accent);
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }

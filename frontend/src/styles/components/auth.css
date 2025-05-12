@@ -1,0 +1,97 @@
+/* Authentication Page Styles */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 1rem;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background-color: var(--bg-pr);
+  border-radius: var(--main-border-radius);
+  box-shadow: 0 4px 8px var(--accent-black-v);
+}
+
+.login-form,
+.register-form {
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--bdc);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--accent);
+  color: var(--ui-text-color-on-accent);
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-button:hover {
+  background-color: var(--accent-darker);
+}
+
+.submit-button:disabled {
+  background-color: var(--tt-2);
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: var(--accent-red);
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: var(--rating-bg-red);
+  border-radius: 4px;
+}
+
+.auth-toggle {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.text-button {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: inherit;
+  text-decoration: underline;
+}
+
+.login-button {
+  padding: 0.5rem 1rem;
+  background-color: var(--accent);
+  color: var(--ui-text-color-on-accent);
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.login-button:hover {
+  background-color: var(--accent-darker);
+} 

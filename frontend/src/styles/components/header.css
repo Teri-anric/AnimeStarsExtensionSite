@@ -1,0 +1,45 @@
+/* Header Styles */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: var(--ui-bg-accent);
+  color: var(--ui-text-color-on-accent);
+}
+
+.header-logo a {
+  color: var(--ui-text-color-on-accent);
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.username {
+  font-weight: 500;
+}
+
+.logout-button {
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  border: 1px solid var(--bdc-dark);
+  color: var(--ui-text-color-on-accent);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+} 

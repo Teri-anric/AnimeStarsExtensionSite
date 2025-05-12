@@ -26,6 +26,236 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const CardCollection = {
+    Trade: 'trade',
+    Need: 'need',
+    Owned: 'owned'
+} as const;
+
+export type CardCollection = typeof CardCollection[keyof typeof CardCollection];
+
+
+/**
+ * 
+ * @export
+ * @interface CardId
+ */
+export interface CardId {
+}
+/**
+ * 
+ * @export
+ * @interface CardPaginationResponse
+ */
+export interface CardPaginationResponse {
+    /**
+     * 
+     * @type {number}
+     * @memberof CardPaginationResponse
+     */
+    'total': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardPaginationResponse
+     */
+    'page': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardPaginationResponse
+     */
+    'per_page': number;
+    /**
+     * 
+     * @type {Array<CardSchema>}
+     * @memberof CardPaginationResponse
+     */
+    'items': Array<CardSchema>;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardPaginationResponse
+     */
+    'total_pages': number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CardPaginationResponse
+     */
+    'has_next': boolean;
+}
+/**
+ * 
+ * @export
+ * @interface CardSchema
+ */
+export interface CardSchema {
+    /**
+     * 
+     * @type {string}
+     * @memberof CardSchema
+     */
+    'id': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardSchema
+     */
+    'card_id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardSchema
+     */
+    'name': string;
+    /**
+     * 
+     * @type {CardType}
+     * @memberof CardSchema
+     */
+    'rank': CardType;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardSchema
+     */
+    'anime_name': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardSchema
+     */
+    'anime_link': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardSchema
+     */
+    'author': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardSchema
+     */
+    'image': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardSchema
+     */
+    'mp4': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardSchema
+     */
+    'webm': string | null;
+}
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const CardType = {
+    Ass: 'ass',
+    S: 's',
+    A: 'a',
+    B: 'b',
+    C: 'c',
+    D: 'd',
+    E: 'e'
+} as const;
+
+export type CardType = typeof CardType[keyof typeof CardType];
+
+
+/**
+ * 
+ * @export
+ * @interface CardUsersSummaryResponse
+ */
+export interface CardUsersSummaryResponse {
+    /**
+     * 
+     * @type {CardUsersSummarySchema}
+     * @memberof CardUsersSummaryResponse
+     */
+    'owned'?: CardUsersSummarySchema | null;
+    /**
+     * 
+     * @type {CardUsersSummarySchema}
+     * @memberof CardUsersSummaryResponse
+     */
+    'trade'?: CardUsersSummarySchema | null;
+    /**
+     * 
+     * @type {CardUsersSummarySchema}
+     * @memberof CardUsersSummaryResponse
+     */
+    'need'?: CardUsersSummarySchema | null;
+}
+/**
+ * 
+ * @export
+ * @interface CardUsersSummarySchema
+ */
+export interface CardUsersSummarySchema {
+    /**
+     * 
+     * @type {string}
+     * @memberof CardUsersSummarySchema
+     */
+    'id': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardUsersSummarySchema
+     */
+    'card_id': number;
+    /**
+     * 
+     * @type {CardCollection}
+     * @memberof CardUsersSummarySchema
+     */
+    'collection': CardCollection;
+    /**
+     * 
+     * @type {SummaryCardState}
+     * @memberof CardUsersSummarySchema
+     */
+    'state': SummaryCardState;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardUsersSummarySchema
+     */
+    'count': number;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface HTTPValidationError
+ */
+export interface HTTPValidationError {
+    /**
+     * 
+     * @type {Array<ValidationError>}
+     * @memberof HTTPValidationError
+     */
+    'detail'?: Array<ValidationError>;
+}
+/**
+ * 
+ * @export
  * @interface HealthResponse
  */
 export interface HealthResponse {
@@ -36,6 +266,936 @@ export interface HealthResponse {
      */
     'status': string;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const SummaryCardState = {
+    Locked: 'locked',
+    Unlocked: 'unlocked'
+} as const;
+
+export type SummaryCardState = typeof SummaryCardState[keyof typeof SummaryCardState];
+
+
+/**
+ * 
+ * @export
+ * @interface Token
+ */
+export interface Token {
+    /**
+     * 
+     * @type {string}
+     * @memberof Token
+     */
+    'access_token': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Token
+     */
+    'token_type'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface UserCreate
+ */
+export interface UserCreate {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserCreate
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserCreate
+     */
+    'password': string;
+}
+/**
+ * 
+ * @export
+ * @interface UserResponse
+ */
+export interface UserResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResponse
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UserResponse
+     */
+    'is_active': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResponse
+     */
+    'created_at': string;
+}
+/**
+ * 
+ * @export
+ * @interface ValidationError
+ */
+export interface ValidationError {
+    /**
+     * 
+     * @type {Array<ValidationErrorLocInner>}
+     * @memberof ValidationError
+     */
+    'loc': Array<ValidationErrorLocInner>;
+    /**
+     * 
+     * @type {string}
+     * @memberof ValidationError
+     */
+    'msg': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ValidationError
+     */
+    'type': string;
+}
+/**
+ * 
+ * @export
+ * @interface ValidationErrorLocInner
+ */
+export interface ValidationErrorLocInner {
+}
+
+/**
+ * AuthApi - axios parameter creator
+ * @export
+ */
+export const AuthApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Login
+         * @param {string} username 
+         * @param {string} password 
+         * @param {string | null} [grantType] 
+         * @param {string} [scope] 
+         * @param {string | null} [clientId] 
+         * @param {string | null} [clientSecret] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        loginApiAuthLoginPost: async (username: string, password: string, grantType?: string | null, scope?: string, clientId?: string | null, clientSecret?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'username' is not null or undefined
+            assertParamExists('loginApiAuthLoginPost', 'username', username)
+            // verify required parameter 'password' is not null or undefined
+            assertParamExists('loginApiAuthLoginPost', 'password', password)
+            const localVarPath = `/api/auth/login`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new URLSearchParams();
+
+
+            if (grantType !== undefined) { 
+                localVarFormParams.set('grant_type', grantType as any);
+            }
+    
+            if (username !== undefined) { 
+                localVarFormParams.set('username', username as any);
+            }
+    
+            if (password !== undefined) { 
+                localVarFormParams.set('password', password as any);
+            }
+    
+            if (scope !== undefined) { 
+                localVarFormParams.set('scope', scope as any);
+            }
+    
+            if (clientId !== undefined) { 
+                localVarFormParams.set('client_id', clientId as any);
+            }
+    
+            if (clientSecret !== undefined) { 
+                localVarFormParams.set('client_secret', clientSecret as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'application/x-www-form-urlencoded';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams.toString();
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Logout
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        logoutApiAuthLogoutPost: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/auth/logout`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Read Users Me
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        readUsersMeApiAuthMeGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/auth/me`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Register
+         * @param {UserCreate} userCreate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        registerApiAuthRegisterPost: async (userCreate: UserCreate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userCreate' is not null or undefined
+            assertParamExists('registerApiAuthRegisterPost', 'userCreate', userCreate)
+            const localVarPath = `/api/auth/register`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(userCreate, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AuthApi - functional programming interface
+ * @export
+ */
+export const AuthApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AuthApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Login
+         * @param {string} username 
+         * @param {string} password 
+         * @param {string | null} [grantType] 
+         * @param {string} [scope] 
+         * @param {string | null} [clientId] 
+         * @param {string | null} [clientSecret] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async loginApiAuthLoginPost(username: string, password: string, grantType?: string | null, scope?: string, clientId?: string | null, clientSecret?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Token>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.loginApiAuthLoginPost(username, password, grantType, scope, clientId, clientSecret, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.loginApiAuthLoginPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Logout
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async logoutApiAuthLogoutPost(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.logoutApiAuthLogoutPost(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.logoutApiAuthLogoutPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Read Users Me
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async readUsersMeApiAuthMeGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.readUsersMeApiAuthMeGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.readUsersMeApiAuthMeGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Register
+         * @param {UserCreate} userCreate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async registerApiAuthRegisterPost(userCreate: UserCreate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.registerApiAuthRegisterPost(userCreate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.registerApiAuthRegisterPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * AuthApi - factory interface
+ * @export
+ */
+export const AuthApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AuthApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Login
+         * @param {string} username 
+         * @param {string} password 
+         * @param {string | null} [grantType] 
+         * @param {string} [scope] 
+         * @param {string | null} [clientId] 
+         * @param {string | null} [clientSecret] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        loginApiAuthLoginPost(username: string, password: string, grantType?: string | null, scope?: string, clientId?: string | null, clientSecret?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<Token> {
+            return localVarFp.loginApiAuthLoginPost(username, password, grantType, scope, clientId, clientSecret, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Logout
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        logoutApiAuthLogoutPost(options?: RawAxiosRequestConfig): AxiosPromise<any> {
+            return localVarFp.logoutApiAuthLogoutPost(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Read Users Me
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        readUsersMeApiAuthMeGet(options?: RawAxiosRequestConfig): AxiosPromise<UserResponse> {
+            return localVarFp.readUsersMeApiAuthMeGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Register
+         * @param {UserCreate} userCreate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        registerApiAuthRegisterPost(userCreate: UserCreate, options?: RawAxiosRequestConfig): AxiosPromise<UserResponse> {
+            return localVarFp.registerApiAuthRegisterPost(userCreate, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AuthApi - object-oriented interface
+ * @export
+ * @class AuthApi
+ * @extends {BaseAPI}
+ */
+export class AuthApi extends BaseAPI {
+    /**
+     * 
+     * @summary Login
+     * @param {string} username 
+     * @param {string} password 
+     * @param {string | null} [grantType] 
+     * @param {string} [scope] 
+     * @param {string | null} [clientId] 
+     * @param {string | null} [clientSecret] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public loginApiAuthLoginPost(username: string, password: string, grantType?: string | null, scope?: string, clientId?: string | null, clientSecret?: string | null, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).loginApiAuthLoginPost(username, password, grantType, scope, clientId, clientSecret, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Logout
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public logoutApiAuthLogoutPost(options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).logoutApiAuthLogoutPost(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Read Users Me
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public readUsersMeApiAuthMeGet(options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).readUsersMeApiAuthMeGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Register
+     * @param {UserCreate} userCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public registerApiAuthRegisterPost(userCreate: UserCreate, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).registerApiAuthRegisterPost(userCreate, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * CardApi - axios parameter creator
+ * @export
+ */
+export const CardApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Get Card
+         * @param {CardId} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCardApiCardCardIdGet: async (cardId: CardId, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'cardId' is not null or undefined
+            assertParamExists('getCardApiCardCardIdGet', 'cardId', cardId)
+            const localVarPath = `/api/card/{card_id}`
+                .replace(`{${"card_id"}}`, encodeURIComponent(String(cardId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get Card Users Summary
+         * @param {CardId} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCardUsersSummaryApiCardCardIdUsersSummaryGet: async (cardId: CardId, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'cardId' is not null or undefined
+            assertParamExists('getCardUsersSummaryApiCardCardIdUsersSummaryGet', 'cardId', cardId)
+            const localVarPath = `/api/card/{card_id}/users/summary`
+                .replace(`{${"card_id"}}`, encodeURIComponent(String(cardId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get Card Users Summary By Collection
+         * @param {CardId} cardId 
+         * @param {CardCollection} collection 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet: async (cardId: CardId, collection: CardCollection, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'cardId' is not null or undefined
+            assertParamExists('getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet', 'cardId', cardId)
+            // verify required parameter 'collection' is not null or undefined
+            assertParamExists('getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet', 'collection', collection)
+            const localVarPath = `/api/card/{card_id}/users/summary/{collection}`
+                .replace(`{${"card_id"}}`, encodeURIComponent(String(cardId)))
+                .replace(`{${"collection"}}`, encodeURIComponent(String(collection)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get Cards
+         * @param {string} [id] Filter by ID of the card
+         * @param {number} [cardId] Filter by Card ID of the card
+         * @param {string} [name] Filter by Name of the card
+         * @param {CardType} [rank] Filter by Rank of the card
+         * @param {string | null} [animeName] Filter by Anime Name of the card
+         * @param {string | null} [animeLink] Filter by Anime Link of the card
+         * @param {string | null} [author] Filter by Author of the card
+         * @param {string | null} [image] Filter by Image of the card
+         * @param {string | null} [mp4] Filter by MP4 of the card
+         * @param {string | null} [webm] Filter by WebM of the card
+         * @param {number} [page] 
+         * @param {number} [perPage] 
+         * @param {GetCardsApiCardGetSortEnum} [sort] Sort by the card
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCardsApiCardGet: async (id?: string, cardId?: number, name?: string, rank?: CardType, animeName?: string | null, animeLink?: string | null, author?: string | null, image?: string | null, mp4?: string | null, webm?: string | null, page?: number, perPage?: number, sort?: GetCardsApiCardGetSortEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/card/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (id !== undefined) {
+                localVarQueryParameter['id'] = id;
+            }
+
+            if (cardId !== undefined) {
+                localVarQueryParameter['card_id'] = cardId;
+            }
+
+            if (name !== undefined) {
+                localVarQueryParameter['name'] = name;
+            }
+
+            if (rank !== undefined) {
+                localVarQueryParameter['rank'] = rank;
+            }
+
+            if (animeName !== undefined) {
+                localVarQueryParameter['anime_name'] = animeName;
+            }
+
+            if (animeLink !== undefined) {
+                localVarQueryParameter['anime_link'] = animeLink;
+            }
+
+            if (author !== undefined) {
+                localVarQueryParameter['author'] = author;
+            }
+
+            if (image !== undefined) {
+                localVarQueryParameter['image'] = image;
+            }
+
+            if (mp4 !== undefined) {
+                localVarQueryParameter['mp4'] = mp4;
+            }
+
+            if (webm !== undefined) {
+                localVarQueryParameter['webm'] = webm;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (perPage !== undefined) {
+                localVarQueryParameter['per_page'] = perPage;
+            }
+
+            if (sort !== undefined) {
+                localVarQueryParameter['sort'] = sort;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * CardApi - functional programming interface
+ * @export
+ */
+export const CardApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = CardApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Get Card
+         * @param {CardId} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCardApiCardCardIdGet(cardId: CardId, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardSchema>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCardApiCardCardIdGet(cardId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CardApi.getCardApiCardCardIdGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get Card Users Summary
+         * @param {CardId} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId: CardId, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardUsersSummaryResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CardApi.getCardUsersSummaryApiCardCardIdUsersSummaryGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get Card Users Summary By Collection
+         * @param {CardId} cardId 
+         * @param {CardCollection} collection 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId: CardId, collection: CardCollection, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardUsersSummarySchema>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId, collection, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CardApi.getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get Cards
+         * @param {string} [id] Filter by ID of the card
+         * @param {number} [cardId] Filter by Card ID of the card
+         * @param {string} [name] Filter by Name of the card
+         * @param {CardType} [rank] Filter by Rank of the card
+         * @param {string | null} [animeName] Filter by Anime Name of the card
+         * @param {string | null} [animeLink] Filter by Anime Link of the card
+         * @param {string | null} [author] Filter by Author of the card
+         * @param {string | null} [image] Filter by Image of the card
+         * @param {string | null} [mp4] Filter by MP4 of the card
+         * @param {string | null} [webm] Filter by WebM of the card
+         * @param {number} [page] 
+         * @param {number} [perPage] 
+         * @param {GetCardsApiCardGetSortEnum} [sort] Sort by the card
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCardsApiCardGet(id?: string, cardId?: number, name?: string, rank?: CardType, animeName?: string | null, animeLink?: string | null, author?: string | null, image?: string | null, mp4?: string | null, webm?: string | null, page?: number, perPage?: number, sort?: GetCardsApiCardGetSortEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardPaginationResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCardsApiCardGet(id, cardId, name, rank, animeName, animeLink, author, image, mp4, webm, page, perPage, sort, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CardApi.getCardsApiCardGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * CardApi - factory interface
+ * @export
+ */
+export const CardApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = CardApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Get Card
+         * @param {CardId} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCardApiCardCardIdGet(cardId: CardId, options?: RawAxiosRequestConfig): AxiosPromise<CardSchema> {
+            return localVarFp.getCardApiCardCardIdGet(cardId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get Card Users Summary
+         * @param {CardId} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId: CardId, options?: RawAxiosRequestConfig): AxiosPromise<CardUsersSummaryResponse> {
+            return localVarFp.getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get Card Users Summary By Collection
+         * @param {CardId} cardId 
+         * @param {CardCollection} collection 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId: CardId, collection: CardCollection, options?: RawAxiosRequestConfig): AxiosPromise<CardUsersSummarySchema> {
+            return localVarFp.getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId, collection, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get Cards
+         * @param {string} [id] Filter by ID of the card
+         * @param {number} [cardId] Filter by Card ID of the card
+         * @param {string} [name] Filter by Name of the card
+         * @param {CardType} [rank] Filter by Rank of the card
+         * @param {string | null} [animeName] Filter by Anime Name of the card
+         * @param {string | null} [animeLink] Filter by Anime Link of the card
+         * @param {string | null} [author] Filter by Author of the card
+         * @param {string | null} [image] Filter by Image of the card
+         * @param {string | null} [mp4] Filter by MP4 of the card
+         * @param {string | null} [webm] Filter by WebM of the card
+         * @param {number} [page] 
+         * @param {number} [perPage] 
+         * @param {GetCardsApiCardGetSortEnum} [sort] Sort by the card
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCardsApiCardGet(id?: string, cardId?: number, name?: string, rank?: CardType, animeName?: string | null, animeLink?: string | null, author?: string | null, image?: string | null, mp4?: string | null, webm?: string | null, page?: number, perPage?: number, sort?: GetCardsApiCardGetSortEnum, options?: RawAxiosRequestConfig): AxiosPromise<CardPaginationResponse> {
+            return localVarFp.getCardsApiCardGet(id, cardId, name, rank, animeName, animeLink, author, image, mp4, webm, page, perPage, sort, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * CardApi - object-oriented interface
+ * @export
+ * @class CardApi
+ * @extends {BaseAPI}
+ */
+export class CardApi extends BaseAPI {
+    /**
+     * 
+     * @summary Get Card
+     * @param {CardId} cardId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CardApi
+     */
+    public getCardApiCardCardIdGet(cardId: CardId, options?: RawAxiosRequestConfig) {
+        return CardApiFp(this.configuration).getCardApiCardCardIdGet(cardId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get Card Users Summary
+     * @param {CardId} cardId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CardApi
+     */
+    public getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId: CardId, options?: RawAxiosRequestConfig) {
+        return CardApiFp(this.configuration).getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get Card Users Summary By Collection
+     * @param {CardId} cardId 
+     * @param {CardCollection} collection 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CardApi
+     */
+    public getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId: CardId, collection: CardCollection, options?: RawAxiosRequestConfig) {
+        return CardApiFp(this.configuration).getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId, collection, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get Cards
+     * @param {string} [id] Filter by ID of the card
+     * @param {number} [cardId] Filter by Card ID of the card
+     * @param {string} [name] Filter by Name of the card
+     * @param {CardType} [rank] Filter by Rank of the card
+     * @param {string | null} [animeName] Filter by Anime Name of the card
+     * @param {string | null} [animeLink] Filter by Anime Link of the card
+     * @param {string | null} [author] Filter by Author of the card
+     * @param {string | null} [image] Filter by Image of the card
+     * @param {string | null} [mp4] Filter by MP4 of the card
+     * @param {string | null} [webm] Filter by WebM of the card
+     * @param {number} [page] 
+     * @param {number} [perPage] 
+     * @param {GetCardsApiCardGetSortEnum} [sort] Sort by the card
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CardApi
+     */
+    public getCardsApiCardGet(id?: string, cardId?: number, name?: string, rank?: CardType, animeName?: string | null, animeLink?: string | null, author?: string | null, image?: string | null, mp4?: string | null, webm?: string | null, page?: number, perPage?: number, sort?: GetCardsApiCardGetSortEnum, options?: RawAxiosRequestConfig) {
+        return CardApiFp(this.configuration).getCardsApiCardGet(id, cardId, name, rank, animeName, animeLink, author, image, mp4, webm, page, perPage, sort, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+/**
+ * @export
+ */
+export const GetCardsApiCardGetSortEnum = {
+    IdAsc: 'id asc',
+    IdDesc: 'id desc',
+    Id: 'id',
+    CardIdAsc: 'card_id asc',
+    CardIdDesc: 'card_id desc',
+    CardId: 'card_id',
+    NameAsc: 'name asc',
+    NameDesc: 'name desc',
+    Name: 'name',
+    RankAsc: 'rank asc',
+    RankDesc: 'rank desc',
+    Rank: 'rank',
+    AnimeNameAsc: 'anime_name asc',
+    AnimeNameDesc: 'anime_name desc',
+    AnimeName: 'anime_name',
+    AnimeLinkAsc: 'anime_link asc',
+    AnimeLinkDesc: 'anime_link desc',
+    AnimeLink: 'anime_link',
+    AuthorAsc: 'author asc',
+    AuthorDesc: 'author desc',
+    Author: 'author',
+    ImageAsc: 'image asc',
+    ImageDesc: 'image desc',
+    Image: 'image',
+    Mp4Asc: 'mp4 asc',
+    Mp4Desc: 'mp4 desc',
+    Mp4: 'mp4',
+    WebmAsc: 'webm asc',
+    WebmDesc: 'webm desc',
+    Webm: 'webm'
+} as const;
+export type GetCardsApiCardGetSortEnum = typeof GetCardsApiCardGetSortEnum[keyof typeof GetCardsApiCardGetSortEnum];
+
 
 /**
  * DefaultApi - axios parameter creator

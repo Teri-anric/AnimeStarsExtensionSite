@@ -1,0 +1,27 @@
+/* Random GIF Component */
+.random-gif-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: var(--bg-2);
+}
+
+.anime-gif {
+  max-width: 100%;
+  border-radius: var(--main-border-radius);
+  box-shadow: 0 4px 12px var(--accent-black-v);
+  margin-top: 1.5rem;
+}
+
+.status-indicator {
+  background-color: var(--bg);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: var(--tt-2);
+  border: 1px solid var(--bdc);
+} 
