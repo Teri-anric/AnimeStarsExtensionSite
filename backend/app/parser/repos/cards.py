@@ -18,24 +18,24 @@ class AnimestarCardsRepo(AnimestarBaseRepo):
 
         soup = await self.get_page(f"/cards/page/{page}", params=params)
 
-        total = None
-        if _total_selector := soup.select_one(TOTAL_SELECTOR):
-            total = _total_selector.text.strip()
-
         cards = []
         for card in soup.select(CARD_SELECTOR):
             cards.append(
                 Card(
                     name=card["data-name"],
-                    id=card["data-id"],
+                    id=int(card["data-id"]),
                     rank=card["data-rank"].upper(),
-                    anime_name=card["data-anime-name"],
-                    anime_link=card["data-anime-link"],
-                    author=card["data-author"],
-                    image=card["data-image"],
-                    mp4=card["data-mp4"],
-                    webm=card["data-webm"],
+                    anime_name=card["data-anime-name"] or None,
+                    anime_link=card["data-anime-link"] or None,
+                    author=card["data-author"] or None,
+                    image=card["data-image"] or None,
+                    mp4=card["data-mp4"] or None,
+                    webm=card["data-webm"] or None,
                 )
             )
+        
+        total = len(cards)
+        if _total_selector := soup.select_one(TOTAL_SELECTOR):
+            total = _total_selector.text.strip()
 
         return self.parse_pagination(soup, PaginatedCards, total=total, cards=cards)

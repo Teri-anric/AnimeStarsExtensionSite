@@ -12,14 +12,14 @@ class SummaryCardUsers(Base, TimestampMixin):
 
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
 
-    card_id: int = Column(Integer, ForeignKey("animestars_cards.id"), nullable=False, index=True)
+    card_id: int = Column(Integer, ForeignKey("animestars_cards.card_id"), nullable=False, index=True)
     collection: CardCollection = Column(Enum(CardCollection), nullable=False, index=True)
 
     state: SummaryCardState = Column(Enum(SummaryCardState), nullable=False)
 
     count: int = Column(Integer, nullable=False)
 
-    card = relationship(
-        "animestars_cards",
-        back_populates="summary_card_users",
-    )
+    # card = relationship(
+    #     "animestars_cards",
+    #     # back_populates="summary_card_users",
+    # )

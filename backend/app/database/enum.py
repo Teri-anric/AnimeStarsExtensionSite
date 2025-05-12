@@ -12,16 +12,9 @@ class CardType(Enum):
 
 
 class CardCollection(Enum):
-    TRADE = "trade"
+    TRADE = "trade" 
     NEED = "need"
     OWNED = "owned"
-
-
-class CardState(Enum):
-    ON_TRADE = "on_trade"
-    LOCKED = "locked"
-    FRIENDS_ONLY = "friends_only"
-    TROPHY = "trophy"
 
 
 class SummaryCardState(Enum):

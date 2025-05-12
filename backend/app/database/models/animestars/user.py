@@ -11,12 +11,12 @@ class AnimestarsUser(Base, TimestampMixin):
 
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
 
-    username: str = Column(String, nullable=False)
+    username: str = Column(String, unique=True, nullable=False)
 
-    author_cards = relationship(
-        "animestars_cards",
-        primaryjoin="animestars_cards.author == animestars_users.username",
-    )
+    # author_cards = relationship(
+    #     "animestars_cards",
+    #     primaryjoin="Card.author == AnimestarsUser.username",
+    # )
 
     __table_args__ = (
         Index("idx_animestars_users_username", func.lower(username), unique=True),

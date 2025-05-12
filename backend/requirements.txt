@@ -8,3 +8,5 @@ python-dotenv
 black
 beautifulsoup4
 httpx
+apscheduler~=3.10.0
+httpx[http2]

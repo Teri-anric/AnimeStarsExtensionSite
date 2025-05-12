@@ -42,6 +42,12 @@ def upgrade() -> None:
         [sa.literal_column("lower(username)")],
         unique=True,
     )
+    op.create_index(
+        "uq_animestars_users_username_exact",
+        "animestars_users",
+        ["username"],
+        unique=True,
+    )
     op.create_table(
         "animestars_cards",
         sa.Column("id", sa.UUID(), nullable=False),
@@ -55,7 +61,7 @@ def upgrade() -> None:
         sa.Column("anime_name", sa.String(), nullable=True),
         sa.Column("anime_link", sa.String(), nullable=True),
         sa.Column("author", sa.String(), nullable=True),
-        sa.Column("image", sa.String(), nullable=False),
+        sa.Column("image", sa.String(), nullable=True),
         sa.Column("mp4", sa.String(), nullable=True),
         sa.Column("webm", sa.String(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
@@ -71,51 +77,6 @@ def upgrade() -> None:
         "animestars_cards",
         ["card_id"],
         unique=True,
-    )
-    op.create_table(
-        "animestars_card_users",
-        sa.Column("id", sa.UUID(), nullable=False),
-        sa.Column("card_id", sa.Integer(), nullable=False),
-        sa.Column("user_username", sa.String(), nullable=False),
-        sa.Column(
-            "collection",
-            COLLECTION_ENUM,
-            nullable=False,
-        ),
-        sa.Column(
-            "state",
-            CARD_STATE_ENUM,
-            nullable=True,
-        ),
-        sa.Column("created_at", sa.DateTime(), nullable=False),
-        sa.Column("updated_at", sa.DateTime(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["card_id"],
-            ["animestars_cards.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["user_username"],
-            ["animestars_users.username"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_index(
-        op.f("ix_animestars_card_users_card_id"),
-        "animestars_card_users",
-        ["card_id"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("ix_animestars_card_users_collection"),
-        "animestars_card_users",
-        ["collection"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("ix_animestars_card_users_user_username"),
-        "animestars_card_users",
-        ["user_username"],
-        unique=False,
     )
     op.create_table(
         "animestars_summary_card_users",
@@ -136,7 +97,7 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
             ["card_id"],
-            ["animestars_cards.id"],
+            ["animestars_cards.card_id"],
         ),
         sa.PrimaryKeyConstraint("id"),
     )

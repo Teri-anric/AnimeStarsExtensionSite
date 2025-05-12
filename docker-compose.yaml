@@ -37,6 +37,11 @@ services:
     depends_on:
       - db
 
+  scheduler:
+    <<: *backend-app
+    command: python -m app.scheduler
+    restart: unless-stopped
+
   db:
     image: postgres:16
     env_file:
@@ -64,3 +69,36 @@ services:
     depends_on:
       - backend
       - frontend
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN__EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN__PASSWORD}
+    configs:
+      - source: pgadmin_servers
+        target: /pgadmin4/servers.json
+
+configs:
+  pgadmin_servers:
+    content: |
+      {
+        "Servers": {
+          "1": {
+            "Name": "PostgreSQL",
+            "Group": "Servers",
+            "Host": "db",
+            "Port": ${DATABASE__PORT},
+            "MaintenanceDB": "${DATABASE__DB}",
+            "Username": "${DATABASE__USER}",
+            "Password": "${DATABASE__PASSWORD}",
+            "SavePassword": true,
+            "SSLMode": "prefer",
+            "ConnectNow": true
+          }
+        }
+      }

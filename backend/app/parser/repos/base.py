@@ -32,7 +32,12 @@ class AnimestarBaseRepo(AbstractAsyncContextManager):
     async def get_page(self, url: str, **kwargs) -> BeautifulSoup:
         try:
             resp = await self.client().get(url, **kwargs)
+            resp.raise_for_status()  # Raise an exception for 4XX/5XX responses
             return BeautifulSoup(await resp.aread(), "html.parser")
+        except httpx.HTTPStatusError as e:
+            raise AnimestarError(f"HTTP error {e.response.status_code} for {url}: {e.response.text}")
+        except httpx.RequestError as e:
+            raise AnimestarError(f"Request error for {url}: {e}")
         except Exception as e:
             raise AnimestarError(f"Failed to get page {url}: {e}")
 
@@ -67,17 +72,17 @@ class AnimestarBaseRepo(AbstractAsyncContextManager):
             return None
         return resp.json()
     
-    def parse_pagination(self, soup: BeautifulSoup, cls: type[PaginatedBase], total, **kwargs) -> PaginatedBase:
+    def parse_pagination(self, soup: BeautifulSoup, cls: type[PaginatedBase], total: int, **kwargs) -> PaginatedBase:
         CURRENT_PAGE_SELECTOR = ".pagination__pages > span:not(.nav_ext)"
         PAGES_SELECTOR = ".pagination__pages > span, .pagination__pages > a"
 
-        current_page = None
+        current_page = 1
         if _current_page_selector := soup.select_one(CURRENT_PAGE_SELECTOR):
             current_page = _current_page_selector.text.strip()
 
-        last_page = None
-        if _last_page_selector := soup.select(PAGES_SELECTOR)[-1]:
-            last_page = _last_page_selector.text.strip()
+        last_page = 1
+        if _last_page_selector := soup.select(PAGES_SELECTOR):
+            last_page = _last_page_selector[-1].text.strip()
     
         return cls(
             current_page=current_page,
@@ -110,10 +115,11 @@ class AnimestarBaseRepo(AbstractAsyncContextManager):
                 headers=self.DEFAULT_HEADERS,
                 cookies=self._get_cookie(),
                 proxy=self.proxy,
-                verify=False,
-                http1=False,
+                verify=True,
+                http1=True,
                 http2=True,
-                follow_redirects=True
+                follow_redirects=True,
+                timeout=30.0
             )
         return self._client
 
