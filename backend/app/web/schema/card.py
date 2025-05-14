@@ -92,7 +92,6 @@ class CardFilter(BaseSchema):
             if value is None:
                 continue
             filters.append(FilterProperty(property=key, operator=FilterProperty.Operator.EQ, value=value))
-
         return AndFilter(filters=filters)
 
 

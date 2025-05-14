@@ -5,15 +5,18 @@
   align-items: center;
   min-height: 80vh;
   padding: 1rem;
+  color: white !important;
 }
 
 .auth-container {
   width: 100%;
   max-width: 400px;
   padding: 2rem;
-  background-color: var(--bg-pr);
+  background-color: var(--ui-bg);
   border-radius: var(--main-border-radius);
-  box-shadow: 0 4px 8px var(--accent-black-v);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--bdc-3);
+  color: white !important;
 }
 
 .login-form,
@@ -23,75 +26,88 @@
 
 .form-group {
   margin-bottom: 1rem;
+  text-align: left;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
+  color: white !important;
 }
 
 .form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--bdc);
-  border-radius: 4px;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
   font-size: 1rem;
+  background-color: var(--ui-bg-2);
+  color: white !important;
 }
 
 .submit-button {
   width: 100%;
   padding: 0.75rem;
   background-color: var(--accent);
-  color: var(--ui-text-color-on-accent);
+  color: white !important;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--main-border-radius);
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .submit-button:hover {
-  background-color: var(--accent-darker);
+  background-color: var(--accent-s);
 }
 
 .submit-button:disabled {
-  background-color: var(--tt-2);
+  background-color: var(--ui-bg-accent);
+  opacity: 0.5;
   cursor: not-allowed;
+  color: #aaa !important;
 }
 
 .error-message {
-  color: var(--accent-red);
+  color: var(--accent-red) !important;
   margin-bottom: 1rem;
   padding: 0.5rem;
-  background-color: var(--rating-bg-red);
-  border-radius: 4px;
+  background-color: rgba(244, 67, 54, 0.1);
+  border-radius: var(--main-border-radius);
+  border-left: 3px solid var(--accent-red);
 }
 
 .auth-toggle {
   text-align: center;
   margin-top: 1rem;
+  color: #aaa !important;
 }
 
 .text-button {
   background: none;
   border: none;
-  color: var(--accent);
+  color: var(--accent) !important;
   cursor: pointer;
   font-size: inherit;
   text-decoration: underline;
+  padding: 0;
+}
+
+.text-button:hover {
+  color: var(--accent-s) !important;
 }
 
 .login-button {
   padding: 0.5rem 1rem;
   background-color: var(--accent);
-  color: var(--ui-text-color-on-accent);
+  color: white !important;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--main-border-radius);
   text-decoration: none;
   transition: background-color 0.2s;
 }
 
 .login-button:hover {
-  background-color: var(--accent-darker);
+  background-color: var(--accent-s);
 } 

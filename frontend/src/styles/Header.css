@@ -1,10 +1,9 @@
-/* Header Styles */
 .app-header {
   display: flex;
   align-items: center;
   padding: 15px 20px;
   background-color: var(--ui-bg);
-  color: white !important;
+  color: var(--tt);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   border-bottom: 1px solid var(--bdc-3);
 }
@@ -17,14 +16,14 @@
 .header-logo a {
   font-size: 24px;
   font-weight: bold;
-  color: var(--accent) !important;
+  color: var(--accent);
   text-decoration: none;
   transition: opacity 0.2s;
 }
 
 .header-logo a:hover {
   opacity: 0.9;
-  color: var(--accent-s) !important;
+  color: var(--accent-s);
 }
 
 .main-nav {
@@ -34,7 +33,7 @@
 }
 
 .nav-link {
-  color: #aaa !important;
+  color: var(--tt-2);
   text-decoration: none;
   padding: 8px 12px;
   border-radius: var(--main-border-radius);
@@ -43,12 +42,12 @@
 
 .nav-link:hover {
   background-color: var(--ui-bg-accent);
-  color: white !important;
+  color: var(--tt);
 }
 
 .nav-link.active {
   background-color: var(--accent);
-  color: white !important;
+  color: var(--ui-text-color-on-accent);
   font-weight: 600;
 }
 
@@ -64,8 +63,7 @@
 
 .username {
   margin-right: 10px;
-  color: #aaa !important;
-  font-weight: 500;
+  color: var(--tt-2);
 }
 
 .user-actions {
@@ -75,7 +73,7 @@
 
 .settings-link {
   display: inline-block;
-  color: white !important;
+  color: var(--tt);
   text-decoration: none;
   padding: 8px 15px;
   border-radius: var(--main-border-radius);
@@ -85,13 +83,13 @@
 
 .settings-link:hover {
   background-color: var(--accent);
-  color: white !important;
+  color: var(--ui-text-color-on-accent);
 }
 
 .logout-button {
   padding: 8px 15px;
   background-color: var(--ui-bg-accent);
-  color: white !important;
+  color: var(--tt);
   border: none;
   border-radius: var(--main-border-radius);
   cursor: pointer;
@@ -101,12 +99,12 @@
 
 .logout-button:hover {
   background-color: var(--accent-red);
-  color: white !important;
+  color: var(--ui-text-color-on-accent);
 }
 
 .login-button {
   display: inline-block;
-  color: white !important;
+  color: var(--ui-text-color-on-accent);
   text-decoration: none;
   padding: 8px 15px;
   border-radius: var(--main-border-radius);

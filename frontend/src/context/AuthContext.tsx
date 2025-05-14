@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       formData.append('username', username);
       formData.append('password', password);
       
-      const response = await axios.post('http://localhost:8000/api/auth/login', formData.toString(), {
+      const response = await axios.post(import.meta.env.VITE_API_URL + '/api/auth/login', formData.toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }

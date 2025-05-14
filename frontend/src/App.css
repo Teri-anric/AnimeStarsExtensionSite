@@ -2,19 +2,24 @@
   width: 100%;
   min-height: 100vh;
   text-align: center;
+  color: white !important;
 }
 
-body {
+body, html {
   margin: 0;
   padding: 0;
   min-height: 100vh;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--bg);
+  color: white !important;
 }
 
 .app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: var(--bg);
+  color: white !important;
 }
 
 .app-content {
@@ -22,6 +27,8 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  background-color: var(--bg);
+  color: white !important;
 }
 
 .logo {
@@ -30,11 +37,13 @@ body {
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em var(--accent));
 }
+
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em var(--accent-s));
 }
 
 @keyframes logo-spin {
@@ -57,32 +66,72 @@ body {
 }
 
 .read-the-docs {
-  color: #888;
+  color: #aaa;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #121212;
-    color: #e0e0e0;
-  }
-  
-  .auth-container {
-    background-color: #1e1e1e;
-    color: #e0e0e0;
-  }
-  
-  .status-indicator {
-    background-color: #2a2a2a;
-    color: #b0b0b0;
-  }
-  
-  .form-group input {
-    background-color: #333;
-    color: #fff;
-    border-color: #555;
-  }
-  
-  .error-message {
-    background-color: rgba(229, 57, 53, 0.2);
-  }
+/* Common form styles */
+input, select, textarea, button {
+  background-color: var(--ui-bg-2);
+  color: white !important;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+}
+
+input::placeholder {
+  color: #aaa;
+}
+
+/* Fix for text visibility */
+h1, h2, h3, h4, h5, h6, p, span, div, label, a, button {
+  color: white !important;
+}
+
+label {
+  color: white !important;
+}
+
+.form-group label {
+  color: white !important;
+}
+
+a {
+  color: var(--accent) !important;
+}
+
+a:hover {
+  color: var(--accent-s) !important;
+}
+
+button[type="submit"], .submit-button {
+  background-color: var(--accent) !important;
+  color: white !important;
+}
+
+button[type="submit"]:hover, .submit-button:hover {
+  background-color: var(--accent-s) !important;
+}
+
+.auth-container {
+  background-color: var(--ui-bg);
+  color: white !important;
+}
+
+.status-indicator {
+  background-color: var(--ui-bg-2);
+  color: #aaa !important;
+}
+
+.form-group input {
+  background-color: var(--ui-bg-2);
+  color: white !important;
+  border-color: var(--bdc-3);
+}
+
+.error-message {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: var(--accent-red) !important;
+}
+
+.loading {
+  color: white !important;
 }

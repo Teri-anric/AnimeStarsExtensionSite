@@ -1,15 +1,15 @@
-import { Configuration, DefaultApi, HealthApi } from '../client';
+import { Configuration, DefaultApi, HealthApi, CardApi } from '../client';
 
 /**
  * Creates an authenticated API client with the stored token
  */
-export const createAuthenticatedClient = <T extends DefaultApi | HealthApi>(
+export const createAuthenticatedClient = <T extends DefaultApi | HealthApi | CardApi>(
   ApiClass: new (config: Configuration) => T
 ): T => {
   const token = localStorage.getItem('token');
   
   const config = new Configuration({
-    basePath: 'http://localhost:8000',
+    basePath: import.meta.env.VITE_API_URL || 'http://localhost:8000',
     accessToken: token || undefined,
     isJsonMime: () => true
   });
@@ -20,11 +20,11 @@ export const createAuthenticatedClient = <T extends DefaultApi | HealthApi>(
 /**
  * Creates a basic API client without authentication
  */
-export const createClient = <T extends DefaultApi | HealthApi>(
+export const createClient = <T extends DefaultApi | HealthApi | CardApi>(
   ApiClass: new (config: Configuration) => T
 ): T => {
   const config = new Configuration({
-    basePath: 'http://localhost:8000',
+    basePath: import.meta.env.VITE_API_URL || 'http://localhost:8000',
     isJsonMime: () => true
   });
   

@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import '../styles/Header.css';
 
 const Header = () => {
   const { isAuthenticated, username, logout } = useAuth();
@@ -10,13 +11,29 @@ const Header = () => {
         <Link to="/">Anime Stars</Link>
       </div>
       
-      <nav className="header-nav">
+      {isAuthenticated && (
+        <nav className="main-nav">
+          <NavLink to="/cards" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            Cards
+          </NavLink>
+          <NavLink to="/random-gif" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            Random GIF
+          </NavLink>
+        </nav>
+      )}
+      
+      <nav className="user-nav">
         {isAuthenticated ? (
-          <div className="user-info">
+          <div className="user-menu">
             <span className="username">Welcome, {username}</span>
-            <button className="logout-button" onClick={logout}>
-              Logout
-            </button>
+            <div className="user-actions">
+              <Link to="/settings" className="settings-link">
+                Settings
+              </Link>
+              <button className="logout-button" onClick={logout}>
+                Logout
+              </button>
+            </div>
           </div>
         ) : (
           <Link to="/auth" className="login-button">

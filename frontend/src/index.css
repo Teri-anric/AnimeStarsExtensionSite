@@ -11,7 +11,7 @@
   --bg-image: url('/images/bg.png');
 
   /* Text Colors */
-  --tt: #161616;
+  --tt: white;
   --tt-2: #9da5b1;
   --tt-3: #777;
 
@@ -41,7 +41,7 @@
   --ui-bg-2: #191a1b;
   --ui-bg-3: #191a1b;
   --ui-bg-accent: #333;
-  --ui-text-color-on-accent: #fff;
+  --ui-text-color-on-accent: white;
   --ui-bdc: #191a1b;
 
   /* Other Variables */
@@ -55,7 +55,7 @@
   font-weight: 400;
 
   color-scheme: dark;
-  color: var(--tt);
+  color: white;
   background-color: var(--bg);
 
   font-synthesis: none;
@@ -78,7 +78,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  color: var(--tt);
+  color: white !important;
   background-color: var(--bg);
 }
 
@@ -95,6 +95,11 @@ a:hover {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  color: white !important;
+}
+
+h2, h3, h4, h5, h6, p, span, div {
+  color: white !important;
 }
 
 button {
@@ -105,7 +110,7 @@ button {
   font-weight: 500;
   font-family: inherit;
   background-color: var(--ui-bg);
-  color: var(--tt);
+  color: white !important;
   cursor: pointer;
   transition: border-color 0.25s;
 }

@@ -17,7 +17,7 @@ class PaginationRepository(BaseRepository, Generic[T], ABC):
     async def paginate(
         self, stmt: Select, query: PaginationQuery, *args, **kwargs
     ) -> Pagination[T]:
-        base_stmt =stmt # self._apply_filters(stmt, query.filter)
+        base_stmt = self._apply_filters(stmt, query.filter)
 
         stmt = self._apply_sorts(base_stmt, query.order_by)
         stmt = self._apply_pagination(stmt, query)

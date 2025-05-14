@@ -3,11 +3,12 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  color: white !important;
 }
 
 .app-content {
   flex: 1;
   padding: 1rem;
   background-color: var(--bg);
-  color: var(--tt);
+  color: white !important;
 } 
