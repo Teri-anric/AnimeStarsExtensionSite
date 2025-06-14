@@ -1,9 +1,9 @@
-api.animestars.strawberrycat.dev {
+ass-api.strawberrycat.dev {
     reverse_proxy http://backend:8000
 
 }
 
-animestars.strawberrycat.dev {
+ass.strawberrycat.dev {
     handle /* {
         root * /usr/share/nginx/html
         file_server

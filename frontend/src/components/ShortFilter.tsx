@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import '../styles/ShortFilter.css';
 
 interface ShortFilterProps {
@@ -20,6 +20,39 @@ const ShortFilter: React.FC<ShortFilterProps> = ({
   onRankFilterChange,
   onSearch
 }) => {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const animeNameInputRef = useRef<HTMLInputElement>(null);
+
+  const adjustInputWidth = (input: HTMLInputElement, value: string) => {
+    // Create a temporary span to measure text width
+    const span = document.createElement('span');
+    span.style.visibility = 'hidden';
+    span.style.position = 'absolute';
+    span.style.fontSize = '14px';
+    span.style.fontFamily = getComputedStyle(input).fontFamily;
+    span.style.padding = '0 10px';
+    span.textContent = value || input.placeholder;
+    
+    document.body.appendChild(span);
+    const textWidth = span.offsetWidth;
+    document.body.removeChild(span);
+    
+    // Set minimum width to 120px and add some padding
+    const newWidth = Math.max(120, textWidth + 20);
+    input.style.width = `${newWidth}px`;
+  };
+
+  useEffect(() => {
+    if (nameInputRef.current) {
+      adjustInputWidth(nameInputRef.current, nameFilter);
+    }
+  }, [nameFilter]);
+
+  useEffect(() => {
+    if (animeNameInputRef.current) {
+      adjustInputWidth(animeNameInputRef.current, animeNameFilter);
+    }
+  }, [animeNameFilter]);
   return (
     <div className="short-filter">
       <form onSubmit={onSearch} className="compact-form">
@@ -30,6 +63,7 @@ const ShortFilter: React.FC<ShortFilterProps> = ({
             onChange={(e) => onNameFilterChange(e.target.value)}
             placeholder="Card name or ID"
             className="compact-input"
+            ref={nameInputRef}
           />
           
           <input
@@ -38,6 +72,7 @@ const ShortFilter: React.FC<ShortFilterProps> = ({
             onChange={(e) => onAnimeNameFilterChange(e.target.value)}
             placeholder="Anime name"
             className="compact-input"
+            ref={animeNameInputRef}
           />
           
           <select

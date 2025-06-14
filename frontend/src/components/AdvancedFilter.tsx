@@ -63,9 +63,7 @@ const rankOptions = [
 ];
 
 const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose }) => {
-  const [rules, setRules] = useState<FilterRule[]>([
-    { id: '1', field: 'name', operator: 'ilike', value: '' }
-  ]);
+  const [rules, setRules] = useState<FilterRule[]>([]);
 
   const addRule = () => {
     const newRule: FilterRule = {

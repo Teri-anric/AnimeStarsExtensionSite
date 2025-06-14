@@ -8,6 +8,7 @@ x-backend-app: &backend-app
     - .env
   environment:
     - DATABASE__HOST=db
+    - PARSER__PROXY=socks5://proxy:8080
 
 x-frontend-app: &frontend-app
   build:

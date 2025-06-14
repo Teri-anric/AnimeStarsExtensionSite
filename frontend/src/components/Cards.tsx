@@ -198,18 +198,6 @@ const Cards = () => {
         />
       )}
 
-      {filterMode === 'advanced' && advancedFilter && (
-        <div className="active-advanced-filter">
-          <p>Advanced filter is active</p>
-          <button onClick={() => setShowAdvancedFilter(true)} className="edit-filter-button">
-            Edit Filter
-          </button>
-          <button onClick={() => {setAdvancedFilter(null); setFilterMode('short');}} className="clear-filter-button">
-            Clear Filter
-          </button>
-        </div>
-      )}
-      
       {loading ? (
         <div className="loading">Loading cards...</div>
       ) : error ? (

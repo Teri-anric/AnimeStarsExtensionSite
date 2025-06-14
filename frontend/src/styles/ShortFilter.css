@@ -24,11 +24,12 @@
   border-radius: var(--main-border-radius);
   font-size: 14px;
   min-width: 120px;
-  max-width: 180px;
-  flex: 1;
+  max-width: none;
+  flex: 0 0 auto;
   background-color: var(--ui-bg-2);
   color: white !important;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, width 0.2s;
+  width: 120px;
 }
 
 .compact-input:focus {
