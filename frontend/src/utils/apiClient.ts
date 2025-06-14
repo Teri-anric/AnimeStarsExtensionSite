@@ -1,7 +1,7 @@
 import { Configuration, DefaultApi, HealthApi, CardApi } from '../client';
 
 
-const basePath = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const basePath = import.meta.env.VITE_API_URL;
 
 /**
  * Creates an authenticated API client with the stored token
