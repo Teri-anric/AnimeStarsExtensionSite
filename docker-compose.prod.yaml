@@ -3,7 +3,8 @@ x-backend-app: &backend-app
     context: backend
     dockerfile: Dockerfile
   volumes:
-    - ./backend:/app
+    - ./backend/app:/app
+    - ./backend/migration:/migration
   env_file:
     - .env
   restart: unless-stopped
