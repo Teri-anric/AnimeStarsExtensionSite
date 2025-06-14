@@ -42,7 +42,8 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       const response = await authApi.registerApiAuthRegisterPost(userCreate);
       
       if (response.status === 200) {
-        navigate('/login');
+        onSuccess();
+        navigate('/auth');
       }
     } catch (err: any) {
       if (err.response?.data?.detail) {
