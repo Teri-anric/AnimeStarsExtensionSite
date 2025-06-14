@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { AuthApiFactory, UserCreate } from '../client/api';
 
 interface RegisterFormProps {
   onSuccess: () => void;
@@ -11,6 +12,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,14 +33,16 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     setLoading(true);
     
     try {
-      // Using axios directly because the client doesn't have registration endpoint yet
-      const response = await axios.post('http://localhost:8000/api/auth/register', {
+      const authApi = AuthApiFactory();
+      const userCreate: UserCreate = {
         username,
         password
-      });
+      };
+      
+      const response = await authApi.registerApiAuthRegisterPost(userCreate);
       
       if (response.status === 200) {
-        onSuccess();
+        navigate('/login');
       }
     } catch (err: any) {
       if (err.response?.data?.detail) {
