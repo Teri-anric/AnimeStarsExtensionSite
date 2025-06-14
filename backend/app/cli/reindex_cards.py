@@ -98,3 +98,6 @@ async def reindex_cards():
             break
         page += 1
 
+
+if __name__ == "__main__":
+    asyncio.run(reindex_cards())
