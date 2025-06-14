@@ -118,7 +118,7 @@ class AnimestarBaseRepo(AbstractAsyncContextManager):
                 headers=self.DEFAULT_HEADERS,
                 cookies=self._get_cookie(),
                 proxy=self.proxy,
-                verify=True,
+                verify=False,
                 http1=True,
                 http2=True,
                 follow_redirects=True,

@@ -42,3 +42,7 @@ clear:
 
 black:
 	docker compose run backend black .
+
+
+reindex-cards:
+	docker compose -f docker-compose.prod.yaml run backend python -m app.cli.reindex_cards
