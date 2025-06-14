@@ -6,6 +6,7 @@ x-backend-app: &backend-app
     - ./backend:/app
   env_file:
     - .env
+  restart: unless-stopped
   environment:
     - DATABASE__HOST=db
     - PARSER__PROXY=socks5://proxy:8080
@@ -36,7 +37,6 @@ services:
   scheduler:
     <<: *backend-app
     command: python -m app.scheduler
-    restart: unless-stopped
     depends_on:
       - db
 

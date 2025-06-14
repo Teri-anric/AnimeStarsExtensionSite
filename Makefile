@@ -6,14 +6,26 @@ frontend-api-client-build:
 build:
 	docker compose build
 
+build-prod:
+	docker compose -f docker-compose.prod.yaml build
+
 up:
 	docker compose up -d
+
+up-prod:
+	docker compose -f docker-compose.prod.yaml up -d
 
 down:
 	docker compose down --remove-orphans
 
+down-prod:
+	docker compose -f docker-compose.prod.yaml down --remove-orphans
+
 logs:
 	docker compose logs -f backend frontend
+
+logs-prod:
+	docker compose -f docker-compose.prod.yaml logs -f backend frontend scheduler
 
 migration-autogenerate:
 	docker compose run --remove-orphans backend python -m alembic revision --autogenerate

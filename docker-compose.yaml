@@ -2,6 +2,7 @@ x-backend-app: &backend-app
   build:
     context: backend
     dockerfile: Dockerfile
+  restart: unless-stopped
   volumes:
     - ./backend/app:/app
     - ./backend/migration:/migration
@@ -39,7 +40,6 @@ services:
   scheduler:
     <<: *backend-app
     command: python -m app.scheduler
-    restart: unless-stopped
 
   db:
     image: postgres:16
