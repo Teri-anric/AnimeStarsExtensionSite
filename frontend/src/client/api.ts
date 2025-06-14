@@ -472,6 +472,12 @@ export interface DeckSummarySchema {
      * @memberof DeckSummarySchema
      */
     'card_count': number;
+    /**
+     * First 6 cards for preview
+     * @type {Array<CardSchema>}
+     * @memberof DeckSummarySchema
+     */
+    'preview_cards'?: Array<CardSchema>;
 }
 /**
  * 
@@ -1480,11 +1486,10 @@ export const DeckApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getDeckDetailApiDeckAnimeLinkGet: async (animeLink: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getDeckDetailApiDeckDetailGet: async (animeLink: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'animeLink' is not null or undefined
-            assertParamExists('getDeckDetailApiDeckAnimeLinkGet', 'animeLink', animeLink)
-            const localVarPath = `/api/deck/{anime_link}`
-                .replace(`{${"anime_link"}}`, encodeURIComponent(String(animeLink)));
+            assertParamExists('getDeckDetailApiDeckDetailGet', 'animeLink', animeLink)
+            const localVarPath = `/api/deck/detail`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1495,6 +1500,10 @@ export const DeckApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (animeLink !== undefined) {
+                localVarQueryParameter['anime_link'] = animeLink;
+            }
 
 
     
@@ -1569,10 +1578,10 @@ export const DeckApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getDeckDetailApiDeckAnimeLinkGet(animeLink: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeckDetailSchema>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getDeckDetailApiDeckAnimeLinkGet(animeLink, options);
+        async getDeckDetailApiDeckDetailGet(animeLink: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeckDetailSchema>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDeckDetailApiDeckDetailGet(animeLink, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DeckApi.getDeckDetailApiDeckAnimeLinkGet']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DeckApi.getDeckDetailApiDeckDetailGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1607,8 +1616,8 @@ export const DeckApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getDeckDetailApiDeckAnimeLinkGet(animeLink: string, options?: RawAxiosRequestConfig): AxiosPromise<DeckDetailSchema> {
-            return localVarFp.getDeckDetailApiDeckAnimeLinkGet(animeLink, options).then((request) => request(axios, basePath));
+        getDeckDetailApiDeckDetailGet(animeLink: string, options?: RawAxiosRequestConfig): AxiosPromise<DeckDetailSchema> {
+            return localVarFp.getDeckDetailApiDeckDetailGet(animeLink, options).then((request) => request(axios, basePath));
         },
         /**
          * Get all decks (anime grouped by anime_link) with pagination and optional search
@@ -1640,8 +1649,8 @@ export class DeckApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DeckApi
      */
-    public getDeckDetailApiDeckAnimeLinkGet(animeLink: string, options?: RawAxiosRequestConfig) {
-        return DeckApiFp(this.configuration).getDeckDetailApiDeckAnimeLinkGet(animeLink, options).then((request) => request(this.axios, this.basePath));
+    public getDeckDetailApiDeckDetailGet(animeLink: string, options?: RawAxiosRequestConfig) {
+        return DeckApiFp(this.configuration).getDeckDetailApiDeckDetailGet(animeLink, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

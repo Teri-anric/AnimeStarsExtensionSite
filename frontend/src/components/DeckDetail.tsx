@@ -33,7 +33,7 @@ const DeckDetail: React.FC<DeckDetailProps> = ({ animeLink, onBack }) => {
       });
       
       const deckApi = new DeckApi(config);
-      const response = await deckApi.getDeckDetailApiDeckAnimeLinkGet(animeLink);
+      const response = await deckApi.getDeckDetailApiDeckDetailGet(animeLink);
       
       setDeck(response.data);
       setLoading(false);
@@ -100,12 +100,7 @@ const DeckDetail: React.FC<DeckDetailProps> = ({ animeLink, onBack }) => {
                     </video>
                   </div>
                 )}
-                <div className="card-info">
-                  <h3 className="card-name">{card.name}</h3>
-                  <p className="card-id">#{card.card_id}</p>
-                  <p className="card-rank">{card.rank}</p>
-                  {card.author && <p className="card-author">By: {card.author}</p>}
-                </div>
+
               </div>
             </div>
           ))}

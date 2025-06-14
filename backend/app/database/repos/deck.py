@@ -13,7 +13,7 @@ class DeckRepository(BaseRepository):
     """Repository for managing card decks grouped by anime_link"""
     
     async def get_all_decks(self, page: int = 1, per_page: int = 20):
-        """Get all decks (unique anime_link with card counts)"""
+        """Get all decks (unique anime_link with card counts) with first 6 cards"""
         offset = (page - 1) * per_page
         
         # Get unique anime_links with card counts
@@ -41,15 +41,28 @@ class DeckRepository(BaseRepository):
         total_result = await self.session.execute(count_stmt)
         total = total_result.scalar() or 0
         
+        # Get first 6 cards for each deck
+        deck_items = []
+        for deck in decks:
+            # Get first 6 cards for this deck
+            cards_stmt = (
+                select(Card)
+                .where(Card.anime_link == deck.anime_link)
+                .order_by(Card.card_id)
+                .limit(6)
+            )
+            cards_result = await self.session.execute(cards_stmt)
+            preview_cards = cards_result.scalars().all()
+            
+            deck_items.append({
+                'anime_link': deck.anime_link,
+                'anime_name': deck.anime_name,
+                'card_count': deck.card_count,
+                'preview_cards': preview_cards
+            })
+        
         return {
-            'items': [
-                {
-                    'anime_link': deck.anime_link,
-                    'anime_name': deck.anime_name,
-                    'card_count': deck.card_count
-                }
-                for deck in decks
-            ],
+            'items': deck_items,
             'total': total,
             'page': page,
             'per_page': per_page,
@@ -77,7 +90,7 @@ class DeckRepository(BaseRepository):
         }
     
     async def search_decks(self, query: str, page: int = 1, per_page: int = 20):
-        """Search decks by anime name"""
+        """Search decks by anime name with first 6 cards"""
         offset = (page - 1) * per_page
         
         stmt = (
@@ -110,15 +123,28 @@ class DeckRepository(BaseRepository):
         total_result = await self.session.execute(count_stmt)
         total = total_result.scalar() or 0
         
+        # Get first 6 cards for each deck
+        deck_items = []
+        for deck in decks:
+            # Get first 6 cards for this deck
+            cards_stmt = (
+                select(Card)
+                .where(Card.anime_link == deck.anime_link)
+                .order_by(Card.card_id)
+                .limit(6)
+            )
+            cards_result = await self.session.execute(cards_stmt)
+            preview_cards = cards_result.scalars().all()
+            
+            deck_items.append({
+                'anime_link': deck.anime_link,
+                'anime_name': deck.anime_name,
+                'card_count': deck.card_count,
+                'preview_cards': preview_cards
+            })
+        
         return {
-            'items': [
-                {
-                    'anime_link': deck.anime_link,
-                    'anime_name': deck.anime_name,
-                    'card_count': deck.card_count
-                }
-                for deck in decks
-            ],
+            'items': deck_items,
             'total': total,
             'page': page,
             'per_page': per_page,

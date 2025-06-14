@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useDomain } from '../context/DomainContext';
-import { Configuration, DeckApi, DeckSummarySchema, DeckPaginationResponse, DeckDetailSchema } from '../client';
+import { Configuration, DeckApi, DeckSummarySchema, DeckPaginationResponse } from '../client';
 import '../styles/Decks.css';
 
 interface DecksProps {
@@ -18,9 +18,6 @@ const Decks: React.FC<DecksProps> = ({ onDeckSelect }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [total, setTotal] = useState(0);
-  const [expandedDecks, setExpandedDecks] = useState<Set<string>>(new Set());
-  const [deckDetails, setDeckDetails] = useState<Map<string, DeckDetailSchema>>(new Map());
-  const [loadingDecks, setLoadingDecks] = useState<Set<string>>(new Set());
   const perPage = 20;
 
   useEffect(() => {
@@ -72,10 +69,17 @@ const Decks: React.FC<DecksProps> = ({ onDeckSelect }) => {
     if (onDeckSelect) {
       onDeckSelect(anime_link);
     } else {
-      // Fallback for when used without navigation
       console.log('Navigate to deck:', anime_link);
-      alert(`Deck selected: ${anime_link}`);
     }
+  };
+
+  const getCardMediaUrl = (path: string | null) => {
+    if (!path) return '';
+    return `${currentDomain}${path}`;
+  };
+
+  const getRankClass = (rank: string) => {
+    return `rank-${rank.toLowerCase()}`;
   };
 
   if (!isAuthenticated) {
@@ -116,23 +120,60 @@ const Decks: React.FC<DecksProps> = ({ onDeckSelect }) => {
             <p>Total decks: {total}</p>
           </div>
           
-          <div className="decks-grid">
+          <div className="decks-list">
             {decks.length > 0 ? decks.map((deck) => (
-              <div 
-                key={deck.anime_link} 
-                className="deck-card"
-                onClick={() => handleDeckClick(deck.anime_link)}
-              >
-                <div className="deck-info">
-                  <h3 className="deck-title">
-                    {deck.anime_name || 'Unknown Anime'}
-                  </h3>
-                  <p className="deck-card-count">
-                    {deck.card_count} card{deck.card_count !== 1 ? 's' : ''}
-                  </p>
-                  <div className="deck-link">
-                    <small>{deck.anime_link}</small>
+              <div key={deck.anime_link} className="deck-row">
+                <div className="deck-header-section">
+                  <div className="deck-info">
+                    <h2 className="deck-title">
+                      {deck.anime_name || 'Unknown Anime'}
+                    </h2>
+                    <div className="deck-meta">
+                      <span className="deck-card-count">
+                        {deck.card_count} card{deck.card_count !== 1 ? 's' : ''}
+                      </span>
+                      <span className="deck-link">
+                        {deck.anime_link}
+                      </span>
+                    </div>
                   </div>
+                  <button
+                    className="view-deck-button"
+                    onClick={() => handleDeckClick(deck.anime_link)}
+                  >
+                    View Full Deck
+                  </button>
+                </div>
+                
+                <div className="deck-preview-cards">
+                  {deck.preview_cards && deck.preview_cards.length > 0 ? (
+                    <div className="preview-cards-grid">
+                      {deck.preview_cards.map((card) => (
+                        <div key={card.id} className={`preview-card ${getRankClass(card.rank)}`}>
+                          {card.image && !card.mp4 && (
+                            <div className="card-image">
+                              <img 
+                                src={getCardMediaUrl(card.image)} 
+                                alt={card.name} 
+                                loading="lazy"
+                              />
+                            </div>
+                          )}
+                          {card.mp4 && (
+                            <div className="card-video">
+                              <video autoPlay loop muted playsInline>
+                                <source src={getCardMediaUrl(card.mp4)} type="video/mp4" />
+                                Your browser does not support the video tag.
+                              </video>
+                            </div>
+                          )}
+
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="no-preview-cards">No preview cards available</div>
+                  )}
                 </div>
               </div>
             )) : (

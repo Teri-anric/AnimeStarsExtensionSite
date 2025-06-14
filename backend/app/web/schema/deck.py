@@ -9,6 +9,7 @@ class DeckSummarySchema(BaseSchema):
     anime_link: str
     anime_name: str | None
     card_count: int
+    preview_cards: List[CardSchema] = Field(default_factory=list, description="First 6 cards for preview")
 
 
 class DeckPaginationResponse(BaseSchema):

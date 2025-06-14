@@ -27,9 +27,9 @@ async def get_decks(
     return DeckPaginationResponse(**result)
 
 
-@router.get("/{anime_link}")
+@router.get("/detail")
 async def get_deck_detail(
-    anime_link: str,
+    anime_link: Annotated[str, Query()],
     repo: DeckRepositoryDep = None,
 ) -> DeckDetailSchema:
     """Get detailed view of a specific deck with all its cards"""

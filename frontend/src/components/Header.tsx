@@ -19,6 +19,9 @@ const Header = () => {
           <NavLink to="/random-gif" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
             Random GIF
           </NavLink>
+          <NavLink to="/decks" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            Decks
+          </NavLink>
         </nav>
       )}
       
