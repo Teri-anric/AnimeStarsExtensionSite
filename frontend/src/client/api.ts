@@ -852,7 +852,7 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
-            if (configuration) {api/auth/register
+            if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
 
