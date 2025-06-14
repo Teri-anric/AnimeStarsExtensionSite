@@ -12,6 +12,9 @@
   background-color: var(--bg);
   padding: 10px 0;
   margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .cards-container h1 {
@@ -242,4 +245,106 @@
 .pagination span {
   font-size: 14px;
   color: white !important;
+}
+
+/* Filter mode components */
+.filter-mode-selector {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: 20px;
+}
+
+.filter-mode-button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--main-border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.filter-mode-button:hover {
+  background: var(--accent-s);
+  transform: translateY(-1px);
+}
+
+.filter-mode-button.active {
+  background: var(--accent-green);
+}
+
+.filter-mode-button.active:hover {
+  background: var(--accent-green-s);
+}
+
+.active-advanced-filter {
+  background: var(--ui-bg);
+  border: 1px solid var(--accent);
+  border-radius: var(--main-border-radius);
+  padding: 15px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.active-advanced-filter p {
+  margin: 0;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.edit-filter-button,
+.clear-filter-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: var(--main-border-radius);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.edit-filter-button {
+  background: var(--accent);
+  color: white;
+}
+
+.edit-filter-button:hover {
+  background: var(--accent-s);
+}
+
+.clear-filter-button {
+  background: var(--accent-red);
+  color: white;
+}
+
+.clear-filter-button:hover {
+  background: var(--accent-red-s);
+}
+
+/* Responsive adjustments for new components */
+@media (max-width: 768px) {
+  .cards-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .filter-mode-selector {
+    margin-left: 0;
+    justify-content: center;
+  }
+  
+  .active-advanced-filter {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .active-advanced-filter p {
+    margin-bottom: 10px;
+  }
 } 

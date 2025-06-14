@@ -2,7 +2,7 @@ from typing import TypeVar, Generic
 
 from pydantic import BaseModel, ConfigDict
 
-from .filter import Filter
+from .filter import BaseFilter
 from .order_by import OrderBy
 
 T = TypeVar("T")
@@ -30,4 +30,4 @@ class PaginationQuery(BaseModel):
     per_page: int = 10
 
     order_by: OrderBy | None = None
-    filter: Filter | None = None
+    filter: BaseFilter | None = None

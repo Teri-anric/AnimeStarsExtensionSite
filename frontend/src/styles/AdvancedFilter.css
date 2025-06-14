@@ -1,0 +1,224 @@
+.advanced-filter {
+  background-color: var(--ui-bg);
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.advanced-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--bdc-3);
+}
+
+.advanced-filter-header h3 {
+  margin: 0;
+  color: white !important;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #aaa;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background-color: var(--ui-bg-accent);
+  color: white !important;
+}
+
+.filter-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.filter-rule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background-color: var(--ui-bg-2);
+  border-radius: var(--main-border-radius);
+  border: 1px solid var(--bdc-3);
+}
+
+.logical-operator {
+  min-width: 70px;
+  padding: 8px;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  background-color: var(--ui-bg-2);
+  color: var(--accent) !important;
+  font-weight: bold;
+}
+
+.field-select {
+  min-width: 120px;
+  padding: 8px;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  background-color: var(--ui-bg-2);
+  color: white !important;
+}
+
+.operator-select {
+  min-width: 150px;
+  padding: 8px;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  background-color: var(--ui-bg-2);
+  color: white !important;
+}
+
+.filter-input {
+  flex: 1;
+  min-width: 150px;
+  padding: 8px;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  background-color: var(--ui-bg-2);
+  color: white !important;
+}
+
+.filter-input::placeholder {
+  color: #aaa;
+}
+
+.null-indicator {
+  flex: 1;
+  min-width: 150px;
+  padding: 8px;
+  color: #aaa !important;
+  font-style: italic;
+  background-color: var(--ui-bg-2);
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  display: flex;
+  align-items: center;
+}
+
+.remove-rule-button {
+  background-color: var(--accent-red);
+  color: white !important;
+  border: none;
+  padding: 8px 12px;
+  border-radius: var(--main-border-radius);
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.remove-rule-button:hover {
+  background-color: #c82333;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--bdc-3);
+}
+
+.add-rule-button {
+  background-color: var(--accent-green);
+  color: white !important;
+  border: none;
+  padding: 10px 16px;
+  border-radius: var(--main-border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.add-rule-button:hover {
+  background-color: #45a049;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.clear-button {
+  background-color: var(--accent-gray);
+  color: white !important;
+  border: none;
+  padding: 10px 16px;
+  border-radius: var(--main-border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.clear-button:hover {
+  background-color: #757575;
+}
+
+.apply-button {
+  background-color: var(--accent);
+  color: white !important;
+  border: none;
+  padding: 10px 16px;
+  border-radius: var(--main-border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.apply-button:hover {
+  background-color: var(--accent-s);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .filter-rule {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .logical-operator,
+  .field-select,
+  .operator-select,
+  .filter-input {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .remove-rule-button {
+    align-self: center;
+    margin-top: 10px;
+  }
+  
+  .filter-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .filter-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .add-rule-button {
+    width: 100%;
+  }
+} 

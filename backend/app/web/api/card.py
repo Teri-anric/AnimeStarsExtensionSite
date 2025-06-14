@@ -16,16 +16,16 @@ from app.database.enum import CardCollection
 router = APIRouter(prefix="/card", tags=["card"])
 
 
-@router.get("/")
+@router.post("/")
 async def get_cards(
-    query: Annotated[CardQuery, Query()],
+    query: CardQuery,
     repo: CardRepositoryDep,
 ) -> CardPaginationResponse:
     return await repo.search(
         PaginationQuery(
             page=query.page,
             per_page=query.per_page,
-            filter=query.build_filter(),
+            filter=query.filter,
             order_by=query.build_order_by(),
         )
     )

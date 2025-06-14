@@ -1,4 +1,5 @@
 from typing import Literal
+from contextlib import suppress
 
 from ..types import Card, PaginatedCards
 from .base import AnimestarBaseRepo
@@ -35,7 +36,8 @@ class AnimestarCardsRepo(AnimestarBaseRepo):
             )
         
         total = len(cards)
-        if _total_selector := soup.select_one(TOTAL_SELECTOR):
-            total = _total_selector.text.strip()
+        with suppress(Exception):
+            if _total_selector := soup.select_one(TOTAL_SELECTOR):
+                total = int(_total_selector.text.strip().strip("(").strip(")"))
 
         return self.parse_pagination(soup, PaginatedCards, total=total, cards=cards)

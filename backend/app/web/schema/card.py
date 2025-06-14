@@ -5,8 +5,7 @@ from ...database.enum import CardCollection, SummaryCardState
 from .pagination import BasePaginationQuery, BasePaginationResponse
 from .base import BaseSchema
 from typing import Literal
-from ...database.types.filter import Filter, AndFilter, FilterProperty
-from ...database.types.order_by import OrderBy
+from ...database.types.filter import EntryFilter, EnumFliedFilter, StringFieldFilter
 
 
 class CardSchema(BaseSchema):
@@ -56,56 +55,28 @@ CardSort = Literal[
 ]
 
 
-class CardFilter(BaseSchema):
-    id: UUID = Field(default=None, description="Filter by ID of the card")
-    card_id: int = Field(default=None, description="Filter by Card ID of the card")
-    name: str = Field(default=None, description="Filter by Name of the card")
-    rank: CardType = Field(default=None, description="Filter by Rank of the card")
-    anime_name: str | None = Field(
+class CardFilter(EntryFilter):
+    id: EnumFliedFilter[UUID] | None = Field(default=None, description="Filter by ID of the card")
+    card_id: EnumFliedFilter[int] | None = Field(default=None, description="Filter by Card ID of the card")
+    name: StringFieldFilter | None = Field(default=None, description="Filter by Name of the card")
+    rank: EnumFliedFilter[CardType] | None = Field(default=None, description="Filter by Rank of the card")
+    anime_name: StringFieldFilter | None = Field(
         default=None, description="Filter by Anime Name of the card"
     )   
-    anime_link: str | None = Field(
+    anime_link: StringFieldFilter | None = Field(
         default=None, description="Filter by Anime Link of the card"
     )
-    author: str | None = Field(
+    author: StringFieldFilter | None = Field(
         default=None, description="Filter by Author of the card"
     )
-    image: str | None = Field(default=None, description="Filter by Image of the card")
-    mp4: str | None = Field(default=None, description="Filter by MP4 of the card")
-    webm: str | None = Field(default=None, description="Filter by WebM of the card")
-
-    def build_filter(self) -> Filter:
-        filters = []
-        items = {
-            "id": self.id,
-            "card_id": self.card_id,
-            "name": self.name,
-            "rank": self.rank,
-            "anime_name": self.anime_name,
-            "anime_link": self.anime_link,
-            "author": self.author,
-            "image": self.image,
-            "mp4": self.mp4,
-            "webm": self.webm,
-        }
-        for key, value in items.items():
-            if value is None:
-                continue
-            filters.append(FilterProperty(property=key, operator=FilterProperty.Operator.EQ, value=value))
-        return AndFilter(filters=filters)
+    image: StringFieldFilter | None = Field(default=None, description="Filter by Image of the card")
+    mp4: StringFieldFilter | None = Field(default=None, description="Filter by MP4 of the card")
+    webm: StringFieldFilter | None = Field(default=None, description="Filter by WebM of the card")
 
 
-class CardQuery(BasePaginationQuery, CardFilter):
-    sort: CardSort | None = Field(default=None, description="Sort by the card")
 
-    def build_order_by(self) -> OrderBy | None:
-        if self.sort is None:
-            return None
-        prop, *args = self.sort.split(" ")
-        direction = OrderBy.Sort.Direction.DESC
-        if "asc" in args:
-            direction = OrderBy.Sort.Direction.ASC
-        return OrderBy(sorts=[OrderBy.Sort(property=prop, direction=direction)])
+class CardQuery(BasePaginationQuery[CardFilter, CardSort]):
+    pass
 
 
 class CardPaginationResponse(BasePaginationResponse[CardSchema]):
