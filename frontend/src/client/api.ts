@@ -387,6 +387,93 @@ export interface CardUsersSummarySchema {
 
 
 /**
+ * Schema for detailed deck view with all cards
+ * @export
+ * @interface DeckDetailSchema
+ */
+export interface DeckDetailSchema {
+    /**
+     * 
+     * @type {string}
+     * @memberof DeckDetailSchema
+     */
+    'anime_link': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeckDetailSchema
+     */
+    'anime_name': string | null;
+    /**
+     * 
+     * @type {Array<CardSchema>}
+     * @memberof DeckDetailSchema
+     */
+    'cards': Array<CardSchema>;
+}
+/**
+ * Paginated response for deck listings
+ * @export
+ * @interface DeckPaginationResponse
+ */
+export interface DeckPaginationResponse {
+    /**
+     * 
+     * @type {Array<DeckSummarySchema>}
+     * @memberof DeckPaginationResponse
+     */
+    'items': Array<DeckSummarySchema>;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeckPaginationResponse
+     */
+    'total': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeckPaginationResponse
+     */
+    'page': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeckPaginationResponse
+     */
+    'per_page': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeckPaginationResponse
+     */
+    'total_pages': number;
+}
+/**
+ * Schema for deck summary in listings
+ * @export
+ * @interface DeckSummarySchema
+ */
+export interface DeckSummarySchema {
+    /**
+     * 
+     * @type {string}
+     * @memberof DeckSummarySchema
+     */
+    'anime_link': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeckSummarySchema
+     */
+    'anime_name': string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeckSummarySchema
+     */
+    'card_count': number;
+}
+/**
  * 
  * @export
  * @interface EnumFliedFilterCardType
@@ -1375,6 +1462,200 @@ export class CardApi extends BaseAPI {
      */
     public getCardsApiCardPost(cardQuery: CardQuery, options?: RawAxiosRequestConfig) {
         return CardApiFp(this.configuration).getCardsApiCardPost(cardQuery, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * DeckApi - axios parameter creator
+ * @export
+ */
+export const DeckApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Get detailed view of a specific deck with all its cards
+         * @summary Get Deck Detail
+         * @param {string} animeLink 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDeckDetailApiDeckAnimeLinkGet: async (animeLink: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'animeLink' is not null or undefined
+            assertParamExists('getDeckDetailApiDeckAnimeLinkGet', 'animeLink', animeLink)
+            const localVarPath = `/api/deck/{anime_link}`
+                .replace(`{${"anime_link"}}`, encodeURIComponent(String(animeLink)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get all decks (anime grouped by anime_link) with pagination and optional search
+         * @summary Get Decks
+         * @param {number} [page] 
+         * @param {number} [perPage] 
+         * @param {string | null} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDecksApiDeckGet: async (page?: number, perPage?: number, query?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/deck/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (perPage !== undefined) {
+                localVarQueryParameter['per_page'] = perPage;
+            }
+
+            if (query !== undefined) {
+                localVarQueryParameter['query'] = query;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * DeckApi - functional programming interface
+ * @export
+ */
+export const DeckApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DeckApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Get detailed view of a specific deck with all its cards
+         * @summary Get Deck Detail
+         * @param {string} animeLink 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDeckDetailApiDeckAnimeLinkGet(animeLink: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeckDetailSchema>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDeckDetailApiDeckAnimeLinkGet(animeLink, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DeckApi.getDeckDetailApiDeckAnimeLinkGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Get all decks (anime grouped by anime_link) with pagination and optional search
+         * @summary Get Decks
+         * @param {number} [page] 
+         * @param {number} [perPage] 
+         * @param {string | null} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDecksApiDeckGet(page?: number, perPage?: number, query?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeckPaginationResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDecksApiDeckGet(page, perPage, query, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DeckApi.getDecksApiDeckGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * DeckApi - factory interface
+ * @export
+ */
+export const DeckApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DeckApiFp(configuration)
+    return {
+        /**
+         * Get detailed view of a specific deck with all its cards
+         * @summary Get Deck Detail
+         * @param {string} animeLink 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDeckDetailApiDeckAnimeLinkGet(animeLink: string, options?: RawAxiosRequestConfig): AxiosPromise<DeckDetailSchema> {
+            return localVarFp.getDeckDetailApiDeckAnimeLinkGet(animeLink, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get all decks (anime grouped by anime_link) with pagination and optional search
+         * @summary Get Decks
+         * @param {number} [page] 
+         * @param {number} [perPage] 
+         * @param {string | null} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDecksApiDeckGet(page?: number, perPage?: number, query?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<DeckPaginationResponse> {
+            return localVarFp.getDecksApiDeckGet(page, perPage, query, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * DeckApi - object-oriented interface
+ * @export
+ * @class DeckApi
+ * @extends {BaseAPI}
+ */
+export class DeckApi extends BaseAPI {
+    /**
+     * Get detailed view of a specific deck with all its cards
+     * @summary Get Deck Detail
+     * @param {string} animeLink 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DeckApi
+     */
+    public getDeckDetailApiDeckAnimeLinkGet(animeLink: string, options?: RawAxiosRequestConfig) {
+        return DeckApiFp(this.configuration).getDeckDetailApiDeckAnimeLinkGet(animeLink, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get all decks (anime grouped by anime_link) with pagination and optional search
+     * @summary Get Decks
+     * @param {number} [page] 
+     * @param {number} [perPage] 
+     * @param {string | null} [query] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DeckApi
+     */
+    public getDecksApiDeckGet(page?: number, perPage?: number, query?: string | null, options?: RawAxiosRequestConfig) {
+        return DeckApiFp(this.configuration).getDecksApiDeckGet(page, perPage, query, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

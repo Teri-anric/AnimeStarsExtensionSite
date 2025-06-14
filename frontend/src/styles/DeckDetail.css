@@ -1,0 +1,258 @@
+.deck-detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: var(--bg);
+  min-height: calc(100vh - 80px);
+}
+
+.deck-detail-header {
+  margin-bottom: 30px;
+  padding: 20px 0;
+}
+
+.back-button {
+  padding: 10px 20px;
+  background: var(--ui-bg-2);
+  color: var(--tt);
+  border: 1px solid var(--bdc);
+  border-radius: var(--main-border-radius);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.back-button:hover {
+  background: var(--ui-bg-accent);
+  border-color: var(--accent);
+}
+
+.deck-title {
+  color: var(--tt);
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.deck-info {
+  color: var(--tt-2);
+  font-size: 1.1rem;
+  margin-bottom: 0;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.card-item {
+  background: var(--ui-bg-2);
+  border: 1px solid var(--bdc);
+  border-radius: var(--main-border-radius);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.card-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  border-color: var(--accent);
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-image, .card-video {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+  background: var(--bg-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-info {
+  padding: 15px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.card-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--tt);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.card-id {
+  font-size: 0.9rem;
+  color: var(--accent);
+  font-weight: 500;
+  margin: 0;
+}
+
+.card-rank {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.card-author {
+  font-size: 0.8rem;
+  color: var(--tt-3);
+  margin: 0;
+  margin-top: auto;
+}
+
+/* Rank-specific styling - matching existing site pattern */
+.rank-ass {
+  border: 2px solid var(--accent-gold);
+}
+
+.rank-ass .card-rank {
+  background: var(--accent-gold);
+  color: var(--tt);
+}
+
+.rank-s {
+  border: 2px solid var(--accent-s);
+}
+
+.rank-s .card-rank {
+  background: var(--accent-s);
+  color: var(--tt);
+}
+
+.rank-a {
+  border: 2px solid var(--accent-green);
+}
+
+.rank-a .card-rank {
+  background: var(--accent-green);
+  color: var(--tt);
+}
+
+.rank-b {
+  border: 2px solid var(--accent-2);
+}
+
+.rank-b .card-rank {
+  background: var(--accent-2);
+  color: var(--tt);
+}
+
+.rank-c {
+  border: 2px solid var(--accent);
+}
+
+.rank-c .card-rank {
+  background: var(--accent);
+  color: var(--tt);
+}
+
+.rank-d, .rank-e {
+  border: 2px solid var(--accent-gray);
+}
+
+.rank-d .card-rank, .rank-e .card-rank {
+  background: var(--accent-gray);
+  color: var(--tt);
+}
+
+/* Loading, error, and auth states */
+.loading, .error-message, .auth-message {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+}
+
+.loading {
+  color: var(--accent);
+}
+
+.error-message {
+  color: var(--accent-red);
+  background: var(--ui-bg-2);
+  border: 1px solid var(--accent-red);
+  border-radius: var(--main-border-radius);
+  margin: 20px 0;
+}
+
+.auth-message {
+  color: var(--accent-gold);
+  background: var(--ui-bg-2);
+  border: 1px solid var(--accent-gold);
+  border-radius: var(--main-border-radius);
+  margin: 20px 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .deck-detail-container {
+    padding: 15px;
+  }
+  
+  .deck-title {
+    font-size: 2rem;
+  }
+  
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+  }
+  
+  .card-image, .card-video {
+    height: 200px;
+  }
+  
+  .card-info {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  
+  .card-image, .card-video {
+    height: 180px;
+  }
+  
+  .card-info {
+    padding: 10px;
+  }
+  
+  .card-name {
+    font-size: 1rem;
+  }
+}

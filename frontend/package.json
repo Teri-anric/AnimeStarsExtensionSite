@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-api-client": "openapi-generator-cli generate -i https://ass-api.strawberrycat.dev/openapi.json -g typescript-axios -o ./src/client"
+    "generate-api-client": "openapi-generator-cli generate -i https://ass-api.strawberrycat.dev/openapi.json -g typescript-axios -o ./src/client",
+    "generate-api-client-local": "openapi-generator-cli generate -i http://localhost:8000/openapi.json -g typescript-axios -o ./src/client"
   },
   "dependencies": {
     "axios": "^1.9.0",

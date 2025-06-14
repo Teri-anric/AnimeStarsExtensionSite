@@ -8,6 +8,7 @@ import RandomAnimeGif from './components/RandomAnimeGif';
 import Cards from './components/Cards';
 import AccountSettings from './components/AccountSettings';
 import ProtectedRoute from './components/ProtectedRoute';
+import DecksPage from './components/DecksPage';
 
 function App() {
   return (
@@ -19,22 +20,33 @@ function App() {
             <main className="app-content">
               <Routes>
                 <Route path="/auth" element={<AuthPage />} />
-                <Route path="/random-gif" element={
-                  <ProtectedRoute>
-                    <RandomAnimeGif />
-                  </ProtectedRoute>
-                } />
-                <Route path="/cards" element={
-                  <ProtectedRoute>
-                    <Cards />
-                  </ProtectedRoute>
-                } />
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <AccountSettings />
-                  </ProtectedRoute>
-                } />
-                <Route path="/" element={<Navigate to="/cards" replace />} />
+                  <Route path="/random-gif" element={
+                    <ProtectedRoute>
+                      <RandomAnimeGif />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/cards" element={
+                    <ProtectedRoute>
+                      <Cards />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/decks" element={
+                    <ProtectedRoute>
+                      <DecksPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/settings" element={
+                    <ProtectedRoute>
+                      <AccountSettings />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/" element=
+                    {
+                    <ProtectedRoute>
+                      <Navigate to="/random-gif" replace />
+                    </ProtectedRoute>
+                    } />
+
               </Routes>
             </main>
           </div>

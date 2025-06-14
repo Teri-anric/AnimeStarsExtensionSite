@@ -3,6 +3,9 @@
 frontend-api-client-build:
 	cd frontend && npm run generate-api-client && cd ..
 
+frontend-api-client-build-local:
+	cd frontend && npm run generate-api-client-local && cd ..
+
 build:
 	docker compose build
 
