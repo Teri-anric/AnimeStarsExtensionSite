@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Configuration, DefaultApi } from '../client';
 
 interface RegisterFormProps {
   onSuccess: () => void;

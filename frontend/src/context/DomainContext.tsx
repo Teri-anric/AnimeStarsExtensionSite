@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { createContext, useState, useContext, ReactNode } from 'react';
 
 // Define available domains for the site
 const AVAILABLE_DOMAINS = [

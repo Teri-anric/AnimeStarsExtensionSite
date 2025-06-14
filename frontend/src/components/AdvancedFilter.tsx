@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CardFilter, CardType, StringFieldFilter, EnumFliedFilterCardType, EnumFliedFilterInt, EnumFliedFilterUUID } from '../client';
+import { CardFilter, CardType } from '../client';
 import '../styles/AdvancedFilter.css';
 
 interface FilterRule {

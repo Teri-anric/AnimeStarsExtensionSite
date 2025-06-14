@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { createAuthenticatedClient } from '../utils/apiClient';
-import { CardApi, CardSchema, CardType, CardQuery, CardQueryOrderByEnum, CardFilter, StringFieldFilter, EnumFliedFilterCardType } from '../client';
+import { CardApi, CardSchema, CardType, CardQuery, CardQueryOrderByEnum, CardFilter } from '../client';
 import '../styles/Cards.css';
 import { useDomain } from '../context/DomainContext';
 import ShortFilter from './ShortFilter';
@@ -15,7 +15,7 @@ const Cards = () => {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [perPage, setPerPage] = useState(64);
+  const [perPage] = useState(64);
   
   // Filter mode
   const [filterMode, setFilterMode] = useState<'short' | 'advanced'>('short');
@@ -126,10 +126,7 @@ const Cards = () => {
     }
   };
 
-  const handleRankChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setRankFilter(e.target.value);
-    setPage(1);
-  };
+
 
   const handleFilterModeToggle = () => {
     if (filterMode === 'short') {

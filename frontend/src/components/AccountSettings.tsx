@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useDomain } from '../context/DomainContext';
 import '../styles/AccountSettings.css';

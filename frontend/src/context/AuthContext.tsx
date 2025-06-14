@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import axios from 'axios';
-import { Configuration, DefaultApi } from '../client';
+import { DefaultApi } from '../client';
 import { createAuthenticatedClient } from '../utils/apiClient';
 
 interface AuthContextType {

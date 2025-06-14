@@ -10,8 +10,7 @@ export const createAuthenticatedClient = <T extends DefaultApi | HealthApi | Car
   
   const config = new Configuration({
     basePath: import.meta.env.VITE_API_URL || 'http://localhost:8000',
-    accessToken: token || undefined,
-    isJsonMime: () => true
+    accessToken: token || undefined
   });
   
   return new ApiClass(config);
@@ -24,8 +23,7 @@ export const createClient = <T extends DefaultApi | HealthApi | CardApi>(
   ApiClass: new (config: Configuration) => T
 ): T => {
   const config = new Configuration({
-    basePath: import.meta.env.VITE_API_URL || 'http://localhost:8000',
-    isJsonMime: () => true
+    basePath: import.meta.env.VITE_API_URL || 'http://localhost:8000'
   });
   
   return new ApiClass(config);
