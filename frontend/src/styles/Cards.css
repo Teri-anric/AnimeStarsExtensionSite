@@ -3,6 +3,11 @@
   margin: 0 auto;
   color: white !important;
   width: 100%;
+  transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cards-container.with-panel {
+  margin-right: 400px;
 }
 
 .cards-header {
@@ -343,5 +348,22 @@
   
   .active-advanced-filter p {
     margin-bottom: 10px;
+  }
+
+  /* On mobile, don't shift the layout - panel takes full screen */
+  .cards-container.with-panel {
+    margin-right: 0;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cards-container.with-panel {
+    margin-right: 350px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .cards-container.with-panel {
+    margin-right: 450px;
   }
 } 

@@ -7,6 +7,7 @@ import '../../styles/Cards.css';
 import ShortFilter from '../../components/ShortFilter';
 import AdvancedFilter from '../../components/AdvancedFilter';
 import Card from '../../components/Card';
+import CardInfoPanel from '../../components/CardInfoPanel';
 
 const CardsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -16,6 +17,10 @@ const CardsPage = () => {
   const [error, setError] = useState('');
   const [totalPages, setTotalPages] = useState(1);
   const [perPage] = useState(63);
+  
+  // Card info panel state
+  const [selectedCard, setSelectedCard] = useState<CardSchema | null>(null);
+  const [isCardInfoOpen, setIsCardInfoOpen] = useState(false);
   
   // Get values from URL parameters
   const page = parseInt(searchParams.get('page') || '1');
@@ -229,10 +234,20 @@ const CardsPage = () => {
     }
   };
 
+  const handleCardClick = (card: CardSchema) => {
+    setSelectedCard(card);
+    setIsCardInfoOpen(true);
+  };
+
+  const handleCardInfoClose = () => {
+    setIsCardInfoOpen(false);
+    setSelectedCard(null);
+  };
+
 
 
   return (
-    <div className="cards-container">
+    <div className={`cards-container ${isCardInfoOpen ? 'with-panel' : ''}`}>
       <div className="cards-header">
         <h1>Anime Cards</h1>
         
@@ -274,7 +289,11 @@ const CardsPage = () => {
         <>
           <div className="cards-grid">
             {cards.length > 0 ? cards.map((card) => (
-              <Card key={card.id} card={card} />
+              <Card 
+                key={card.id} 
+                card={card} 
+                onClick={() => handleCardClick(card)}
+              />
             )) : (
               <div className="no-cards">No cards found matching your criteria.</div>
             )}
@@ -301,6 +320,13 @@ const CardsPage = () => {
           )}
         </>
       )}
+      
+      {/* Card Info Panel */}
+      <CardInfoPanel
+        card={selectedCard}
+        isOpen={isCardInfoOpen}
+        onClose={handleCardInfoClose}
+      />
     </div>
   );
 };

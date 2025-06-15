@@ -300,6 +300,18 @@ export interface CardSchema {
      * @memberof CardSchema
      */
     'webm': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardSchema
+     */
+    'created_at': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardSchema
+     */
+    'updated_at': string | null;
 }
 
 
@@ -654,6 +666,24 @@ export interface StringFieldFilter {
      * @memberof StringFieldFilter
      */
     'not_like'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof StringFieldFilter
+     */
+    'contains'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof StringFieldFilter
+     */
+    'icontains'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof StringFieldFilter
+     */
+    'not_contains'?: string | null;
     /**
      * 
      * @type {Array<string>}

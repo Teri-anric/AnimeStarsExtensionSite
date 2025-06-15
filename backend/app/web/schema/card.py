@@ -6,7 +6,7 @@ from .pagination import BasePaginationQuery, BasePaginationResponse
 from .base import BaseSchema
 from typing import Literal
 from ...database.types.filter import EntryFilter, EnumFliedFilter, StringFieldFilter
-
+from datetime import datetime
 
 class CardSchema(BaseSchema):
     id: UUID
@@ -19,6 +19,9 @@ class CardSchema(BaseSchema):
     image: str | None
     mp4: str | None
     webm: str | None
+
+    created_at: datetime | None
+    updated_at: datetime | None
 
 
 CardSort = Literal[
