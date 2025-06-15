@@ -5,7 +5,7 @@ from ...database.enum import CardCollection, SummaryCardState
 from .pagination import BasePaginationQuery, BasePaginationResponse
 from .base import BaseSchema
 from typing import Literal
-from ...database.types.filter import EntryFilter, EnumFliedFilter, StringFieldFilter
+from ...filters.entries.card_filter import CardFilter
 from datetime import datetime
 
 class CardSchema(BaseSchema):
@@ -58,25 +58,9 @@ CardSort = Literal[
 ]
 
 
-class CardFilter(EntryFilter):
-    id: EnumFliedFilter[UUID] | None = Field(default=None, description="Filter by ID of the card")
-    card_id: EnumFliedFilter[int] | None = Field(default=None, description="Filter by Card ID of the card")
-    name: StringFieldFilter | None = Field(default=None, description="Filter by Name of the card")
-    rank: EnumFliedFilter[CardType] | None = Field(default=None, description="Filter by Rank of the card")
-    anime_name: StringFieldFilter | None = Field(
-        default=None, description="Filter by Anime Name of the card"
-    )   
-    anime_link: StringFieldFilter | None = Field(
-        default=None, description="Filter by Anime Link of the card"
-    )
-    author: StringFieldFilter | None = Field(
-        default=None, description="Filter by Author of the card"
-    )
-    image: StringFieldFilter | None = Field(default=None, description="Filter by Image of the card")
-    mp4: StringFieldFilter | None = Field(default=None, description="Filter by MP4 of the card")
-    webm: StringFieldFilter | None = Field(default=None, description="Filter by WebM of the card")
 
 
+# CardFilter is now imported from filters.entries.card_filter
 
 class CardQuery(BasePaginationQuery[CardFilter, CardSort]):
     pass

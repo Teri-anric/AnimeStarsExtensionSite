@@ -6,11 +6,18 @@ from .base import BaseRepository
 from ..types.filter import BaseFilter
 from ..types.pagination import Pagination, PaginationQuery
 from ..types.order_by import OrderBy
+from ...filters import FilterService
+from ...filters.setup import default_filter_service
+from ...filters.models import BaseEntryFilter
 
 T = TypeVar("T")
 
 
 class PaginationRepository(BaseRepository, Generic[T], ABC):
+    def __init__(self, *args, filter_service: FilterService | None = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.filter_service = filter_service or default_filter_service
+
     async def search(self, query: PaginationQuery, *args, **kwargs) -> Pagination[T]:
         return await self.paginate(select(self.entry_class), query, *args, **kwargs)
 
@@ -50,27 +57,34 @@ class PaginationRepository(BaseRepository, Generic[T], ABC):
     def entry_class(self) -> type[T]:
         raise NotImplementedError
 
-    def _apply_filter(self, stmt: Select, filter: BaseFilter | dict | None) -> Select:
+    def _apply_filter(self, stmt: Select, filter: BaseFilter | BaseEntryFilter | dict | None) -> Select:
+        """Apply filter to statement using the filter service"""
         if not filter:
             return stmt
-        if isinstance(filter, dict):
-            return stmt.where(**filter)
-        filter = filter.apply(self.entry_class)
-        if filter is None:
+            
+        # Use filter service to resolve the condition
+        condition = self.filter_service.parse_and_resolve(
+            filter_data=filter,
+            entry_code=getattr(self, 'entry_code', None),
+            model_class=self.entry_class
+        )
+        
+        if condition is None:
             return stmt
-        return stmt.where(filter)
+        return stmt.where(condition)
+        
     
-    async def get_by(self, filter: BaseFilter) -> list[T]:
+    async def get_by(self, filter: BaseFilter | dict) -> list[T]:
         return await self.scalars(self._apply_filter(select(self.entry_class), filter))
 
-    async def get_one_by(self, filter: BaseFilter) -> T | None:
+    async def get_one_by(self, filter: BaseFilter | dict) -> T | None:
         return await self.scalar(self._apply_filter(select(self.entry_class), filter))
 
-    async def delete_by(self, filter: BaseFilter) -> int:
+    async def delete_by(self, filter: BaseFilter | dict) -> int:
         result = await self.execute(self._apply_filter(delete(self.entry_class), filter))
         return result.rowcount
 
-    async def update_by(self, filter: BaseFilter, update_by: dict) -> int:
+    async def update_by(self, filter: BaseFilter | dict, update_by: dict) -> int:
         result = await self.execute(
             self._apply_filter(update(self.entry_class), filter).values(**update_by)
         )

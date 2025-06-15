@@ -1,12 +1,7 @@
 from sqlalchemy import select, func, distinct
-from sqlalchemy.orm import selectinload
-from typing import Dict, List
-from uuid import UUID
 
 from .base import BaseRepository
 from ..models.animestars.card import Card
-from ..types.filter import RawFilter
-from .pagination import PaginationRepository
 from ..types.deck import DeckSummaryDTO, DeckPaginationDTO, DeckDetailDTO
 
 

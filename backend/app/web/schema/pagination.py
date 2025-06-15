@@ -1,11 +1,11 @@
 from .base import BaseSchema
 from typing import Generic, TypeVar
 from pydantic import Field
-from ...database.types.filter import EntryFilter
+from ...filters.models import BaseEntryFilter
 from ...database.types.order_by import OrderBy
 
 T = TypeVar("T")
-F = TypeVar("F", bound=EntryFilter)
+F = TypeVar("F", bound=BaseEntryFilter)
 S = TypeVar("S")
 
 

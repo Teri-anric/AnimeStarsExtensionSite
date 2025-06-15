@@ -12,6 +12,7 @@ from app.web.schema.card import (
 from app.web.deps import CardRepositoryDep, SummaryCardUsersRepositoryDep
 from app.database.types.pagination import PaginationQuery
 from app.database.enum import CardCollection
+from app.filters.metadata import default_metadata_provider
 
 router = APIRouter(prefix="/card", tags=["card"])
 
@@ -21,6 +22,22 @@ async def get_cards(
     query: CardQuery,
     repo: CardRepositoryDep,
 ) -> CardPaginationResponse:
+    """
+    Get cards with filtering support.
+    
+    The new filter system supports:
+    - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm
+    - Computed fields: author_username (demonstrates custom logic)
+    
+    Example filter usage:
+    {
+        "filter": {
+            "name": {"contains": "Naruto"},
+            "author_username": {"icontains": "user"},
+            "rank": {"eq": "S"}
+        }
+    }
+    """
     return await repo.search(
         PaginationQuery(
             page=query.page,
