@@ -1,26 +1,26 @@
 import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useDomain } from '../../context/DomainContext';
 import { Configuration, DeckApi, DeckDetailSchema } from '../../client';
 import '../../styles/DeckDetail.css';
 
-interface DeckDetailPageProps {
-  animeLink: string;
-  onBack: () => void;
-}
-
-const DeckDetailPage: React.FC<DeckDetailPageProps> = ({ animeLink, onBack }) => {
+const DeckDetailPage: React.FC = () => {
+  const { anime_link } = useParams<{ anime_link: string }>();
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { currentDomain } = useDomain();
   const [deck, setDeck] = useState<DeckDetailSchema | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const decodedAnimeLink = anime_link ? decodeURIComponent(anime_link) : '';
+
   useEffect(() => {
-    if (isAuthenticated && animeLink) {
+    if (isAuthenticated && decodedAnimeLink) {
       fetchDeckDetail();
     }
-  }, [isAuthenticated, animeLink]);
+  }, [isAuthenticated, decodedAnimeLink]);
 
   const fetchDeckDetail = async () => {
     try {
@@ -33,7 +33,7 @@ const DeckDetailPage: React.FC<DeckDetailPageProps> = ({ animeLink, onBack }) =>
       });
       
       const deckApi = new DeckApi(config);
-      const response = await deckApi.getDeckDetailApiDeckDetailGet(animeLink);
+      const response = await deckApi.getDeckDetailApiDeckDetailGet(decodedAnimeLink);
       
       setDeck(response.data);
       setLoading(false);
@@ -53,6 +53,14 @@ const DeckDetailPage: React.FC<DeckDetailPageProps> = ({ animeLink, onBack }) =>
     return `rank-${rank.toLowerCase()}`;
   };
 
+  const handleBack = () => {
+    navigate('/decks');
+  };
+
+  if (!anime_link) {
+    return <div className="error-message">Invalid deck link</div>;
+  }
+
   if (!isAuthenticated) {
     return <div className="auth-message">Please log in to view deck details.</div>;
   }
@@ -60,7 +68,7 @@ const DeckDetailPage: React.FC<DeckDetailPageProps> = ({ animeLink, onBack }) =>
   return (
     <div className="deck-detail-container">
       <div className="deck-detail-header">
-        <button onClick={onBack} className="back-button">
+        <button onClick={handleBack} className="back-button">
           ← Back to Decks
         </button>
         
@@ -100,7 +108,6 @@ const DeckDetailPage: React.FC<DeckDetailPageProps> = ({ animeLink, onBack }) =>
                     </video>
                   </div>
                 )}
-
               </div>
             </div>
           ))}

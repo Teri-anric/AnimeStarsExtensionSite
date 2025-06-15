@@ -16,7 +16,7 @@ const CardsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [totalPages, setTotalPages] = useState(1);
-  const [perPage] = useState(64);
+  const [perPage] = useState(63);
   
   // Get values from URL parameters
   const page = parseInt(searchParams.get('page') || '1');

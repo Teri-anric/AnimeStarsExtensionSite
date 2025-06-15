@@ -6,11 +6,10 @@ import {
   LoginPage,
   RegisterPage,
   CardsPage, 
-  DecksPage, 
-  DeckDetailPage,
   RandomAnimeGifPage, 
   AccountSettingsPage 
 } from './pages';
+import { DecksListPage, DeckDetailPage } from './pages/decks';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -38,7 +37,7 @@ function App() {
                   } />
                   <Route path="/decks" element={
                     <ProtectedRoute>
-                      <DecksPage />
+                      <DecksListPage />
                     </ProtectedRoute>
                   } />
                   <Route path="/deck/:anime_link" element={
