@@ -4,14 +4,13 @@ import { useAuth } from '../../context/AuthContext';
 import { createAuthenticatedClient } from '../../utils/apiClient';
 import { CardApi, CardSchema, CardType, CardQuery, CardQueryOrderByEnum, CardFilter } from '../../client';
 import '../../styles/Cards.css';
-import { useDomain } from '../../context/DomainContext';
 import ShortFilter from '../../components/ShortFilter';
 import AdvancedFilter from '../../components/AdvancedFilter';
+import Card from '../../components/Card';
 
 const CardsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
-  const { currentDomain } = useDomain();
   const [cards, setCards] = useState<CardSchema[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -177,14 +176,7 @@ const CardsPage = () => {
     }
   };
 
-  const getCardMediaUrl = (path: string | null) => {
-    if (!path) return '';
-    return `${currentDomain}${path}`;
-  };
 
-  const getRankClass = (rank: CardType) => {
-    return `rank-${rank.toLowerCase()}`;
-  };
 
   return (
     <div className="cards-container">
@@ -228,27 +220,7 @@ const CardsPage = () => {
         <>
           <div className="cards-grid">
             {cards.length > 0 ? cards.map((card) => (
-              <div key={card.id} className={`card-item ${getRankClass(card.rank)}`}>
-                <div className="card-content">
-                  {card.image && !card.mp4 && (
-                    <div className="card-image">
-                      <img 
-                        src={getCardMediaUrl(card.image)} 
-                        alt={card.name} 
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
-                  {card.mp4 && (
-                    <div className="card-video">
-                      <video autoPlay loop muted playsInline>
-                        <source src={getCardMediaUrl(card.mp4)} type="video/mp4" />
-                        Your browser does not support the video tag.
-                      </video>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <Card key={card.id} card={card} />
             )) : (
               <div className="no-cards">No cards found matching your criteria.</div>
             )}

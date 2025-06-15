@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useDomain } from '../../context/DomainContext';
-import { Configuration, DeckApi, DeckSummarySchema, DeckPaginationResponse } from '../../client';
+import { Configuration, DeckApi, DeckSummarySchema } from '../../client';
 import '../../styles/Decks.css';
+import Card from '../../components/Card';
 
 interface DecksListPageProps {
   onDeckSelect?: (animeLink: string) => void;
@@ -11,7 +11,6 @@ interface DecksListPageProps {
 
 const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
   const { isAuthenticated } = useAuth();
-  const { currentDomain } = useDomain();
   const navigate = useNavigate();
   const [decks, setDecks] = useState<DeckSummarySchema[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,14 +76,7 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
     }
   };
 
-  const getCardMediaUrl = (path: string | null) => {
-    if (!path) return '';
-    return `${currentDomain}${path}`;
-  };
 
-  const getRankClass = (rank: string) => {
-    return `rank-${rank.toLowerCase()}`;
-  };
 
   if (!isAuthenticated) {
     return <div className="auth-message">Please log in to view decks.</div>;
@@ -126,7 +118,7 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
           
           <div className="decks-list">
             {decks.length > 0 ? decks.map((deck) => (
-              <div key={deck.anime_link} className="deck-row">
+              <div key={deck.anime_link} className="deck-row" onClick={() => handleDeckClick(deck.anime_link)}>
                 <div className="deck-header-section">
                   <div className="deck-info">
                     <h2 className="deck-title">
@@ -141,38 +133,13 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
                       </span>
                     </div>
                   </div>
-                  <button
-                    className="view-deck-button"
-                    onClick={() => handleDeckClick(deck.anime_link)}
-                  >
-                    View Full Deck
-                  </button>
                 </div>
                 
                 <div className="deck-preview-cards">
                   {deck.preview_cards && deck.preview_cards.length > 0 ? (
                     <div className="preview-cards-grid">
                       {deck.preview_cards.map((card) => (
-                        <div key={card.id} className={`preview-card ${getRankClass(card.rank)}`}>
-                          {card.image && !card.mp4 && (
-                            <div className="card-image">
-                              <img 
-                                src={getCardMediaUrl(card.image)} 
-                                alt={card.name} 
-                                loading="lazy"
-                              />
-                            </div>
-                          )}
-                          {card.mp4 && (
-                            <div className="card-video">
-                              <video autoPlay loop muted playsInline>
-                                <source src={getCardMediaUrl(card.mp4)} type="video/mp4" />
-                                Your browser does not support the video tag.
-                              </video>
-                            </div>
-                          )}
-
-                        </div>
+                        <Card key={card.id} card={card} variant="preview" />
                       ))}
                     </div>
                   ) : (

@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useDomain } from '../../context/DomainContext';
 import { Configuration, DeckApi, DeckDetailSchema } from '../../client';
 import '../../styles/DeckDetail.css';
+import Card from '../../components/Card';
 
 const DeckDetailPage: React.FC = () => {
   const { anime_link } = useParams<{ anime_link: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { currentDomain } = useDomain();
   const [deck, setDeck] = useState<DeckDetailSchema | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -44,14 +43,7 @@ const DeckDetailPage: React.FC = () => {
     }
   };
 
-  const getCardMediaUrl = (path: string | null) => {
-    if (!path) return '';
-    return `${currentDomain}${path}`;
-  };
 
-  const getRankClass = (rank: string) => {
-    return `rank-${rank.toLowerCase()}`;
-  };
 
   const handleBack = () => {
     navigate('/decks');
@@ -89,27 +81,7 @@ const DeckDetailPage: React.FC = () => {
       {deck && !loading && !error && (
         <div className="cards-grid">
           {deck.cards.map((card) => (
-            <div key={card.id} className={`card-item ${getRankClass(card.rank)}`}>
-              <div className="card-content">
-                {card.image && !card.mp4 && (
-                  <div className="card-image">
-                    <img 
-                      src={getCardMediaUrl(card.image)} 
-                      alt={card.name} 
-                      loading="lazy"
-                    />
-                  </div>
-                )}
-                {card.mp4 && (
-                  <div className="card-video">
-                    <video autoPlay loop muted playsInline>
-                      <source src={getCardMediaUrl(card.mp4)} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                )}
-              </div>
-            </div>
+            <Card key={card.id} card={card} />
           ))}
         </div>
       )}
