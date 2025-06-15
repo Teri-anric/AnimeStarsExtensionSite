@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Configuration, DeckApi, DeckDetailSchema } from '../../client';
+import { Configuration, DeckApi, DeckDetailSchema, CardSchema } from '../../client';
 import '../../styles/DeckDetail.css';
 import Card from '../../components/Card';
+import CardInfoPanel from '../../components/CardInfoPanel';
 
 const DeckDetailPage: React.FC = () => {
   const { anime_link } = useParams<{ anime_link: string }>();
@@ -12,6 +13,10 @@ const DeckDetailPage: React.FC = () => {
   const [deck, setDeck] = useState<DeckDetailSchema | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  
+  // Card info panel state
+  const [selectedCard, setSelectedCard] = useState<CardSchema | null>(null);
+  const [isCardInfoOpen, setIsCardInfoOpen] = useState(false);
 
   const decodedAnimeLink = anime_link ? decodeURIComponent(anime_link) : '';
 
@@ -43,7 +48,15 @@ const DeckDetailPage: React.FC = () => {
     }
   };
 
+  const handleCardClick = (card: CardSchema) => {
+    setSelectedCard(card);
+    setIsCardInfoOpen(true);
+  };
 
+  const handleCardInfoClose = () => {
+    setIsCardInfoOpen(false);
+    setSelectedCard(null);
+  };
 
   const handleBack = () => {
     navigate('/decks');
@@ -58,7 +71,7 @@ const DeckDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="deck-detail-container">
+    <div className={`deck-detail-container ${isCardInfoOpen ? 'with-panel' : ''}`}>
       <div className="deck-detail-header">
         <button onClick={handleBack} className="back-button">
           ← Back to Decks
@@ -81,10 +94,21 @@ const DeckDetailPage: React.FC = () => {
       {deck && !loading && !error && (
         <div className="cards-grid">
           {deck.cards.map((card) => (
-            <Card key={card.id} card={card} />
+            <Card 
+              key={card.id} 
+              card={card} 
+              onClick={() => handleCardClick(card)}
+            />
           ))}
         </div>
       )}
+      
+      {/* Card Info Panel */}
+      <CardInfoPanel
+        card={selectedCard}
+        isOpen={isCardInfoOpen}
+        onClose={handleCardInfoClose}
+      />
     </div>
   );
 };
