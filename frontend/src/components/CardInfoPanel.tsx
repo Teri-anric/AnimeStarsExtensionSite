@@ -1,5 +1,5 @@
 import React from 'react';
-import { CardSchema, CardType } from '../client';
+import { CardSchema } from '../client';
 import { useDomain } from '../context/DomainContext';
 import '../styles/CardInfoPanel.css';
 

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AuthApiFactory, UserCreate } from '../../client/api';
 
 interface RegisterFormProps {
@@ -12,7 +11,6 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
