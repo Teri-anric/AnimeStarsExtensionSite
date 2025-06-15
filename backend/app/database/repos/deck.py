@@ -7,12 +7,13 @@ from .base import BaseRepository
 from ..models.animestars.card import Card
 from ..types.filter import RawFilter
 from .pagination import PaginationRepository
+from ..types.deck import DeckSummaryDTO, DeckPaginationDTO, DeckDetailDTO
 
 
 class DeckRepository(BaseRepository):
     """Repository for managing card decks grouped by anime_link"""
     
-    async def get_all_decks(self, page: int = 1, per_page: int = 20):
+    async def get_all_decks(self, page: int = 1, per_page: int = 20) -> DeckPaginationDTO:
         """Get all decks (unique anime_link with card counts) with first 6 cards"""
         offset = (page - 1) * per_page
         
@@ -54,22 +55,24 @@ class DeckRepository(BaseRepository):
             cards_result = await self.session.execute(cards_stmt)
             preview_cards = cards_result.scalars().all()
             
-            deck_items.append({
-                'anime_link': deck.anime_link,
-                'anime_name': deck.anime_name,
-                'card_count': deck.card_count,
-                'preview_cards': preview_cards
-            })
+            deck_items.append(DeckSummaryDTO(
+                anime_link=deck.anime_link,
+                anime_name=deck.anime_name,
+                card_count=deck.card_count,
+                preview_cards=preview_cards
+            ))
         
-        return {
-            'items': deck_items,
-            'total': total,
-            'page': page,
-            'per_page': per_page,
-            'total_pages': (total + per_page - 1) // per_page
-        }
+        total_pages = (total + per_page - 1) // per_page
+        return DeckPaginationDTO(
+            items=deck_items,
+            total=total,
+            page=page,
+            per_page=per_page,
+            total_pages=total_pages,
+            has_next=page < total_pages
+        )
     
-    async def get_deck_by_anime_link(self, anime_link: str):
+    async def get_deck_by_anime_link(self, anime_link: str) -> DeckDetailDTO | None:
         """Get all cards for a specific anime_link (deck)"""
         stmt = (
             select(Card)
@@ -83,13 +86,13 @@ class DeckRepository(BaseRepository):
         if not cards:
             return None
             
-        return {
-            'anime_link': anime_link,
-            'anime_name': cards[0].anime_name,
-            'cards': cards
-        }
+        return DeckDetailDTO(
+            anime_link=anime_link,
+            anime_name=cards[0].anime_name,
+            cards=cards
+        )
     
-    async def search_decks(self, query: str, page: int = 1, per_page: int = 20):
+    async def search_decks(self, query: str, page: int = 1, per_page: int = 20) -> DeckPaginationDTO:
         """Search decks by anime name with first 6 cards"""
         offset = (page - 1) * per_page
         
@@ -136,17 +139,19 @@ class DeckRepository(BaseRepository):
             cards_result = await self.session.execute(cards_stmt)
             preview_cards = cards_result.scalars().all()
             
-            deck_items.append({
-                'anime_link': deck.anime_link,
-                'anime_name': deck.anime_name,
-                'card_count': deck.card_count,
-                'preview_cards': preview_cards
-            })
+            deck_items.append(DeckSummaryDTO(
+                anime_link=deck.anime_link,
+                anime_name=deck.anime_name,
+                card_count=deck.card_count,
+                preview_cards=preview_cards
+            ))
         
-        return {
-            'items': deck_items,
-            'total': total,
-            'page': page,
-            'per_page': per_page,
-            'total_pages': (total + per_page - 1) // per_page
-        } 
+        total_pages = (total + per_page - 1) // per_page
+        return DeckPaginationDTO(
+            items=deck_items,
+            total=total,
+            page=page,
+            per_page=per_page,
+            total_pages=total_pages,
+            has_next=page < total_pages
+        ) 

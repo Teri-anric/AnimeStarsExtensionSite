@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from .card import CardSchema
 from .base import BaseSchema
+from .pagination import BasePaginationResponse
 
 
 class DeckSummarySchema(BaseSchema):
@@ -12,13 +13,9 @@ class DeckSummarySchema(BaseSchema):
     preview_cards: List[CardSchema] = Field(default_factory=list, description="First 6 cards for preview")
 
 
-class DeckPaginationResponse(BaseSchema):
+class DeckPaginationResponse(BasePaginationResponse[DeckSummarySchema]):
     """Paginated response for deck listings"""
     items: List[DeckSummarySchema]
-    total: int
-    page: int
-    per_page: int
-    total_pages: int
 
 
 class DeckDetailSchema(BaseSchema):
