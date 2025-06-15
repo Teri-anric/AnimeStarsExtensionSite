@@ -16,11 +16,11 @@ const Header = () => {
           <NavLink to="/cards" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
             Cards
           </NavLink>
-          <NavLink to="/random-gif" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
-            Random GIF
-          </NavLink>
           <NavLink to="/decks" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
             Decks
+          </NavLink>
+          <NavLink to="/random-gif" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            Random GIF
           </NavLink>
         </nav>
       )}
@@ -39,7 +39,7 @@ const Header = () => {
             </div>
           </div>
         ) : (
-          <Link to="/auth" className="login-button">
+          <Link to="/login" className="login-button">
             Login
           </Link>
         )}

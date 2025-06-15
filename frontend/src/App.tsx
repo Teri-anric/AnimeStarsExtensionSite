@@ -2,13 +2,17 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import './App.css';
 import { AuthProvider } from './context/AuthContext';
 import { DomainProvider } from './context/DomainContext';
-import AuthPage from './components/AuthPage';
+import { 
+  LoginPage,
+  RegisterPage,
+  CardsPage, 
+  DecksPage, 
+  DeckDetailPage,
+  RandomAnimeGifPage, 
+  AccountSettingsPage 
+} from './pages';
 import Header from './components/Header';
-import RandomAnimeGif from './components/RandomAnimeGif';
-import Cards from './components/Cards';
-import AccountSettings from './components/AccountSettings';
 import ProtectedRoute from './components/ProtectedRoute';
-import DecksPage from './components/DecksPage';
 
 function App() {
   return (
@@ -19,15 +23,17 @@ function App() {
             <Header />
             <main className="app-content">
               <Routes>
-                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/auth" element={<Navigate to="/login" replace />} />
                   <Route path="/random-gif" element={
                     <ProtectedRoute>
-                      <RandomAnimeGif />
+                      <RandomAnimeGifPage />
                     </ProtectedRoute>
                   } />
                   <Route path="/cards" element={
                     <ProtectedRoute>
-                      <Cards />
+                      <CardsPage />
                     </ProtectedRoute>
                   } />
                   <Route path="/decks" element={
@@ -35,9 +41,14 @@ function App() {
                       <DecksPage />
                     </ProtectedRoute>
                   } />
+                  <Route path="/deck/:anime_link" element={
+                    <ProtectedRoute>
+                      <DeckDetailPage />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/settings" element={
                     <ProtectedRoute>
-                      <AccountSettings />
+                      <AccountSettingsPage />
                     </ProtectedRoute>
                   } />
                   <Route path="/" element=

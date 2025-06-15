@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthApiFactory, UserCreate } from '../client/api';
+import { AuthApiFactory, UserCreate } from '../../client/api';
 
 interface RegisterFormProps {
   onSuccess: () => void;
@@ -43,7 +43,6 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       
       if (response.status === 200) {
         onSuccess();
-        navigate('/auth');
       }
     } catch (err: any) {
       if (err.response?.data?.detail) {

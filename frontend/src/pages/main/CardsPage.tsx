@@ -1,30 +1,32 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { createAuthenticatedClient } from '../utils/apiClient';
-import { CardApi, CardSchema, CardType, CardQuery, CardQueryOrderByEnum, CardFilter } from '../client';
-import '../styles/Cards.css';
-import { useDomain } from '../context/DomainContext';
-import ShortFilter from './ShortFilter';
-import AdvancedFilter from './AdvancedFilter';
+import { useSearchParams } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { createAuthenticatedClient } from '../../utils/apiClient';
+import { CardApi, CardSchema, CardType, CardQuery, CardQueryOrderByEnum, CardFilter } from '../../client';
+import '../../styles/Cards.css';
+import { useDomain } from '../../context/DomainContext';
+import ShortFilter from '../../components/ShortFilter';
+import AdvancedFilter from '../../components/AdvancedFilter';
 
-const Cards = () => {
+const CardsPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
   const { currentDomain } = useDomain();
   const [cards, setCards] = useState<CardSchema[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [perPage] = useState(63);
+  const [perPage] = useState(64);
+  
+  // Get values from URL parameters
+  const page = parseInt(searchParams.get('page') || '1');
+  const nameFilter = searchParams.get('name') || '';
+  const animeNameFilter = searchParams.get('anime') || '';
+  const rankFilter = searchParams.get('rank') || '';
+  const filterMode = (searchParams.get('mode') as 'short' | 'advanced') || 'short';
   
   // Filter mode
-  const [filterMode, setFilterMode] = useState<'short' | 'advanced'>('short');
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
-  
-  // Short filter states
-  const [nameFilter, setNameFilter] = useState('');
-  const [animeNameFilter, setAnimeNameFilter] = useState('');
-  const [rankFilter, setRankFilter] = useState<string>('');
   
   // Advanced filter state
   const [advancedFilter, setAdvancedFilter] = useState<CardFilter | null>(null);
@@ -35,7 +37,7 @@ const Cards = () => {
       setLoading(true);
       fetchCards();
     }
-  }, [isAuthenticated, page, perPage, nameFilter, animeNameFilter, rankFilter, advancedFilter, filterMode]);
+  }, [isAuthenticated, page, nameFilter, animeNameFilter, rankFilter, advancedFilter, filterMode]);
 
   const buildFilter = (): CardFilter | null => {
     if (filterMode === 'advanced') {
@@ -115,40 +117,63 @@ const Cards = () => {
     }
   };
 
+  const updateSearchParams = (updates: Record<string, string | null>) => {
+    const newParams = new URLSearchParams(searchParams);
+    
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === '') {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, value);
+      }
+    });
+    
+    setSearchParams(newParams);
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setPage(1);
+    updateSearchParams({ page: '1' });
   };
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
-      setPage(newPage);
+      updateSearchParams({ page: newPage.toString() });
     }
   };
 
+  const handleNameFilterChange = (value: string) => {
+    updateSearchParams({ name: value, page: '1' });
+  };
 
+  const handleAnimeNameFilterChange = (value: string) => {
+    updateSearchParams({ anime: value, page: '1' });
+  };
+
+  const handleRankFilterChange = (value: string) => {
+    updateSearchParams({ rank: value, page: '1' });
+  };
 
   const handleFilterModeToggle = () => {
     if (filterMode === 'short') {
-      setFilterMode('advanced');
+      updateSearchParams({ mode: 'advanced', page: '1' });
       setShowAdvancedFilter(true);
     } else {
-      setFilterMode('short');
+      updateSearchParams({ mode: 'short', page: '1' });
       setShowAdvancedFilter(false);
       setAdvancedFilter(null);
     }
-    setPage(1);
   };
 
   const handleAdvancedFilterChange = (filter: CardFilter | null) => {
     setAdvancedFilter(filter);
-    setPage(1);
+    updateSearchParams({ page: '1' });
   };
 
   const handleAdvancedFilterClose = () => {
     setShowAdvancedFilter(false);
     if (!advancedFilter) {
-      setFilterMode('short');
+      updateSearchParams({ mode: 'short' });
     }
   };
 
@@ -181,9 +206,9 @@ const Cards = () => {
           nameFilter={nameFilter}
           animeNameFilter={animeNameFilter}
           rankFilter={rankFilter}
-          onNameFilterChange={setNameFilter}
-          onAnimeNameFilterChange={setAnimeNameFilter}
-          onRankFilterChange={setRankFilter}
+          onNameFilterChange={handleNameFilterChange}
+          onAnimeNameFilterChange={handleAnimeNameFilterChange}
+          onRankFilterChange={handleRankFilterChange}
           onSearch={handleSearch}
         />
       )}
@@ -204,53 +229,54 @@ const Cards = () => {
           <div className="cards-grid">
             {cards.length > 0 ? cards.map((card) => (
               <div key={card.id} className={`card-item ${getRankClass(card.rank)}`}>
-                {card.image && !card.mp4 && (
-                  <div className="card-image">
-                    <img 
-                      src={getCardMediaUrl(card.image)} 
-                      alt={card.name} 
-                      loading="lazy"
-                    />
-                  </div>
-                )}
-                {card.mp4 && (
-                  <div className="card-video">
-                    <video autoPlay loop muted playsInline>
-                      <source src={getCardMediaUrl(card.mp4)} type="video/mp4" />
-                      {/* {card.webm && <source src={getCardMediaUrl(card.webm)} type="video/webm" />} */}
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                )}
+                <div className="card-content">
+                  {card.image && !card.mp4 && (
+                    <div className="card-image">
+                      <img 
+                        src={getCardMediaUrl(card.image)} 
+                        alt={card.name} 
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  {card.mp4 && (
+                    <div className="card-video">
+                      <video autoPlay loop muted playsInline>
+                        <source src={getCardMediaUrl(card.mp4)} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  )}
+                </div>
               </div>
             )) : (
-              <div className="no-cards">No cards found</div>
+              <div className="no-cards">No cards found matching your criteria.</div>
             )}
           </div>
-          
-          <div className="pagination">
-            <button 
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page === 1}
-            >
-              Previous
-            </button>
-            
-            <span>
-              Page {page} of {totalPages}
-            </span>
-            
-            <button 
-              onClick={() => handlePageChange(page + 1)}
-              disabled={page === totalPages}
-            >
-              Next
-            </button>
-          </div>
+
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button 
+                onClick={() => handlePageChange(page - 1)} 
+                disabled={page <= 1}
+              >
+                Previous
+              </button>
+              
+              <span>Page {page} of {totalPages}</span>
+              
+              <button 
+                onClick={() => handlePageChange(page + 1)} 
+                disabled={page >= totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
   );
 };
 
-export default Cards; 
+export default CardsPage; 
