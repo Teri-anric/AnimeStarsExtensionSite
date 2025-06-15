@@ -23,12 +23,23 @@ const CardsPage = () => {
   const animeNameFilter = searchParams.get('anime') || '';
   const rankFilter = searchParams.get('rank') || '';
   const filterMode = (searchParams.get('mode') as 'short' | 'advanced') || 'short';
+  const advancedFilterParam = searchParams.get('filter');
   
   // Filter mode
-  const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
+  const [showAdvancedFilter, setShowAdvancedFilter] = useState(filterMode === 'advanced');
   
-  // Advanced filter state
-  const [advancedFilter, setAdvancedFilter] = useState<CardFilter | null>(null);
+  // Advanced filter state - parse from URL parameter
+  const [advancedFilter, setAdvancedFilter] = useState<CardFilter | null>(() => {
+    if (advancedFilterParam) {
+      try {
+        return JSON.parse(decodeURIComponent(advancedFilterParam));
+      } catch (e) {
+        console.error('Failed to parse advanced filter from URL:', e);
+        return null;
+      }
+    }
+    return null;
+  });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -36,7 +47,25 @@ const CardsPage = () => {
       setLoading(true);
       fetchCards();
     }
-  }, [isAuthenticated, page, nameFilter, animeNameFilter, rankFilter, advancedFilter, filterMode]);
+  }, [isAuthenticated, page, nameFilter, animeNameFilter, rankFilter, advancedFilter, filterMode, advancedFilterParam]);
+
+  useEffect(() => {
+    setShowAdvancedFilter(filterMode === 'advanced');
+  }, [filterMode]);
+
+  useEffect(() => {
+    if (advancedFilterParam) {
+      try {
+        const parsedFilter = JSON.parse(decodeURIComponent(advancedFilterParam));
+        setAdvancedFilter(parsedFilter);
+      } catch (e) {
+        console.error('Failed to parse advanced filter from URL:', e);
+        setAdvancedFilter(null);
+      }
+    } else {
+      setAdvancedFilter(null);
+    }
+  }, [advancedFilterParam]);
 
   const buildFilter = (): CardFilter | null => {
     if (filterMode === 'advanced') {
@@ -47,18 +76,26 @@ const CardsPage = () => {
     const filters: CardFilter[] = [];
 
     if (nameFilter) {
-      filters.push({
-        or: [
-          {
-            name: {
-              ilike: `%${nameFilter}%`
-            }
-          }, {
-            card_id: {
-              eq: parseInt(nameFilter)
-            }
+      const nameFilterConditions: CardFilter[] = [
+        {
+          name: {
+            ilike: `%${nameFilter}%`
           }
-        ]
+        }
+      ];
+      
+      // Only add card_id filter if nameFilter is a valid number
+      const cardIdNumber = parseInt(nameFilter);
+      if (!isNaN(cardIdNumber)) {
+        nameFilterConditions.push({
+          card_id: {
+            eq: cardIdNumber
+          }
+        });
+      }
+      
+      filters.push({
+        or: nameFilterConditions
       });
     }
 
@@ -96,15 +133,30 @@ const CardsPage = () => {
   const fetchCards = async () => {
     try {
       const cardApi = createAuthenticatedClient(CardApi);
+      const filter = buildFilter();
+      
+      console.log('Fetching cards with filter:', JSON.stringify(filter, null, 2));
+      console.log('Filter mode:', filterMode);
+      console.log('Name filter:', nameFilter);
+      console.log('Anime filter:', animeNameFilter);
+      console.log('Rank filter:', rankFilter);
+      console.log('Advanced filter:', JSON.stringify(advancedFilter, null, 2));
       
       const cardQuery: CardQuery = {
         page,
         per_page: perPage,
-        filter: buildFilter(),
+        filter,
         order_by: CardQueryOrderByEnum.Id
       };
 
       const response = await cardApi.getCardsApiCardPost(cardQuery);
+      
+      console.log('Server response:', {
+        total: response.data.total,
+        totalPages: response.data.total_pages,
+        itemsCount: response.data.items.length,
+        firstItem: response.data.items[0]
+      });
       
       setCards(response.data.items);
       setTotalPages(response.data.total_pages);
@@ -158,7 +210,7 @@ const CardsPage = () => {
       updateSearchParams({ mode: 'advanced', page: '1' });
       setShowAdvancedFilter(true);
     } else {
-      updateSearchParams({ mode: 'short', page: '1' });
+      updateSearchParams({ mode: 'short', filter: null, page: '1' });
       setShowAdvancedFilter(false);
       setAdvancedFilter(null);
     }
@@ -166,13 +218,14 @@ const CardsPage = () => {
 
   const handleAdvancedFilterChange = (filter: CardFilter | null) => {
     setAdvancedFilter(filter);
-    updateSearchParams({ page: '1' });
+    const filterParam = filter ? encodeURIComponent(JSON.stringify(filter)) : null;
+    updateSearchParams({ filter: filterParam, page: '1' });
   };
 
   const handleAdvancedFilterClose = () => {
     setShowAdvancedFilter(false);
     if (!advancedFilter) {
-      updateSearchParams({ mode: 'short' });
+      updateSearchParams({ mode: 'short', filter: null });
     }
   };
 
@@ -209,6 +262,7 @@ const CardsPage = () => {
         <AdvancedFilter
           onFilterChange={handleAdvancedFilterChange}
           onClose={handleAdvancedFilterClose}
+          initialFilter={advancedFilter}
         />
       )}
 

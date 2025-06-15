@@ -121,6 +121,9 @@ class StringFieldFilter(FieldFilter):
     like: str | None = None
     ilike: str | None = None  # case-insensitive like
     not_like: str | None = None
+    contains: str | None = None
+    icontains: str | None = None
+    not_contains: str | None = None
     in_: list[str] | None = Field(None, alias="in")
     not_in: list[str] | None = None
     is_null: bool | None = None
@@ -138,6 +141,12 @@ class StringFieldFilter(FieldFilter):
             conditions.append(column.ilike(self.ilike))
         if self.not_like is not None:
             conditions.append(column.not_like(self.not_like))
+        if self.contains is not None:
+            conditions.append(column.like(f'%{self.contains}%'))
+        if self.icontains is not None:
+            conditions.append(column.ilike(f'%{self.icontains}%'))
+        if self.not_contains is not None:
+            conditions.append(column.not_like(f'%{self.not_contains}%'))
         if self.in_ is not None:
             conditions.append(column.in_(self.in_))
         if self.not_in is not None:

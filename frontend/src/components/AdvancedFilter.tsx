@@ -13,6 +13,7 @@ interface FilterRule {
 interface AdvancedFilterProps {
   onFilterChange: (filter: CardFilter | null) => void;
   onClose: () => void;
+  initialFilter?: CardFilter | null;
 }
 
 const fieldOptions = [
@@ -30,9 +31,9 @@ const fieldOptions = [
 const stringOperators = [
   { value: 'eq', label: 'Equals' },
   { value: 'ne', label: 'Not Equals' },
-  { value: 'like', label: 'Contains (case sensitive)' },
-  { value: 'ilike', label: 'Contains (case insensitive)' },
-  { value: 'not_like', label: 'Does not contain' },
+  { value: 'contains', label: 'Contains (case sensitive)' },
+  { value: 'icontains', label: 'Contains (case insensitive)' },
+  { value: 'not_contains', label: 'Does not contain' },
   { value: 'is_null', label: 'Is empty' }
 ];
 
@@ -62,8 +63,69 @@ const rankOptions = [
   { value: 'e', label: 'E' }
 ];
 
-const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose }) => {
-  const [rules, setRules] = useState<FilterRule[]>([]);
+const parseFilterToRules = (filter: CardFilter): FilterRule[] => {
+  console.log('Parsing filter to rules:', filter);
+  const rules: FilterRule[] = [];
+  let ruleId = 1;
+
+  const parseFieldFilter = (fieldName: string, fieldFilter: any, logicalOp: 'and' | 'or' = 'and'): FilterRule[] => {
+    const fieldRules: FilterRule[] = [];
+    
+    Object.entries(fieldFilter).forEach(([operator, value]) => {
+      if (operator === 'is_null' && value === true) {
+        fieldRules.push({
+          id: (ruleId++).toString(),
+          field: fieldName,
+          operator: 'is_null',
+          value: '',
+          logicalOperator: logicalOp
+        });
+      } else if (operator === 'in' || operator === 'not_in') {
+        const arrayValue = Array.isArray(value) ? value.join(', ') : String(value);
+        fieldRules.push({
+          id: (ruleId++).toString(),
+          field: fieldName,
+          operator,
+          value: arrayValue,
+          logicalOperator: logicalOp
+        });
+      } else {
+        fieldRules.push({
+          id: (ruleId++).toString(),
+          field: fieldName,
+          operator,
+          value: String(value),
+          logicalOperator: logicalOp
+        });
+      }
+    });
+    
+    return fieldRules;
+  };
+
+  const processFilter = (currentFilter: CardFilter, logicalOp: 'and' | 'or' = 'and') => {
+    Object.entries(currentFilter).forEach(([key, value]) => {
+      if (key === 'and' && Array.isArray(value)) {
+        value.forEach(subFilter => processFilter(subFilter, 'and'));
+      } else if (key === 'or' && Array.isArray(value)) {
+        value.forEach(subFilter => processFilter(subFilter, 'or'));
+      } else if (fieldOptions.some(f => f.value === key)) {
+        rules.push(...parseFieldFilter(key, value, logicalOp));
+      }
+    });
+  };
+
+  processFilter(filter);
+  return rules;
+};
+
+const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose, initialFilter }) => {
+  const [rules, setRules] = useState<FilterRule[]>(() => {
+    if (initialFilter) {
+      return parseFilterToRules(initialFilter);
+    }
+    return [];
+  });
 
   const addRule = () => {
     const newRule: FilterRule = {
@@ -83,9 +145,29 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
   };
 
   const updateRule = (id: string, field: keyof FilterRule, value: string) => {
-    setRules(rules.map(rule => 
-      rule.id === id ? { ...rule, [field]: value } : rule
-    ));
+    setRules(rules.map(rule => {
+      if (rule.id === id) {
+        const updatedRule = { ...rule, [field]: value };
+        
+        // If field is changed to rank, set appropriate operator
+        if (field === 'field' && value === 'rank' && rule.operator === 'ilike') {
+          updatedRule.operator = 'eq';
+          console.log('Changed operator to eq for rank field');
+        }
+        // If field is changed from rank to string field, set appropriate operator
+        else if (field === 'field' && rule.field === 'rank' && value !== 'rank') {
+          const fieldType = getFieldType(value);
+          if (fieldType === 'string') {
+            updatedRule.operator = 'ilike';
+            console.log('Changed operator to ilike for string field');
+          }
+        }
+        
+        console.log('Updated rule:', updatedRule);
+        return updatedRule;
+      }
+      return rule;
+    }));
   };
 
   const getOperatorsForField = (fieldType: string) => {
@@ -198,11 +280,13 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
 
   const applyFilter = () => {
     const filter = buildFilter();
+    console.log('Advanced filter applying:', JSON.stringify(filter, null, 2));
+    console.log('Current rules:', JSON.stringify(rules, null, 2));
     onFilterChange(filter);
   };
 
   const clearFilter = () => {
-    setRules([{ id: '1', field: 'name', operator: 'ilike', value: '' }]);
+    setRules([]);
     onFilterChange(null);
   };
 

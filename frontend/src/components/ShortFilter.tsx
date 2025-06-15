@@ -60,7 +60,9 @@ const ShortFilter: React.FC<ShortFilterProps> = ({
           <input
             type="text"
             value={nameFilter}
-            onChange={(e) => onNameFilterChange(e.target.value)}
+            onChange={(e) => {
+              onNameFilterChange(e.target.value);
+            }}
             placeholder="Card name or ID"
             className="compact-input"
             ref={nameInputRef}
@@ -69,7 +71,9 @@ const ShortFilter: React.FC<ShortFilterProps> = ({
           <input
             type="text"
             value={animeNameFilter}
-            onChange={(e) => onAnimeNameFilterChange(e.target.value)}
+            onChange={(e) => {
+              onAnimeNameFilterChange(e.target.value);
+            }}
             placeholder="Anime name"
             className="compact-input"
             ref={animeNameInputRef}
@@ -77,7 +81,9 @@ const ShortFilter: React.FC<ShortFilterProps> = ({
           
           <select
             value={rankFilter}
-            onChange={(e) => onRankFilterChange(e.target.value)}
+            onChange={(e) => {
+              onRankFilterChange(e.target.value);
+            }}
             className="compact-select"
           >
             <option value="">All Ranks</option>
