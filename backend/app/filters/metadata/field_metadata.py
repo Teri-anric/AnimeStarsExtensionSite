@@ -1,14 +1,18 @@
 from abc import ABC, abstractmethod
-from sqlalchemy import Column
-from typing import Any
+from sqlalchemy import Column, Select
+from sqlalchemy.orm import aliased
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..models.entry_filters import BaseEntryFilter
 
 
 class BaseFieldMetadata(ABC):
     """Base class for field metadata"""
     
     @abstractmethod
-    def get_column(self) -> Column:
-        """Get the SQLAlchemy column for this field"""
+    def get_column(self, alias=None) -> Column:
+        """Get the SQLAlchemy column for this field, optionally with alias"""
         pass
     
     @abstractmethod
@@ -24,7 +28,10 @@ class PropertyFieldMetadata(BaseFieldMetadata):
         self._column = column
         self._field_name = field_name
     
-    def get_column(self) -> Column:
+    def get_column(self, alias=None) -> Column:
+        """Get the column, using alias if provided"""
+        if alias is not None:
+            return getattr(alias, self._field_name)
         return self._column
     
     def get_field_name(self) -> str:
@@ -33,9 +40,18 @@ class PropertyFieldMetadata(BaseFieldMetadata):
     def property_code(self) -> str:
         """Get the property code (same as field name)"""
         return self._field_name
+
+
+class BaseJoinHandler(ABC):
+    """Abstract class for handling joins"""
     
-    def apply_filter(self, stmt, field_filter):
-        """Apply field filter to SQL statement"""
-        # This method will be implemented by the field resolver
-        # For now, just return the statement unchanged
-        return stmt 
+    @property
+    @abstractmethod
+    def alias(self):
+        """Get the SQLAlchemy alias for the joined table"""
+        pass
+    
+    @abstractmethod
+    def prepare_query(self, stmt: Select, parent_alias=None) -> Select:
+        """Prepare query by adding necessary JOINs with parent alias context"""
+        pass 

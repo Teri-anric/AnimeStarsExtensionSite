@@ -1,7 +1,7 @@
 from uuid import UUID
 from pydantic import Field
 from ..models.entry_filters import BaseEntryFilter
-from ..models.field_filters import StringFieldFilter, EnumFieldFilter, ArrayFieldFilter
+from ..models.field_filters import StringFieldFilter, EnumFieldFilter
 from .summary_card_users_filter import SummaryCardUsersFilter
 from ...database.enum import CardType
 
@@ -21,8 +21,8 @@ class CardFilter(BaseEntryFilter):
     mp4: StringFieldFilter | None = Field(default=None, description="Filter by MP4 of the card")
     webm: StringFieldFilter | None = Field(default=None, description="Filter by WebM of the card")
     
-    # Example of ArrayFieldFilter with SubmodelFilter for join filtering
-    summary_card_users: ArrayFieldFilter[SummaryCardUsersFilter] | None = Field(
+    # Entry filter for join filtering
+    summary_card_users: SummaryCardUsersFilter | None = Field(
         default=None, 
         description="Filter cards by their related SummaryCardUsers records"
     )

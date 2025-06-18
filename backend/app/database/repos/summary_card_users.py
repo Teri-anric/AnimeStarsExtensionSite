@@ -13,6 +13,8 @@ class SummaryCardUsersRepository(
     PaginationRepository[SummaryCardUsers],
     BaseRepository,
 ):
+    entry_code = "summary_card_users"
+
     @property
     def entry_class(self) -> type[SummaryCardUsers]:
         return SummaryCardUsers

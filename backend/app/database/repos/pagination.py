@@ -61,11 +61,16 @@ class PaginationRepository(BaseRepository, Generic[T], ABC):
         """Apply filter to statement using the filter service"""
         if not filter:
             return stmt
-            
-        # Use filter service to resolve the condition
+        
+        entry_code = getattr(self, 'entry_code', None)
+        
+        # Use FilterService to prepare query with metadata (handles ArrayFieldFilter and and/or logic)
+        stmt = self.filter_service.prepare_query_with_metadata(stmt, filter, entry_code)
+        
+        # Use filter service to resolve the remaining conditions
         condition = self.filter_service.parse_and_resolve(
             filter_data=filter,
-            entry_code=getattr(self, 'entry_code', None),
+            entry_code=entry_code,
             model_class=self.entry_class
         )
         

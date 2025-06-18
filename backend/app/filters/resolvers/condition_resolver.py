@@ -5,13 +5,12 @@ from .field_resolver import FieldConditionResolver
 from ..models.base_filters import BaseFilter, CombinedFilter, NotFilter, RawFilter
 from ..models.entry_filters import BaseEntryFilter
 from ..models.field_filters import FieldFilter
-from ..metadata import MetadataProvider
 
 
 class ConditionResolver(BaseResolver):
     """Main resolver that orchestrates all filter resolution"""
     
-    def __init__(self, metadata_provider: MetadataProvider):
+    def __init__(self, metadata_provider):
         self.metadata_provider = metadata_provider
         self.field_resolver = FieldConditionResolver()
     
@@ -55,11 +54,29 @@ class ConditionResolver(BaseResolver):
         # Process field filters
         for field_name, field_metadata in container.get_all_fields().items():
             field_filter = getattr(filter_obj, field_name, None)
-            if field_filter and isinstance(field_filter, FieldFilter):
-                column = field_metadata.get_column()
+            if field_filter is None:
+                continue
+                
+            if isinstance(field_filter, FieldFilter):
+                # Handle regular field filters using metadata
+                column = field_metadata.get_column(alias=None)
                 condition = self.field_resolver.resolve(field_filter, column)
                 if condition is not None:
                     conditions.append(condition)
+            
+            elif isinstance(field_filter, BaseEntryFilter):
+                # Handle nested entry filters using join handlers
+                join_handler = container.get_join(field_name)
+                if join_handler is not None:
+                    # Use alias from join handler for nested filter resolution
+                    nested_condition = self._resolve_entry_filter_with_alias(field_filter, join_handler.alias)
+                    if nested_condition is not None:
+                        conditions.append(nested_condition)
+                else:
+                    # Fallback: try to resolve without alias
+                    nested_condition = self._resolve_entry_filter(field_filter)
+                    if nested_condition is not None:
+                        conditions.append(nested_condition)
         
         # Process logical operators
         if filter_obj.and_:
@@ -72,6 +89,57 @@ class ConditionResolver(BaseResolver):
             or_conditions = []
             for sub_filter in filter_obj.or_:
                 condition = self._resolve_entry_filter(sub_filter)
+                if condition is not None:
+                    or_conditions.append(condition)
+            if or_conditions:
+                conditions.append(or_(*or_conditions))
+        
+        return and_(*conditions) if len(conditions) > 1 else (conditions[0] if conditions else None)
+    
+    def _resolve_entry_filter_with_alias(self, filter_obj: BaseEntryFilter, alias) -> ClauseElement | None:
+        """Resolve entry-specific filter with provided alias for join"""
+        entry_code = filter_obj.get_entry_code()
+        container = self.metadata_provider.get_container_or_raise(entry_code)
+        conditions = []
+        
+        # Process field filters with alias
+        for field_name, field_metadata in container.get_all_fields().items():
+            field_filter = getattr(filter_obj, field_name, None)
+            if field_filter is None:
+                continue
+                
+            if isinstance(field_filter, FieldFilter):
+                # Handle regular field filters using metadata with alias
+                column = field_metadata.get_column(alias=alias)
+                condition = self.field_resolver.resolve(field_filter, column)
+                if condition is not None:
+                    conditions.append(condition)
+            
+            elif isinstance(field_filter, BaseEntryFilter):
+                # Handle nested entry filters using join handlers
+                join_handler = container.get_join(field_name)
+                if join_handler is not None:
+                    # Use alias from join handler for nested filter resolution
+                    nested_condition = self._resolve_entry_filter_with_alias(field_filter, join_handler.alias)
+                    if nested_condition is not None:
+                        conditions.append(nested_condition)
+                else:
+                    # Fallback: try to resolve without alias
+                    nested_condition = self._resolve_entry_filter(field_filter)
+                    if nested_condition is not None:
+                        conditions.append(nested_condition)
+        
+        # Process logical operators
+        if filter_obj.and_:
+            for sub_filter in filter_obj.and_:
+                condition = self._resolve_entry_filter_with_alias(sub_filter, alias)
+                if condition is not None:
+                    conditions.append(condition)
+        
+        if filter_obj.or_:
+            or_conditions = []
+            for sub_filter in filter_obj.or_:
+                condition = self._resolve_entry_filter_with_alias(sub_filter, alias)
                 if condition is not None:
                     or_conditions.append(condition)
             if or_conditions:

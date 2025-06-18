@@ -27,11 +27,11 @@ class Card(Base, TimestampMixin):
     mp4: str = Column(String, nullable=True)
     webm: str = Column(String, nullable=True)
 
-    # summary_card_users = relationship(
-    #     SummaryCardUsers,
-    #     back_populates="card",
-    #     cascade="all, delete",
-    # )
+    summary_card_users = relationship(
+        SummaryCardUsers,
+        back_populates="card",
+        cascade="all, delete",
+    )
 
     # author_user = relationship(
     #     AnimestarsUser,

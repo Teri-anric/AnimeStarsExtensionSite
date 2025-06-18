@@ -1,6 +1,6 @@
 from sqlalchemy import Column, and_
 from sqlalchemy.sql.elements import ClauseElement
-from sqlalchemy.orm import RelationshipProperty, Session
+from sqlalchemy.orm import RelationshipProperty
 from .base_resolver import BaseResolver
 from ..models.field_filters import (
     FieldFilter,
@@ -15,17 +15,11 @@ from ..models.field_filters import (
 class FieldConditionResolver(BaseResolver):
     """Resolver for field-specific filters"""
     
-    def __init__(self, session: Session = None):
-        self.session = session
-        # Import here to avoid circular imports
-        if session:
-            from .array_resolver import ArrayFieldResolver
-            self.array_resolver = ArrayFieldResolver(session)
-        else:
-            self.array_resolver = None
+    def __init__(self):
+        self.array_resolver = None
     
-    def resolve(self, filter_obj: FieldFilter, context: Column | RelationshipProperty) -> ClauseElement | None:
-        """Resolve field filter to SQL condition"""
+    def resolve(self, filter_obj: FieldFilter, context: Column | RelationshipProperty) -> ClauseElement | dict | None:
+        """Resolve field filter to SQL condition or structured data"""
         if isinstance(filter_obj, StringFieldFilter):
             return self._resolve_string_filter(filter_obj, context)
         elif isinstance(filter_obj, NumericFieldFilter):
@@ -35,10 +29,8 @@ class FieldConditionResolver(BaseResolver):
         elif isinstance(filter_obj, EnumFieldFilter):
             return self._resolve_enum_filter(filter_obj, context)
         elif isinstance(filter_obj, ArrayFieldFilter):
-            if self.array_resolver:
-                return self.array_resolver.resolve(filter_obj, context)
-            else:
-                raise ValueError("ArrayFieldFilter requires a session for join operations")
+            # For ArrayFieldFilter, we need target model info which will be provided by metadata
+            raise ValueError("ArrayFieldFilter should be handled by metadata container, not field resolver")
         else:
             raise ValueError(f"Unsupported field filter type: {type(filter_obj)}")
     
@@ -75,7 +67,7 @@ class FieldConditionResolver(BaseResolver):
         return self._combine_conditions(conditions)
     
     def _resolve_numeric_filter(self, filter_obj: NumericFieldFilter, column: Column) -> ClauseElement | None:
-        """Resolve numeric field filter"""
+        """Resolve numeric filter"""
         conditions = []
         
         if filter_obj.eq is not None:

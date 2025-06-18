@@ -1,6 +1,7 @@
 from .service import FilterService
-from .metadata import CardMetadataContainer, MetadataProvider
+from .metadata import CardMetadataContainer, SummaryCardUsersMetadataContainer, MetadataProvider
 from .entries.card_filter import CardFilter
+from .entries.summary_card_users_filter import SummaryCardUsersFilter
 
 
 def create_default_filter_service() -> FilterService:
@@ -10,12 +11,14 @@ def create_default_filter_service() -> FilterService:
     
     # Register metadata containers
     metadata_provider.register_container(CardMetadataContainer())
+    metadata_provider.register_container(SummaryCardUsersMetadataContainer())
     
     # Create filter service
     filter_service = FilterService(metadata_provider)
     
     # Register entry filters
     filter_service.register_entry_filter(CardFilter)
+    filter_service.register_entry_filter(SummaryCardUsersFilter)
     
     return filter_service
 

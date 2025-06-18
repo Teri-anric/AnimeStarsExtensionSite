@@ -31,6 +31,7 @@ class FilterParser:
         else:
             raise ValueError(f"Unsupported filter data type: {type(filter_data)}")
     
+
     def _parse_dict_filter(self, filter_dict: dict, entry_code: str | None = None) -> BaseFilter | None:
         """Parse dictionary filter"""
         if not filter_dict:
@@ -43,12 +44,46 @@ class FilterParser:
         if "not" in filter_dict:
             return self._parse_not_filter(filter_dict, entry_code)
         
-        # Check if this is an entry filter
+        # If entry_code provided, use it
         if entry_code and entry_code in self._entry_filter_registry:
             return self._parse_entry_filter(filter_dict, entry_code)
         
+        # Try to auto-detect entry filter by fields
+        detected_entry_code = self._detect_entry_filter(filter_dict)
+        if detected_entry_code:
+            return self._parse_entry_filter(filter_dict, detected_entry_code)
+        
         # Default to raw dictionary (will be handled by condition resolver)
         return filter_dict
+    
+    def _detect_entry_filter(self, filter_dict: dict) -> str | None:
+        """Detect entry filter type based on fields present in filter_dict"""
+        filter_fields = set(filter_dict.keys()) - {"and", "or"}  # Exclude logical operators
+        
+        best_match = None
+        best_score = 0
+        
+        for entry_code, filter_class in self._entry_filter_registry.items():
+            # Get field names from the filter class
+            try:
+                # Create dummy instance to get field names
+                dummy_instance = filter_class()
+                class_fields = set(dummy_instance.model_fields.keys()) - {"and_", "or_"}
+                
+                # Calculate match score - how many fields match
+                matching_fields = filter_fields & class_fields
+                score = len(matching_fields) / max(len(filter_fields), 1)
+                
+                # If all filter_dict fields match class fields, it's a good candidate
+                if matching_fields == filter_fields and score > best_score:
+                    best_match = entry_code
+                    best_score = score
+                    
+            except Exception:
+                # Skip if can't create dummy instance
+                continue
+        
+        return best_match
     
     def _parse_entry_filter(self, filter_dict: dict, entry_code: str) -> BaseEntryFilter:
         """Parse entry-specific filter"""

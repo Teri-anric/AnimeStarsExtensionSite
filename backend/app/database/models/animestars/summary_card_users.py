@@ -19,7 +19,7 @@ class SummaryCardUsers(Base, TimestampMixin):
 
     count: int = Column(Integer, nullable=False)
 
-    # card = relationship(
-    #     "animestars_cards",
-    #     # back_populates="summary_card_users",
-    # )
+    card = relationship(
+        "Card",
+        back_populates="summary_card_users",
+    )

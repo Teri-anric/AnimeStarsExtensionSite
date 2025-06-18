@@ -4,11 +4,12 @@ from sqlalchemy import Select
 
 
 if TYPE_CHECKING:
-    from .field_metadata import BaseFieldMetadata
-    from ..models.field_filters import FieldFilter
+    from .field_metadata import BaseFieldMetadata, BaseJoinHandler
+    from ..models.entry_filters import BaseEntryFilter
 else:
     BaseFieldMetadata = object
-    FieldFilter = object
+    BaseEntryFilter = object
+    BaseJoinHandler = object
 
 
 class MetadataContainer(ABC):
@@ -22,36 +23,24 @@ class MetadataContainer(ABC):
         """Get the entity code for the container"""
         pass
 
-    @property
-    def entity_code(self) -> str:
-        """Get the entity code for the container"""
-        return self.get_entity_code()
+    def get_field_metadata(self, property_code: str) -> BaseFieldMetadata | None:
+        """Get field metadata by property code"""
+        return self._field_metadata.get(property_code)
+    
+    def get_join(self, property_code: str) -> BaseJoinHandler | None:
+        """Get join handler for property code - implement in subclasses"""
+        return None
+
+    @abstractmethod
+    def prepare_query(self, stmt: Select, entry_filter: BaseEntryFilter) -> Select:
+        """
+        Prepare query by adding necessary JOINs based on the filter.
+        This is where the metadata container handles relationships and JOINs.
+        Subclasses must implement this method.
+        """
+        return stmt
 
     def add_field(self, field_metadata: BaseFieldMetadata) -> "MetadataContainer":
         """Add field metadata to the container using its property_code"""
         self._field_metadata[field_metadata.property_code()] = field_metadata
         return self
-
-    def get_field_metadata(self, property_code: str) -> BaseFieldMetadata | None:
-        """Get field metadata by property code"""
-        return self._field_metadata.get(property_code)
-
-    def has_field(self, property_code: str) -> bool:
-        """Check if field exists in metadata"""
-        return property_code in self._field_metadata
-
-    def get_all_fields(self) -> dict[str, BaseFieldMetadata]:
-        """Get all field metadata"""
-        return self._field_metadata.copy()
-
-    def apply_field_filter(
-        self, stmt: Select, property_code: str, field_filter: FieldFilter
-    ) -> Select:
-        """Apply a field filter using the appropriate metadata"""
-        field_metadata = self.get_field_metadata(property_code)
-        if field_metadata is None:
-            raise ValueError(
-                f"Field '{property_code}' not found in metadata for entity '{self.entity_code}'"
-            )
-
-        return field_metadata.apply_filter(stmt, field_filter)

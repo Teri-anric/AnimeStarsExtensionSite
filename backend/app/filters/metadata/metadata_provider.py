@@ -1,19 +1,24 @@
-from typing import Dict, Optional
-from .metadata_container import MetadataContainer
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .metadata_container import MetadataContainer
+else:
+    MetadataContainer = object
+
 
 
 class MetadataProvider:
     """Provider that manages multiple metadata containers"""
     
     def __init__(self):
-        self._containers: Dict[str, MetadataContainer] = {}
+        self._containers: dict[str, MetadataContainer] = {}
     
     def register_container(self, container: MetadataContainer) -> "MetadataProvider":
         """Register a metadata container"""
         self._containers[container.entity_code] = container
         return self
     
-    def get_container(self, entity_code: str) -> Optional[MetadataContainer]:
+    def get_container(self, entity_code: str) -> MetadataContainer | None:
         """Get metadata container by entity code"""
         return self._containers.get(entity_code)
     
@@ -21,7 +26,7 @@ class MetadataProvider:
         """Check if container exists"""
         return entity_code in self._containers
     
-    def get_all_containers(self) -> Dict[str, MetadataContainer]:
+    def get_all_containers(self) -> dict[str, MetadataContainer]:
         """Get all registered containers"""
         return self._containers.copy()
     
