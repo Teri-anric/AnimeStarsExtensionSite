@@ -15,8 +15,4 @@ class CardCollection(Enum):
     TRADE = "trade" 
     NEED = "need"
     OWNED = "owned"
-
-
-class SummaryCardState(Enum):
-    LOCKED = "locked"
-    UNLOCKED = "unlocked"
+    UNLOCKED_OWNED = "unlocked_owned"

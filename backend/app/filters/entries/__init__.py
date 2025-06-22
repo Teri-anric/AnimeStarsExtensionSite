@@ -1,7 +1,7 @@
 from .card_filter import CardFilter
-from .summary_card_users_filter import SummaryCardUsersFilter
+from .card_users_stats_filter import CardUsersStatsFilter
 
 __all__ = [
     "CardFilter",
-    "SummaryCardUsersFilter",
+    "CardUsersStatsFilter",
 ] 

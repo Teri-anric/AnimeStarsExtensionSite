@@ -31,7 +31,7 @@ class Token(UUIDPKMixin, TimestampMixin, Base):
 
         access_token_expires = timedelta(
             minutes=settings.auth.access_token_expire_minutes
-        )   
+        )
         access_token = create_access_token(
             data={
                 "sub": str(self.id),

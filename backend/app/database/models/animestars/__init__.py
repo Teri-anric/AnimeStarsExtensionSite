@@ -1,5 +1,5 @@
 from .card import Card
 from .user import AnimestarsUser
-from .summary_card_users import SummaryCardUsers
+from .card_users_stats import CardUsersStats
 
-__all__ = ["Card", "AnimestarsUser", "SummaryCardUsers"]
+__all__ = ["Card", "AnimestarsUser", "CardUsersStats"]

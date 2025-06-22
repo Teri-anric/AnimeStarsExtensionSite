@@ -1,7 +1,6 @@
-from pydantic import Field, field_validator
+from pydantic import field_validator
 from uuid import UUID
 from ...database.models.animestars.card import CardType
-from ...database.enum import CardCollection, SummaryCardState
 from .pagination import BasePaginationQuery, BasePaginationResponse
 from .base import BaseSchema
 from typing import Literal
@@ -70,26 +69,9 @@ CardSort = Literal[
 
 
 
-
-# CardFilter is now imported from filters.entries.card_filter
-
 class CardQuery(BasePaginationQuery[CardFilter, CardSort]):
     pass
 
 
 class CardPaginationResponse(BasePaginationResponse[CardSchema]):
     items: list[CardSchema]
-
-
-class CardUsersSummarySchema(BaseSchema):
-    id: UUID
-    card_id: int
-    collection: CardCollection
-    state: SummaryCardState
-    count: int
-
-
-class CardUsersSummaryResponse(BaseSchema):
-    owned: CardUsersSummarySchema | None = None
-    trade: CardUsersSummarySchema | None = None
-    need: CardUsersSummarySchema | None = None

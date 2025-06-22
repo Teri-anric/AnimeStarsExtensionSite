@@ -1,18 +1,13 @@
-from fastapi import APIRouter, Query, HTTPException
-from typing import Annotated
+from fastapi import APIRouter, HTTPException
 from uuid import UUID
 
 from app.web.schema.card import (
     CardQuery,
     CardPaginationResponse,
     CardSchema,
-    CardUsersSummaryResponse,
-    CardUsersSummarySchema,
 )
-from app.web.deps import CardRepositoryDep, SummaryCardUsersRepositoryDep
+from app.web.deps import CardRepositoryDep
 from app.database.types.pagination import PaginationQuery
-from app.database.enum import CardCollection
-from app.filters.metadata import default_metadata_provider
 
 router = APIRouter(prefix="/card", tags=["card"])
 
@@ -55,19 +50,3 @@ async def get_card(card_id: int | UUID, repo: CardRepositoryDep) -> CardSchema:
         raise HTTPException(status_code=404, detail="Card not found")
     return card
 
-
-@router.get("/{card_id}/users/summary")
-async def get_card_users_summary(
-    card_id: int | UUID,
-    repo: SummaryCardUsersRepositoryDep,
-) -> CardUsersSummaryResponse:
-    return await repo.get_card_users_summary(card_id)
-
-
-@router.get("/{card_id}/users/summary/{collection}")
-async def get_card_users_summary_by_collection(
-    card_id: int | UUID,
-    collection: CardCollection,
-    repo: SummaryCardUsersRepositoryDep,
-) -> CardUsersSummarySchema:
-    return await repo.get_card_users_summary_by_collection(card_id, collection)

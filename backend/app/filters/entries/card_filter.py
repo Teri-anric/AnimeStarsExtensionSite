@@ -1,8 +1,7 @@
 from uuid import UUID
 from pydantic import Field
 from ..models.entry_filters import BaseEntryFilter
-from ..models.field_filters import StringFieldFilter, EnumFieldFilter, ArrayFieldFilter, DateTimeFieldFilter
-from .summary_card_users_filter import SummaryCardUsersFilter
+from ..models.field_filters import StringFieldFilter, EnumFieldFilter, DateTimeFieldFilter
 from ...database.enum import CardType
 
 
@@ -22,13 +21,7 @@ class CardFilter(BaseEntryFilter):
     webm: StringFieldFilter | None = Field(default=None, description="Filter by WebM of the card")
     created_at: DateTimeFieldFilter | None = Field(default=None, description="Filter by Creation date of the card")
     updated_at: DateTimeFieldFilter | None = Field(default=None, description="Filter by Last update date of the card")
-    
-    # Example of ArrayFieldFilter with SubmodelFilter for join filtering
-    summary_card_users: ArrayFieldFilter[SummaryCardUsersFilter] | None = Field(
-        default=None, 
-        description="Filter cards by their related SummaryCardUsers records"
-    )
-    
+
     @classmethod
     def get_entry_code(cls) -> str:
         return "card" 
