@@ -1,22 +1,14 @@
 from .service import FilterService
-from .metadata import CardMetadataContainer, MetadataProvider
+from .metadata import default_metadata_provider
 from .entries.card_filter import CardFilter
+from .entries.desk_filter import DeckFilter
 
 
 def create_default_filter_service() -> FilterService:
     """Create a default filter service with all standard configurations"""
-    # Create metadata provider
-    metadata_provider = MetadataProvider()
-    
-    # Register metadata containers
-    metadata_provider.register_container(CardMetadataContainer())
-    
-    # Create filter service
-    filter_service = FilterService(metadata_provider)
-    
-    # Register entry filters
+    filter_service = FilterService(default_metadata_provider)
     filter_service.register_entry_filter(CardFilter)
-    
+    filter_service.register_entry_filter(DeckFilter)
     return filter_service
 
 
