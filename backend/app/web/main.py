@@ -1,25 +1,12 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api import router as api_router
+from .util_router import router as util_router
 
 app = FastAPI(title="Anime Stars", description="Unofficial Anime Stars API")
 app.include_router(api_router)
-
-
-@app.get("/")
-def read_root():
-    return {"message": "Hello, World!"}
-
-
-class HealthResponse(BaseModel):
-    status: str
-
-
-@app.get("/health", response_model=HealthResponse, tags=["health"])
-def health():
-    return {"status": "ok"}
+app.include_router(util_router)
 
 
 app.add_middleware(

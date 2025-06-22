@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { createAuthenticatedClient } from '../../utils/apiClient';
-import { CardApi, CardSchema, CardType, CardQuery, CardQueryOrderByEnum, CardFilter } from '../../client';
+import { CardApi, CardSchema, CardType, CardQuery, CardFilter } from '../../client';
 import '../../styles/Cards.css';
 import ShortFilter from '../../components/ShortFilter';
 import AdvancedFilter from '../../components/AdvancedFilter';
@@ -21,15 +21,14 @@ const CardsPage = () => {
 
   // Sort options for cards
   const cardSortOptions: SortOption[] = [
-    { value: CardQueryOrderByEnum.Id, label: 'ID (Default)' },
-    { value: CardQueryOrderByEnum.CardIdAsc, label: 'Card ID (Ascending)' },
-    { value: CardQueryOrderByEnum.CardIdDesc, label: 'Card ID (Descending)' },
-    { value: CardQueryOrderByEnum.NameAsc, label: 'Name (A-Z)' },
-    { value: CardQueryOrderByEnum.NameDesc, label: 'Name (Z-A)' },
-    { value: CardQueryOrderByEnum.RankAsc, label: 'Rank (Low to High)' },
-    { value: CardQueryOrderByEnum.RankDesc, label: 'Rank (High to Low)' },
-    { value: CardQueryOrderByEnum.AnimeNameAsc, label: 'Anime Name (A-Z)' },
-    { value: CardQueryOrderByEnum.AnimeNameDesc, label: 'Anime Name (Z-A)' },
+    { value: "card_id asc", label: 'Card ID (Ascending)' },
+    { value: "card_id desc", label: 'Card ID (Descending)' },
+    { value: "name asc", label: 'Name (A-Z)' },
+    { value: "name desc", label: 'Name (Z-A)' },
+    { value: "rank asc", label: 'Rank (Low to High)' },
+    { value: "rank desc", label: 'Rank (High to Low)' },
+    { value: "anime_name asc", label: 'Anime Name (A-Z)' },
+    { value: "anime_name desc", label: 'Anime Name (Z-A)' },
     { value: 'created_at desc', label: 'Newest First' },
     { value: 'created_at asc', label: 'Oldest First' },
     { value: 'updated_at desc', label: 'Recently Updated' },
@@ -47,7 +46,7 @@ const CardsPage = () => {
   const rankFilter = searchParams.get('rank') || '';
   const filterMode = (searchParams.get('mode') as 'short' | 'advanced') || 'short';
   const advancedFilterParam = searchParams.get('filter');
-  const sortBy = (searchParams.get('sort') as CardQueryOrderByEnum) || CardQueryOrderByEnum.Id;
+  const sortBy = searchParams.get('sort') || "created_at desc";
   
   // Filter mode
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(filterMode === 'advanced');

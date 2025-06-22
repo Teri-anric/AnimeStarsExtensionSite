@@ -26,86 +26,14 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
- * @interface ArrayFieldFilterSummaryCardUsersFilter
- */
-export interface ArrayFieldFilterSummaryCardUsersFilter {
-    /**
-     * 
-     * @type {SummaryCardUsersFilter}
-     * @memberof ArrayFieldFilterSummaryCardUsersFilter
-     */
-    'any'?: SummaryCardUsersFilter | null;
-    /**
-     * 
-     * @type {SummaryCardUsersFilter}
-     * @memberof ArrayFieldFilterSummaryCardUsersFilter
-     */
-    'all'?: SummaryCardUsersFilter | null;
-    /**
-     * 
-     * @type {SummaryCardUsersFilter}
-     * @memberof ArrayFieldFilterSummaryCardUsersFilter
-     */
-    'none'?: SummaryCardUsersFilter | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ArrayFieldFilterSummaryCardUsersFilter
-     */
-    'is_empty'?: boolean | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ArrayFieldFilterSummaryCardUsersFilter
-     */
-    'is_not_empty'?: boolean | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof ArrayFieldFilterSummaryCardUsersFilter
-     */
-    'size_eq'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof ArrayFieldFilterSummaryCardUsersFilter
-     */
-    'size_gt'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof ArrayFieldFilterSummaryCardUsersFilter
-     */
-    'size_lt'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof ArrayFieldFilterSummaryCardUsersFilter
-     */
-    'size_gte'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof ArrayFieldFilterSummaryCardUsersFilter
-     */
-    'size_lte'?: number | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ArrayFieldFilterSummaryCardUsersFilter
-     */
-    'is_null'?: boolean | null;
-}
-/**
- * 
- * @export
  * @enum {string}
  */
 
 export const CardCollection = {
     Trade: 'trade',
     Need: 'need',
-    Owned: 'owned'
+    Owned: 'owned',
+    UnlockedOwned: 'unlocked_owned'
 } as const;
 
 export type CardCollection = typeof CardCollection[keyof typeof CardCollection];
@@ -201,12 +129,6 @@ export interface CardFilter {
      * @memberof CardFilter
      */
     'updated_at'?: DateTimeFieldFilter | null;
-    /**
-     * 
-     * @type {ArrayFieldFilterSummaryCardUsersFilter}
-     * @memberof CardFilter
-     */
-    'summary_card_users'?: ArrayFieldFilterSummaryCardUsersFilter | null;
 }
 /**
  * 
@@ -272,10 +194,10 @@ export interface CardQuery {
     'filter'?: CardFilter | null;
     /**
      * 
-     * @type {string}
+     * @type {OrderBy}
      * @memberof CardQuery
      */
-    'order_by'?: CardQueryOrderByEnum | null;
+    'order_by'?: OrderBy | null;
     /**
      * 
      * @type {number}
@@ -289,48 +211,6 @@ export interface CardQuery {
      */
     'per_page'?: number;
 }
-
-export const CardQueryOrderByEnum = {
-    IdAsc: 'id asc',
-    IdDesc: 'id desc',
-    Id: 'id',
-    CardIdAsc: 'card_id asc',
-    CardIdDesc: 'card_id desc',
-    CardId: 'card_id',
-    NameAsc: 'name asc',
-    NameDesc: 'name desc',
-    Name: 'name',
-    RankAsc: 'rank asc',
-    RankDesc: 'rank desc',
-    Rank: 'rank',
-    AnimeNameAsc: 'anime_name asc',
-    AnimeNameDesc: 'anime_name desc',
-    AnimeName: 'anime_name',
-    AnimeLinkAsc: 'anime_link asc',
-    AnimeLinkDesc: 'anime_link desc',
-    AnimeLink: 'anime_link',
-    AuthorAsc: 'author asc',
-    AuthorDesc: 'author desc',
-    Author: 'author',
-    ImageAsc: 'image asc',
-    ImageDesc: 'image desc',
-    Image: 'image',
-    Mp4Asc: 'mp4 asc',
-    Mp4Desc: 'mp4 desc',
-    Mp4: 'mp4',
-    WebmAsc: 'webm asc',
-    WebmDesc: 'webm desc',
-    Webm: 'webm',
-    CreatedAtAsc: 'created_at asc',
-    CreatedAtDesc: 'created_at desc',
-    CreatedAt: 'created_at',
-    UpdatedAtAsc: 'updated_at asc',
-    UpdatedAtDesc: 'updated_at desc',
-    UpdatedAt: 'updated_at'
-} as const;
-
-export type CardQueryOrderByEnum = typeof CardQueryOrderByEnum[keyof typeof CardQueryOrderByEnum];
-
 /**
  * 
  * @export
@@ -366,49 +246,49 @@ export interface CardSchema {
      * @type {string}
      * @memberof CardSchema
      */
-    'anime_name': string | null;
+    'anime_name'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof CardSchema
      */
-    'anime_link': string | null;
+    'anime_link'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof CardSchema
      */
-    'author': string | null;
+    'author'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof CardSchema
      */
-    'image': string | null;
+    'image'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof CardSchema
      */
-    'mp4': string | null;
+    'mp4'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof CardSchema
      */
-    'webm': string | null;
+    'webm'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof CardSchema
      */
-    'created_at': string | null;
+    'created_at'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof CardSchema
      */
-    'updated_at': string | null;
+    'updated_at'?: string | null;
 }
 
 
@@ -434,64 +314,119 @@ export type CardType = typeof CardType[keyof typeof CardType];
 /**
  * 
  * @export
- * @interface CardUsersSummaryResponse
+ * @interface CardUsersStatsFilter
  */
-export interface CardUsersSummaryResponse {
+export interface CardUsersStatsFilter {
     /**
      * 
-     * @type {CardUsersSummarySchema}
-     * @memberof CardUsersSummaryResponse
+     * @type {Array<CardUsersStatsFilter>}
+     * @memberof CardUsersStatsFilter
      */
-    'owned'?: CardUsersSummarySchema | null;
+    'and'?: Array<CardUsersStatsFilter> | null;
     /**
      * 
-     * @type {CardUsersSummarySchema}
-     * @memberof CardUsersSummaryResponse
+     * @type {Array<CardUsersStatsFilter>}
+     * @memberof CardUsersStatsFilter
      */
-    'trade'?: CardUsersSummarySchema | null;
+    'or'?: Array<CardUsersStatsFilter> | null;
     /**
      * 
-     * @type {CardUsersSummarySchema}
-     * @memberof CardUsersSummaryResponse
+     * @type {EnumFieldFilterUUID}
+     * @memberof CardUsersStatsFilter
      */
-    'need'?: CardUsersSummarySchema | null;
+    'id'?: EnumFieldFilterUUID | null;
+    /**
+     * 
+     * @type {NumericFieldFilter}
+     * @memberof CardUsersStatsFilter
+     */
+    'card_id'?: NumericFieldFilter | null;
+    /**
+     * 
+     * @type {EnumFieldFilterCardCollection}
+     * @memberof CardUsersStatsFilter
+     */
+    'collection'?: EnumFieldFilterCardCollection | null;
+    /**
+     * 
+     * @type {NumericFieldFilter}
+     * @memberof CardUsersStatsFilter
+     */
+    'count'?: NumericFieldFilter | null;
 }
 /**
  * 
  * @export
- * @interface CardUsersSummarySchema
+ * @interface CardUsersStatsQuery
  */
-export interface CardUsersSummarySchema {
+export interface CardUsersStatsQuery {
+    /**
+     * 
+     * @type {CardUsersStatsFilter}
+     * @memberof CardUsersStatsQuery
+     */
+    'filter'?: CardUsersStatsFilter | null;
+    /**
+     * 
+     * @type {OrderBy1}
+     * @memberof CardUsersStatsQuery
+     */
+    'order_by'?: OrderBy1 | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardUsersStatsQuery
+     */
+    'page'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardUsersStatsQuery
+     */
+    'per_page'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface CardUsersStatsSchema
+ */
+export interface CardUsersStatsSchema {
     /**
      * 
      * @type {string}
-     * @memberof CardUsersSummarySchema
+     * @memberof CardUsersStatsSchema
      */
     'id': string;
     /**
      * 
      * @type {number}
-     * @memberof CardUsersSummarySchema
+     * @memberof CardUsersStatsSchema
      */
     'card_id': number;
     /**
      * 
      * @type {CardCollection}
-     * @memberof CardUsersSummarySchema
+     * @memberof CardUsersStatsSchema
      */
     'collection': CardCollection;
     /**
      * 
-     * @type {SummaryCardState}
-     * @memberof CardUsersSummarySchema
-     */
-    'state': SummaryCardState;
-    /**
-     * 
      * @type {number}
-     * @memberof CardUsersSummarySchema
+     * @memberof CardUsersStatsSchema
      */
     'count': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardUsersStatsSchema
+     */
+    'created_at': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardUsersStatsSchema
+     */
+    'updated_at': string;
 }
 
 
@@ -711,10 +646,10 @@ export interface DeckQuery {
     'filter'?: DeckFilter | null;
     /**
      * 
-     * @type {string}
+     * @type {OrderBy2}
      * @memberof DeckQuery
      */
-    'order_by'?: DeckQueryOrderByEnum | null;
+    'order_by'?: OrderBy2 | null;
     /**
      * 
      * @type {number}
@@ -728,18 +663,6 @@ export interface DeckQuery {
      */
     'per_page'?: number;
 }
-
-export const DeckQueryOrderByEnum = {
-    AnimeNameAsc: 'anime_name asc',
-    AnimeNameDesc: 'anime_name desc',
-    AnimeName: 'anime_name',
-    CardCountAsc: 'card_count asc',
-    CardCountDesc: 'card_count desc',
-    CardCount: 'card_count'
-} as const;
-
-export type DeckQueryOrderByEnum = typeof DeckQueryOrderByEnum[keyof typeof DeckQueryOrderByEnum];
-
 /**
  * Schema for deck summary in listings
  * @export
@@ -771,6 +694,20 @@ export interface DeckSummarySchema {
      */
     'preview_cards'?: Array<CardSchema>;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const Direction = {
+    Asc: 'asc',
+    Desc: 'desc'
+} as const;
+
+export type Direction = typeof Direction[keyof typeof Direction];
+
+
 /**
  * 
  * @export
@@ -889,45 +826,6 @@ export interface EnumFieldFilterInt {
 /**
  * 
  * @export
- * @interface EnumFieldFilterSummaryCardState
- */
-export interface EnumFieldFilterSummaryCardState {
-    /**
-     * 
-     * @type {SummaryCardState}
-     * @memberof EnumFieldFilterSummaryCardState
-     */
-    'eq'?: SummaryCardState | null;
-    /**
-     * 
-     * @type {SummaryCardState}
-     * @memberof EnumFieldFilterSummaryCardState
-     */
-    'ne'?: SummaryCardState | null;
-    /**
-     * 
-     * @type {Array<SummaryCardState>}
-     * @memberof EnumFieldFilterSummaryCardState
-     */
-    'in'?: Array<SummaryCardState> | null;
-    /**
-     * 
-     * @type {Array<SummaryCardState>}
-     * @memberof EnumFieldFilterSummaryCardState
-     */
-    'not_in'?: Array<SummaryCardState> | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof EnumFieldFilterSummaryCardState
-     */
-    'is_null'?: boolean | null;
-}
-
-
-/**
- * 
- * @export
  * @interface EnumFieldFilterUUID
  */
 export interface EnumFieldFilterUUID {
@@ -1008,6 +906,54 @@ export interface HealthResponse {
      * @memberof HealthResponse
      */
     'status': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof HealthResponse
+     */
+    'ping': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof HealthResponse
+     */
+    'uptime_seconds': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof HealthResponse
+     */
+    'uptime_formatted': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof HealthResponse
+     */
+    'version': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof HealthResponse
+     */
+    'environment': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof HealthResponse
+     */
+    'timestamp': string;
+    /**
+     * 
+     * @type {object}
+     * @memberof HealthResponse
+     */
+    'database_stats': object;
+    /**
+     * 
+     * @type {object}
+     * @memberof HealthResponse
+     */
+    'system_info': object;
 }
 /**
  * 
@@ -1099,6 +1045,150 @@ export interface NumericFieldFilter {
 export interface NumericFieldFilterInInner {
 }
 /**
+ * Order by the pagination
+ * @export
+ * @interface OrderBy
+ */
+export interface OrderBy {
+}
+/**
+ * Order by the pagination
+ * @export
+ * @interface OrderBy1
+ */
+export interface OrderBy1 {
+}
+/**
+ * Order by the pagination
+ * @export
+ * @interface OrderBy2
+ */
+export interface OrderBy2 {
+}
+/**
+ * 
+ * @export
+ * @interface SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCount
+ */
+export interface SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCount {
+    /**
+     * 
+     * @type {string}
+     * @memberof SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCount
+     */
+    'property': SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCountPropertyEnum;
+    /**
+     * 
+     * @type {Direction}
+     * @memberof SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCount
+     */
+    'direction': Direction;
+}
+
+export const SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCountPropertyEnum = {
+    AnimeNameAsc: 'anime_name asc',
+    AnimeNameDesc: 'anime_name desc',
+    AnimeName: 'anime_name',
+    CardCountAsc: 'card_count asc',
+    CardCountDesc: 'card_count desc',
+    CardCount: 'card_count'
+} as const;
+
+export type SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCountPropertyEnum = typeof SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCountPropertyEnum[keyof typeof SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCountPropertyEnum];
+
+/**
+ * 
+ * @export
+ * @interface SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAt
+ */
+export interface SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAt {
+    /**
+     * 
+     * @type {string}
+     * @memberof SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAt
+     */
+    'property': SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAtPropertyEnum;
+    /**
+     * 
+     * @type {Direction}
+     * @memberof SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAt
+     */
+    'direction': Direction;
+}
+
+export const SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAtPropertyEnum = {
+    IdAsc: 'id asc',
+    IdDesc: 'id desc',
+    Id: 'id',
+    CardIdAsc: 'card_id asc',
+    CardIdDesc: 'card_id desc',
+    CardId: 'card_id',
+    NameAsc: 'name asc',
+    NameDesc: 'name desc',
+    Name: 'name',
+    RankAsc: 'rank asc',
+    RankDesc: 'rank desc',
+    Rank: 'rank',
+    AnimeNameAsc: 'anime_name asc',
+    AnimeNameDesc: 'anime_name desc',
+    AnimeName: 'anime_name',
+    AnimeLinkAsc: 'anime_link asc',
+    AnimeLinkDesc: 'anime_link desc',
+    AnimeLink: 'anime_link',
+    AuthorAsc: 'author asc',
+    AuthorDesc: 'author desc',
+    Author: 'author',
+    ImageAsc: 'image asc',
+    ImageDesc: 'image desc',
+    Image: 'image',
+    Mp4Asc: 'mp4 asc',
+    Mp4Desc: 'mp4 desc',
+    Mp4: 'mp4',
+    WebmAsc: 'webm asc',
+    WebmDesc: 'webm desc',
+    Webm: 'webm',
+    CreatedAtAsc: 'created_at asc',
+    CreatedAtDesc: 'created_at desc',
+    CreatedAt: 'created_at',
+    UpdatedAtAsc: 'updated_at asc',
+    UpdatedAtDesc: 'updated_at desc',
+    UpdatedAt: 'updated_at'
+} as const;
+
+export type SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAtPropertyEnum = typeof SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAtPropertyEnum[keyof typeof SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAtPropertyEnum];
+
+/**
+ * 
+ * @export
+ * @interface SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAt
+ */
+export interface SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAt {
+    /**
+     * 
+     * @type {string}
+     * @memberof SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAt
+     */
+    'property': SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAtPropertyEnum;
+    /**
+     * 
+     * @type {Direction}
+     * @memberof SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAt
+     */
+    'direction': Direction;
+}
+
+export const SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAtPropertyEnum = {
+    Id: 'id',
+    CardId: 'card_id',
+    Collection: 'collection',
+    Count: 'count',
+    CreatedAt: 'created_at',
+    UpdatedAt: 'updated_at'
+} as const;
+
+export type SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAtPropertyEnum = typeof SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAtPropertyEnum[keyof typeof SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAtPropertyEnum];
+
+/**
  * Filter for string fields
  * @export
  * @interface StringFieldFilter
@@ -1170,63 +1260,6 @@ export interface StringFieldFilter {
      * @memberof StringFieldFilter
      */
     'is_null'?: boolean | null;
-}
-/**
- * 
- * @export
- * @enum {string}
- */
-
-export const SummaryCardState = {
-    Locked: 'locked',
-    Unlocked: 'unlocked'
-} as const;
-
-export type SummaryCardState = typeof SummaryCardState[keyof typeof SummaryCardState];
-
-
-/**
- * Entry filter for SummaryCardUsers model - used as submodel filter in ArrayFieldFilter
- * @export
- * @interface SummaryCardUsersFilter
- */
-export interface SummaryCardUsersFilter {
-    /**
-     * 
-     * @type {Array<SummaryCardUsersFilter>}
-     * @memberof SummaryCardUsersFilter
-     */
-    'and'?: Array<SummaryCardUsersFilter> | null;
-    /**
-     * 
-     * @type {Array<SummaryCardUsersFilter>}
-     * @memberof SummaryCardUsersFilter
-     */
-    'or'?: Array<SummaryCardUsersFilter> | null;
-    /**
-     * 
-     * @type {NumericFieldFilter}
-     * @memberof SummaryCardUsersFilter
-     */
-    'card_id'?: NumericFieldFilter | null;
-    /**
-     * 
-     * @type {EnumFieldFilterCardCollection}
-     * @memberof SummaryCardUsersFilter
-     */
-    'collection'?: EnumFieldFilterCardCollection | null;
-    /**
-     * 
-     * @type {EnumFieldFilterSummaryCardState}
-     * @memberof SummaryCardUsersFilter
-     */
-    'state'?: EnumFieldFilterSummaryCardState | null;
-    /**
-     * 
-     * @type {NumericFieldFilter}
-     * @memberof SummaryCardUsersFilter
-     */
-    'count'?: NumericFieldFilter | null;
 }
 /**
  * 
@@ -1731,78 +1764,6 @@ export const CardApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * 
-         * @summary Get Card Users Summary
-         * @param {CardId} cardId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getCardUsersSummaryApiCardCardIdUsersSummaryGet: async (cardId: CardId, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'cardId' is not null or undefined
-            assertParamExists('getCardUsersSummaryApiCardCardIdUsersSummaryGet', 'cardId', cardId)
-            const localVarPath = `/api/card/{card_id}/users/summary`
-                .replace(`{${"card_id"}}`, encodeURIComponent(String(cardId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Get Card Users Summary By Collection
-         * @param {CardId} cardId 
-         * @param {CardCollection} collection 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet: async (cardId: CardId, collection: CardCollection, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'cardId' is not null or undefined
-            assertParamExists('getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet', 'cardId', cardId)
-            // verify required parameter 'collection' is not null or undefined
-            assertParamExists('getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet', 'collection', collection)
-            const localVarPath = `/api/card/{card_id}/users/summary/{collection}`
-                .replace(`{${"card_id"}}`, encodeURIComponent(String(cardId)))
-                .replace(`{${"collection"}}`, encodeURIComponent(String(collection)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Get cards with filtering support.  The new filter system supports: - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm - Computed fields: author_username (demonstrates custom logic)  Example filter usage: {     \"filter\": {         \"name\": {\"contains\": \"Naruto\"},         \"author_username\": {\"icontains\": \"user\"},         \"rank\": {\"eq\": \"S\"}     } }
          * @summary Get Cards
          * @param {CardQuery} cardQuery 
@@ -1862,33 +1823,6 @@ export const CardApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
-         * @summary Get Card Users Summary
-         * @param {CardId} cardId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId: CardId, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardUsersSummaryResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['CardApi.getCardUsersSummaryApiCardCardIdUsersSummaryGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Get Card Users Summary By Collection
-         * @param {CardId} cardId 
-         * @param {CardCollection} collection 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId: CardId, collection: CardCollection, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardUsersSummarySchema>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId, collection, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['CardApi.getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * Get cards with filtering support.  The new filter system supports: - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm - Computed fields: author_username (demonstrates custom logic)  Example filter usage: {     \"filter\": {         \"name\": {\"contains\": \"Naruto\"},         \"author_username\": {\"icontains\": \"user\"},         \"rank\": {\"eq\": \"S\"}     } }
          * @summary Get Cards
          * @param {CardQuery} cardQuery 
@@ -1920,27 +1854,6 @@ export const CardApiFactory = function (configuration?: Configuration, basePath?
          */
         getCardApiCardCardIdGet(cardId: CardId, options?: RawAxiosRequestConfig): AxiosPromise<CardSchema> {
             return localVarFp.getCardApiCardCardIdGet(cardId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get Card Users Summary
-         * @param {CardId} cardId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId: CardId, options?: RawAxiosRequestConfig): AxiosPromise<CardUsersSummaryResponse> {
-            return localVarFp.getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get Card Users Summary By Collection
-         * @param {CardId} cardId 
-         * @param {CardCollection} collection 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId: CardId, collection: CardCollection, options?: RawAxiosRequestConfig): AxiosPromise<CardUsersSummarySchema> {
-            return localVarFp.getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId, collection, options).then((request) => request(axios, basePath));
         },
         /**
          * Get cards with filtering support.  The new filter system supports: - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm - Computed fields: author_username (demonstrates custom logic)  Example filter usage: {     \"filter\": {         \"name\": {\"contains\": \"Naruto\"},         \"author_username\": {\"icontains\": \"user\"},         \"rank\": {\"eq\": \"S\"}     } }
@@ -1975,31 +1888,6 @@ export class CardApi extends BaseAPI {
     }
 
     /**
-     * 
-     * @summary Get Card Users Summary
-     * @param {CardId} cardId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CardApi
-     */
-    public getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId: CardId, options?: RawAxiosRequestConfig) {
-        return CardApiFp(this.configuration).getCardUsersSummaryApiCardCardIdUsersSummaryGet(cardId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Get Card Users Summary By Collection
-     * @param {CardId} cardId 
-     * @param {CardCollection} collection 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CardApi
-     */
-    public getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId: CardId, collection: CardCollection, options?: RawAxiosRequestConfig) {
-        return CardApiFp(this.configuration).getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId, collection, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * Get cards with filtering support.  The new filter system supports: - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm - Computed fields: author_username (demonstrates custom logic)  Example filter usage: {     \"filter\": {         \"name\": {\"contains\": \"Naruto\"},         \"author_username\": {\"icontains\": \"user\"},         \"rank\": {\"eq\": \"S\"}     } }
      * @summary Get Cards
      * @param {CardQuery} cardQuery 
@@ -2009,6 +1897,188 @@ export class CardApi extends BaseAPI {
      */
     public getCardsApiCardPost(cardQuery: CardQuery, options?: RawAxiosRequestConfig) {
         return CardApiFp(this.configuration).getCardsApiCardPost(cardQuery, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * CardStatsApi - axios parameter creator
+ * @export
+ */
+export const CardStatsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Get Card Users Stats By Card Id
+         * @param {CardUsersStatsQuery} cardUsersStatsQuery 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCardUsersStatsByCardIdApiCardStatsStatsPost: async (cardUsersStatsQuery: CardUsersStatsQuery, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'cardUsersStatsQuery' is not null or undefined
+            assertParamExists('getCardUsersStatsByCardIdApiCardStatsStatsPost', 'cardUsersStatsQuery', cardUsersStatsQuery)
+            const localVarPath = `/api/card/stats/stats`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(cardUsersStatsQuery, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get Last Card Users Stats
+         * @param {number} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLastCardUsersStatsApiCardStatsStatsLastGet: async (cardId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'cardId' is not null or undefined
+            assertParamExists('getLastCardUsersStatsApiCardStatsStatsLastGet', 'cardId', cardId)
+            const localVarPath = `/api/card/stats/stats/last`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (cardId !== undefined) {
+                localVarQueryParameter['card_id'] = cardId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * CardStatsApi - functional programming interface
+ * @export
+ */
+export const CardStatsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = CardStatsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Get Card Users Stats By Card Id
+         * @param {CardUsersStatsQuery} cardUsersStatsQuery 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardUsersStatsSchema>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CardStatsApi.getCardUsersStatsByCardIdApiCardStatsStatsPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get Last Card Users Stats
+         * @param {number} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLastCardUsersStatsApiCardStatsStatsLastGet(cardId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CardUsersStatsSchema>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLastCardUsersStatsApiCardStatsStatsLastGet(cardId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CardStatsApi.getLastCardUsersStatsApiCardStatsStatsLastGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * CardStatsApi - factory interface
+ * @export
+ */
+export const CardStatsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = CardStatsApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Get Card Users Stats By Card Id
+         * @param {CardUsersStatsQuery} cardUsersStatsQuery 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig): AxiosPromise<CardUsersStatsSchema> {
+            return localVarFp.getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get Last Card Users Stats
+         * @param {number} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLastCardUsersStatsApiCardStatsStatsLastGet(cardId: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<CardUsersStatsSchema>> {
+            return localVarFp.getLastCardUsersStatsApiCardStatsStatsLastGet(cardId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * CardStatsApi - object-oriented interface
+ * @export
+ * @class CardStatsApi
+ * @extends {BaseAPI}
+ */
+export class CardStatsApi extends BaseAPI {
+    /**
+     * 
+     * @summary Get Card Users Stats By Card Id
+     * @param {CardUsersStatsQuery} cardUsersStatsQuery 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CardStatsApi
+     */
+    public getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig) {
+        return CardStatsApiFp(this.configuration).getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get Last Card Users Stats
+     * @param {number} cardId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CardStatsApi
+     */
+    public getLastCardUsersStatsApiCardStatsStatsLastGet(cardId: number, options?: RawAxiosRequestConfig) {
+        return CardStatsApiFp(this.configuration).getLastCardUsersStatsApiCardStatsStatsLastGet(cardId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
