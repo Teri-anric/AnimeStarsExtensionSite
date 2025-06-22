@@ -37,9 +37,9 @@ services:
     depends_on:
       - db
 
-  scheduler:
-    <<: *backend-app
-    command: python -m app.scheduler
+  # scheduler:
+  #   <<: *backend-app
+  #   command: python -m app.scheduler
 
   db:
     image: postgres:16
@@ -55,18 +55,18 @@ services:
     volumes:
       - ./db:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4
-    ports:
-      - "5050:80"
-    depends_on:
-      - db
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN__EMAIL}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN__PASSWORD}
-    configs:
-      - source: pgadmin_servers
-        target: /pgadmin4/servers.json
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   ports:
+  #     - "5050:80"
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=${PGADMIN__EMAIL}
+  #     - PGADMIN_DEFAULT_PASSWORD=${PGADMIN__PASSWORD}
+  #   configs:
+  #     - source: pgadmin_servers
+  #       target: /pgadmin4/servers.json
 
 configs:
   pgadmin_servers:

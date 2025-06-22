@@ -1,9 +1,9 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Literal
 from .card import CardSchema
 from .base import BaseSchema
-from .pagination import BasePaginationResponse
-
+from .pagination import BasePaginationResponse, BasePaginationQuery
+from app.filters.entries.desk_filter import DeckFilter
 
 class DeckSummarySchema(BaseSchema):
     """Schema for deck summary in listings"""
@@ -25,8 +25,15 @@ class DeckDetailSchema(BaseSchema):
     cards: List[CardSchema]
 
 
-class DeckQuery(BaseSchema):
-    """Query parameters for deck searches"""
-    query: Optional[str] = Field(None, description="Search query for anime name")
-    page: int = Field(1, ge=1, description="Page number")
-    per_page: int = Field(20, ge=1, le=100, description="Items per page") 
+DeckSort = Literal[
+    "anime_name asc",
+    "anime_name desc", 
+    "anime_name",
+    "card_count asc",
+    "card_count desc",
+    "card_count",
+]
+
+
+class DeckQuery(BasePaginationQuery[DeckFilter, DeckSort]):
+    pass

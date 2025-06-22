@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Configuration, DeckApi, DeckSummarySchema } from '../../client';
+import { Configuration, DeckApi, DeckSummarySchema, DeckQuery, DeckFilter } from '../../client';
 import '../../styles/Decks.css';
 import Card from '../../components/Card';
 
@@ -19,13 +19,14 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [total, setTotal] = useState(0);
+  const [sortBy, setSortBy] = useState<string>('anime_name asc');
   const perPage = 20;
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchDecks();
     }
-  }, [isAuthenticated, page, searchQuery]);
+  }, [isAuthenticated, page, searchQuery, sortBy]);
 
   const fetchDecks = async () => {
     try {
@@ -38,11 +39,26 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
       });
       
       const deckApi = new DeckApi(config);
-      const response = await deckApi.getDecksApiDeckGet(
+      
+      // Build filter for search query
+      let filter: DeckFilter | undefined = undefined;
+      if (searchQuery.trim()) {
+        filter = {
+          anime_name: {
+            icontains: searchQuery.trim()
+          }
+        };
+      }
+
+      // Build deck query object
+      const deckQuery: DeckQuery = {
         page,
-        perPage,
-        searchQuery.trim() || null
-      );
+        per_page: perPage,
+        filter,
+        order_by: sortBy as any
+      };
+      
+      const response = await deckApi.getDecksApiDeckPost(deckQuery);
       
       setDecks(response.data.items);
       setTotalPages(response.data.total_pages);
@@ -66,6 +82,11 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
     }
   };
 
+  const handleSortChange = (newSort: string) => {
+    setSortBy(newSort);
+    setPage(1);
+  };
+
   const handleDeckClick = (anime_link: string) => {
     if (onDeckSelect) {
       onDeckSelect(anime_link);
@@ -75,8 +96,6 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
       navigate(`/deck/${encodedAnimeLink}`);
     }
   };
-
-
 
   if (!isAuthenticated) {
     return <div className="auth-message">Please log in to view decks.</div>;
@@ -91,20 +110,37 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
         </p>
       </div>
 
-      <form onSubmit={handleSearch} className="search-form">
-        <div className="search-input-group">
-          <input
-            type="text"
-            placeholder="Search anime..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          />
-          <button type="submit" className="search-button">
-            Search
-          </button>
+      <div className="decks-controls">
+        <form onSubmit={handleSearch} className="search-form">
+          <div className="search-input-group">
+            <input
+              type="text"
+              placeholder="Search anime..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+            />
+            <button type="submit" className="search-button">
+              Search
+            </button>
+          </div>
+        </form>
+
+        <div className="sort-controls">
+          <label htmlFor="sort-select">Sort by:</label>
+          <select 
+            id="sort-select"
+            value={sortBy} 
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="sort-select"
+          >
+            <option value="anime_name asc">Name A-Z</option>
+            <option value="anime_name desc">Name Z-A</option>
+            <option value="card_count desc">Most Cards</option>
+            <option value="card_count asc">Fewest Cards</option>
+          </select>
         </div>
-      </form>
+      </div>
 
       {loading ? (
         <div className="loading">Loading decks...</div>

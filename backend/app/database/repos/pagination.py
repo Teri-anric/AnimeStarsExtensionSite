@@ -1,7 +1,7 @@
 from typing import TypeVar, Generic
 from abc import ABC, abstractmethod
 
-from sqlalchemy import select, delete, update, Select, func
+from sqlalchemy import select, delete, update, Select, func, asc, desc
 from .base import BaseRepository
 from ..types.filter import BaseFilter
 from ..types.pagination import Pagination, PaginationQuery
@@ -28,10 +28,14 @@ class PaginationRepository(BaseRepository, Generic[T], ABC):
 
         stmt = self._apply_sorts(base_stmt, query.order_by)
         stmt = self._apply_pagination(stmt, query)
+        
+        if "total_base_stmt" in kwargs:
+            total = await self._total(self._apply_filter(kwargs["total_base_stmt"], query.filter))
+        else:
+            total = await self._total(base_stmt)
 
-        total = await self._total(base_stmt)
         items = await self._execute_search(stmt, *args, **kwargs)
-        return Pagination[self.entry_class](
+        return Pagination(
             total=total,
             page=query.page,
             per_page=query.per_page,
@@ -39,14 +43,23 @@ class PaginationRepository(BaseRepository, Generic[T], ABC):
         )
 
     async def _execute_search(self, stmt: Select, *args, **kwargs) -> list[T]:
+        if kwargs.get("is_dto", False):
+            return await self.execute(stmt)
         return await self.scalars(stmt)
 
     async def _total(self, stmt: Select, *args, **kwargs) -> int:
         return await self.scalar(select(func.count()).select_from(stmt))
 
     def _apply_sorts(self, stmt: Select, order_by: OrderBy | None) -> Select:
-        if order_by:
-            stmt = stmt.order_by(*order_by.apply(self.entry_class))
+        if not order_by:
+            return stmt
+
+        for sort in order_by.sorts:
+            if sort.direction == OrderBy.Sort.Direction.ASC:
+                stmt = stmt.order_by(asc(sort.property))
+            else:
+                stmt = stmt.order_by(desc(sort.property))
+        
         return stmt
 
     def _apply_pagination(self, stmt: Select, query: PaginationQuery) -> Select:

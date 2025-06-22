@@ -22,6 +22,30 @@
   align-items: center;
 }
 
+.cards-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.cards-sort {
+  align-self: flex-end;
+}
+
+@media (min-width: 768px) {
+  .cards-controls {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  
+  .cards-sort {
+    margin-top: 0;
+    align-self: center;
+  }
+}
+
 .cards-container h1 {
   margin-bottom: 15px;
   text-align: center;

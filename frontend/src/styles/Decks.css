@@ -27,8 +27,16 @@
   margin: 0 auto;
 }
 
-.search-form {
+.decks-controls {
   margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.search-form {
   display: flex;
   justify-content: center;
 }
@@ -76,6 +84,35 @@
 .search-button:hover {
   background: var(--accent-s);
   border-color: var(--accent-s);
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sort-controls label {
+  color: var(--tt);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sort-select {
+  padding: 8px 12px;
+  border: 1px solid var(--bdc);
+  border-radius: var(--main-border-radius);
+  background-color: var(--ui-bg);
+  color: var(--tt);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(158, 41, 79, 0.1);
 }
 
 .decks-info {
@@ -399,12 +436,21 @@
     font-size: 1.5rem;
   }
   
+  .decks-controls {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
   .search-input-group {
     flex-direction: column;
   }
   
   .search-input, .search-button {
     width: 100%;
+  }
+  
+  .sort-controls {
+    justify-content: center;
   }
   
   .pagination {

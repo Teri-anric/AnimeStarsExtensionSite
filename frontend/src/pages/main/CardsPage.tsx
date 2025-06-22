@@ -8,6 +8,7 @@ import ShortFilter from '../../components/ShortFilter';
 import AdvancedFilter from '../../components/AdvancedFilter';
 import Card from '../../components/Card';
 import CardInfoPanel from '../../components/CardInfoPanel';
+import SortOptions, { SortOption } from '../../components/SortOptions';
 
 const CardsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,6 +18,23 @@ const CardsPage = () => {
   const [error, setError] = useState('');
   const [totalPages, setTotalPages] = useState(1);
   const [perPage] = useState(63);
+
+  // Sort options for cards
+  const cardSortOptions: SortOption[] = [
+    { value: CardQueryOrderByEnum.Id, label: 'ID (Default)' },
+    { value: CardQueryOrderByEnum.CardIdAsc, label: 'Card ID (Ascending)' },
+    { value: CardQueryOrderByEnum.CardIdDesc, label: 'Card ID (Descending)' },
+    { value: CardQueryOrderByEnum.NameAsc, label: 'Name (A-Z)' },
+    { value: CardQueryOrderByEnum.NameDesc, label: 'Name (Z-A)' },
+    { value: CardQueryOrderByEnum.RankAsc, label: 'Rank (Low to High)' },
+    { value: CardQueryOrderByEnum.RankDesc, label: 'Rank (High to Low)' },
+    { value: CardQueryOrderByEnum.AnimeNameAsc, label: 'Anime Name (A-Z)' },
+    { value: CardQueryOrderByEnum.AnimeNameDesc, label: 'Anime Name (Z-A)' },
+    { value: 'created_at desc', label: 'Newest First' },
+    { value: 'created_at asc', label: 'Oldest First' },
+    { value: 'updated_at desc', label: 'Recently Updated' },
+    { value: 'updated_at asc', label: 'Least Recently Updated' },
+  ];
   
   // Card info panel state
   const [selectedCard, setSelectedCard] = useState<CardSchema | null>(null);
@@ -29,6 +47,7 @@ const CardsPage = () => {
   const rankFilter = searchParams.get('rank') || '';
   const filterMode = (searchParams.get('mode') as 'short' | 'advanced') || 'short';
   const advancedFilterParam = searchParams.get('filter');
+  const sortBy = (searchParams.get('sort') as CardQueryOrderByEnum) || CardQueryOrderByEnum.Id;
   
   // Filter mode
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(filterMode === 'advanced');
@@ -52,7 +71,7 @@ const CardsPage = () => {
       setLoading(true);
       fetchCards();
     }
-  }, [isAuthenticated, page, nameFilter, animeNameFilter, rankFilter, advancedFilter, filterMode, advancedFilterParam]);
+  }, [isAuthenticated, page, nameFilter, animeNameFilter, rankFilter, advancedFilter, filterMode, advancedFilterParam, sortBy]);
 
   useEffect(() => {
     setShowAdvancedFilter(filterMode === 'advanced');
@@ -151,7 +170,7 @@ const CardsPage = () => {
         page,
         per_page: perPage,
         filter,
-        order_by: CardQueryOrderByEnum.Id
+        order_by: sortBy
       };
 
       const response = await cardApi.getCardsApiCardPost(cardQuery);
@@ -234,6 +253,10 @@ const CardsPage = () => {
     }
   };
 
+  const handleSortChange = (value: string) => {
+    updateSearchParams({ sort: value, page: '1' });
+  };
+
   const handleCardClick = (card: CardSchema) => {
     setSelectedCard(card);
     setIsCardInfoOpen(true);
@@ -261,25 +284,34 @@ const CardsPage = () => {
         </div>
       </div>
 
-      {filterMode === 'short' && (
-        <ShortFilter
-          nameFilter={nameFilter}
-          animeNameFilter={animeNameFilter}
-          rankFilter={rankFilter}
-          onNameFilterChange={handleNameFilterChange}
-          onAnimeNameFilterChange={handleAnimeNameFilterChange}
-          onRankFilterChange={handleRankFilterChange}
-          onSearch={handleSearch}
-        />
-      )}
+      <div className="cards-controls">
+        {filterMode === 'short' && (
+          <ShortFilter
+            nameFilter={nameFilter}
+            animeNameFilter={animeNameFilter}
+            rankFilter={rankFilter}
+            onNameFilterChange={handleNameFilterChange}
+            onAnimeNameFilterChange={handleAnimeNameFilterChange}
+            onRankFilterChange={handleRankFilterChange}
+            onSearch={handleSearch}
+          />
+        )}
 
-      {showAdvancedFilter && (
-        <AdvancedFilter
-          onFilterChange={handleAdvancedFilterChange}
-          onClose={handleAdvancedFilterClose}
-          initialFilter={advancedFilter}
+        {showAdvancedFilter && (
+          <AdvancedFilter
+            onFilterChange={handleAdvancedFilterChange}
+            onClose={handleAdvancedFilterClose}
+            initialFilter={advancedFilter}
+          />
+        )}
+
+        <SortOptions
+          options={cardSortOptions}
+          currentValue={sortBy}
+          onChange={handleSortChange}
+          className="cards-sort"
         />
-      )}
+      </div>
 
       {loading ? (
         <div className="loading">Loading cards...</div>

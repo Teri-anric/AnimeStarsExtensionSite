@@ -25,7 +25,9 @@ const fieldOptions = [
   { value: 'author', label: 'Author', type: 'string' },
   { value: 'image', label: 'Image Path', type: 'string' },
   { value: 'mp4', label: 'MP4 Path', type: 'string' },
-  { value: 'webm', label: 'WebM Path', type: 'string' }
+  { value: 'webm', label: 'WebM Path', type: 'string' },
+  { value: 'created_at', label: 'Created Date', type: 'datetime' },
+  { value: 'updated_at', label: 'Updated Date', type: 'datetime' }
 ];
 
 const stringOperators = [
@@ -50,6 +52,23 @@ const enumOperators = [
   { value: 'ne', label: 'Not Equals' },
   { value: 'in', label: 'In list' },
   { value: 'not_in', label: 'Not in list' },
+  { value: 'is_null', label: 'Is empty' }
+];
+
+const datetimeOperators = [
+  { value: 'today', label: 'Today' },
+  { value: 'yesterday', label: 'Yesterday' },
+  { value: 'this_week', label: 'This week' },
+  { value: 'last_week', label: 'Last week' },
+  { value: 'this_month', label: 'This month' },
+  { value: 'last_month', label: 'Last month' },
+  { value: 'this_year', label: 'This year' },
+  { value: 'last_year', label: 'Last year' },
+  { value: 'last_n_days', label: 'Last N days' },
+  { value: 'older_than_days', label: 'Older than N days' },
+  { value: 'before', label: 'Before date' },
+  { value: 'after', label: 'After date' },
+  { value: 'eq', label: 'Exact date' },
   { value: 'is_null', label: 'Is empty' }
 ];
 
@@ -178,6 +197,8 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
         return numberOperators;
       case 'enum':
         return enumOperators;
+      case 'datetime':
+        return datetimeOperators;
       default:
         return stringOperators;
     }
@@ -295,6 +316,37 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
     
     if (rule.operator === 'is_null') {
       return <span className="null-indicator">No value needed</span>;
+    }
+
+    // DateTime operators that don't need input
+    if (fieldType === 'datetime' && ['today', 'yesterday', 'this_week', 'last_week', 'this_month', 'last_month', 'this_year', 'last_year'].includes(rule.operator)) {
+      return <span className="null-indicator">No value needed</span>;
+    }
+
+    // DateTime operators that need number input
+    if (fieldType === 'datetime' && ['last_n_days', 'older_than_days'].includes(rule.operator)) {
+      return (
+        <input
+          type="number"
+          value={rule.value}
+          onChange={(e) => updateRule(rule.id, 'value', e.target.value)}
+          placeholder="Number of days..."
+          className="filter-input"
+          min="1"
+        />
+      );
+    }
+
+    // DateTime operators that need date input
+    if (fieldType === 'datetime' && ['before', 'after', 'eq'].includes(rule.operator)) {
+      return (
+        <input
+          type="datetime-local"
+          value={rule.value}
+          onChange={(e) => updateRule(rule.id, 'value', e.target.value)}
+          className="filter-input"
+        />
+      );
     }
 
     if (rule.field === 'rank' && (rule.operator === 'eq' || rule.operator === 'ne')) {

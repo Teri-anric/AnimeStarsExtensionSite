@@ -7,24 +7,27 @@ from app.web.schema.deck import (
     DeckQuery
 )
 from app.web.deps import DeckRepositoryDep
+from app.database.types.pagination import PaginationQuery
+
 
 router = APIRouter(prefix="/deck", tags=["deck"])
 
 
-@router.get("/")
+@router.post("/")
 async def get_decks(
-    page: Annotated[int, Query(ge=1)] = 1,
-    per_page: Annotated[int, Query(ge=1, le=100)] = 20,
-    query: Annotated[Optional[str], Query()] = None,
+    deck_query: DeckQuery,
     repo: DeckRepositoryDep = None,
 ) -> DeckPaginationResponse:
-    """Get all decks (anime grouped by anime_link) with pagination and optional search"""
-    if query:
-        result = await repo.search_decks(query, page, per_page)
-    else:
-        result = await repo.get_all_decks(page, per_page)
+    """Get all decks (anime grouped by anime_link) with pagination, search and sorting"""
     
-    return DeckPaginationResponse(**result)
+    return await repo.search(
+        PaginationQuery(
+            page=deck_query.page,
+            per_page=deck_query.per_page,
+            filter=deck_query.filter,
+            order_by=deck_query.build_order_by(),
+        )
+    )
 
 
 @router.get("/detail")
@@ -38,4 +41,4 @@ async def get_deck_detail(
     if deck is None:
         raise HTTPException(status_code=404, detail="Deck not found")
     
-    return DeckDetailSchema(**deck) 
+    return deck

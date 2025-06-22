@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import Field, field_validator
 from uuid import UUID
 from ...database.models.animestars.card import CardType
 from ...database.enum import CardCollection, SummaryCardState
@@ -13,16 +13,21 @@ class CardSchema(BaseSchema):
     card_id: int
     name: str
     rank: CardType
-    anime_name: str | None
-    anime_link: str | None
-    author: str | None
-    image: str | None
-    mp4: str | None
-    webm: str | None
+    anime_name: str | None = None
+    anime_link: str | None = None
+    author: str | None = None
+    image: str | None = None
+    mp4: str | None = None
+    webm: str | None = None
 
-    created_at: datetime | None
-    updated_at: datetime | None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
+    @field_validator("rank", mode="before")
+    def validate_rank(cls, v):
+        if isinstance(v, str):
+            return CardType(v.lower())
+        return v
 
 CardSort = Literal[
     "id asc",
@@ -55,6 +60,12 @@ CardSort = Literal[
     "webm asc",
     "webm desc",
     "webm",
+    "created_at asc",
+    "created_at desc",
+    "created_at",
+    "updated_at asc",
+    "updated_at desc",
+    "updated_at",
 ]
 
 

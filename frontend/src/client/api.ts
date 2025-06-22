@@ -26,6 +26,79 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface ArrayFieldFilterSummaryCardUsersFilter
+ */
+export interface ArrayFieldFilterSummaryCardUsersFilter {
+    /**
+     * 
+     * @type {SummaryCardUsersFilter}
+     * @memberof ArrayFieldFilterSummaryCardUsersFilter
+     */
+    'any'?: SummaryCardUsersFilter | null;
+    /**
+     * 
+     * @type {SummaryCardUsersFilter}
+     * @memberof ArrayFieldFilterSummaryCardUsersFilter
+     */
+    'all'?: SummaryCardUsersFilter | null;
+    /**
+     * 
+     * @type {SummaryCardUsersFilter}
+     * @memberof ArrayFieldFilterSummaryCardUsersFilter
+     */
+    'none'?: SummaryCardUsersFilter | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ArrayFieldFilterSummaryCardUsersFilter
+     */
+    'is_empty'?: boolean | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ArrayFieldFilterSummaryCardUsersFilter
+     */
+    'is_not_empty'?: boolean | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof ArrayFieldFilterSummaryCardUsersFilter
+     */
+    'size_eq'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof ArrayFieldFilterSummaryCardUsersFilter
+     */
+    'size_gt'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof ArrayFieldFilterSummaryCardUsersFilter
+     */
+    'size_lt'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof ArrayFieldFilterSummaryCardUsersFilter
+     */
+    'size_gte'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof ArrayFieldFilterSummaryCardUsersFilter
+     */
+    'size_lte'?: number | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ArrayFieldFilterSummaryCardUsersFilter
+     */
+    'is_null'?: boolean | null;
+}
+/**
+ * 
+ * @export
  * @enum {string}
  */
 
@@ -39,7 +112,7 @@ export type CardCollection = typeof CardCollection[keyof typeof CardCollection];
 
 
 /**
- * 
+ * Entry filter for Card model - pure data model
  * @export
  * @interface CardFilter
  */
@@ -58,16 +131,16 @@ export interface CardFilter {
     'or'?: Array<CardFilter> | null;
     /**
      * 
-     * @type {EnumFliedFilterUUID}
+     * @type {EnumFieldFilterUUID}
      * @memberof CardFilter
      */
-    'id'?: EnumFliedFilterUUID | null;
+    'id'?: EnumFieldFilterUUID | null;
     /**
      * 
-     * @type {EnumFliedFilterInt}
+     * @type {EnumFieldFilterInt}
      * @memberof CardFilter
      */
-    'card_id'?: EnumFliedFilterInt | null;
+    'card_id'?: EnumFieldFilterInt | null;
     /**
      * 
      * @type {StringFieldFilter}
@@ -76,10 +149,10 @@ export interface CardFilter {
     'name'?: StringFieldFilter | null;
     /**
      * 
-     * @type {EnumFliedFilterCardType}
+     * @type {EnumFieldFilterCardType}
      * @memberof CardFilter
      */
-    'rank'?: EnumFliedFilterCardType | null;
+    'rank'?: EnumFieldFilterCardType | null;
     /**
      * 
      * @type {StringFieldFilter}
@@ -116,6 +189,24 @@ export interface CardFilter {
      * @memberof CardFilter
      */
     'webm'?: StringFieldFilter | null;
+    /**
+     * 
+     * @type {DateTimeFieldFilter}
+     * @memberof CardFilter
+     */
+    'created_at'?: DateTimeFieldFilter | null;
+    /**
+     * 
+     * @type {DateTimeFieldFilter}
+     * @memberof CardFilter
+     */
+    'updated_at'?: DateTimeFieldFilter | null;
+    /**
+     * 
+     * @type {ArrayFieldFilterSummaryCardUsersFilter}
+     * @memberof CardFilter
+     */
+    'summary_card_users'?: ArrayFieldFilterSummaryCardUsersFilter | null;
 }
 /**
  * 
@@ -229,7 +320,13 @@ export const CardQueryOrderByEnum = {
     Mp4: 'mp4',
     WebmAsc: 'webm asc',
     WebmDesc: 'webm desc',
-    Webm: 'webm'
+    Webm: 'webm',
+    CreatedAtAsc: 'created_at asc',
+    CreatedAtDesc: 'created_at desc',
+    CreatedAt: 'created_at',
+    UpdatedAtAsc: 'updated_at asc',
+    UpdatedAtDesc: 'updated_at desc',
+    UpdatedAt: 'updated_at'
 } as const;
 
 export type CardQueryOrderByEnum = typeof CardQueryOrderByEnum[keyof typeof CardQueryOrderByEnum];
@@ -399,6 +496,109 @@ export interface CardUsersSummarySchema {
 
 
 /**
+ * Filter for datetime fields with user-friendly operators
+ * @export
+ * @interface DateTimeFieldFilter
+ */
+export interface DateTimeFieldFilter {
+    /**
+     * 
+     * @type {string}
+     * @memberof DateTimeFieldFilter
+     */
+    'eq'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof DateTimeFieldFilter
+     */
+    'ne'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof DateTimeFieldFilter
+     */
+    'before'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof DateTimeFieldFilter
+     */
+    'after'?: string | null;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof DateTimeFieldFilter
+     */
+    'between'?: Array<any> | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DateTimeFieldFilter
+     */
+    'today'?: boolean | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DateTimeFieldFilter
+     */
+    'yesterday'?: boolean | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DateTimeFieldFilter
+     */
+    'this_week'?: boolean | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DateTimeFieldFilter
+     */
+    'last_week'?: boolean | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DateTimeFieldFilter
+     */
+    'this_month'?: boolean | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DateTimeFieldFilter
+     */
+    'last_month'?: boolean | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DateTimeFieldFilter
+     */
+    'this_year'?: boolean | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DateTimeFieldFilter
+     */
+    'last_year'?: boolean | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof DateTimeFieldFilter
+     */
+    'last_n_days'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof DateTimeFieldFilter
+     */
+    'older_than_days'?: number | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DateTimeFieldFilter
+     */
+    'is_null'?: boolean | null;
+}
+/**
  * Schema for detailed deck view with all cards
  * @export
  * @interface DeckDetailSchema
@@ -424,17 +624,42 @@ export interface DeckDetailSchema {
     'cards': Array<CardSchema>;
 }
 /**
+ * Entry filter for Deck model - pure data model
+ * @export
+ * @interface DeckFilter
+ */
+export interface DeckFilter {
+    /**
+     * 
+     * @type {Array<DeckFilter>}
+     * @memberof DeckFilter
+     */
+    'and'?: Array<DeckFilter> | null;
+    /**
+     * 
+     * @type {Array<DeckFilter>}
+     * @memberof DeckFilter
+     */
+    'or'?: Array<DeckFilter> | null;
+    /**
+     * 
+     * @type {StringFieldFilter}
+     * @memberof DeckFilter
+     */
+    'anime_name'?: StringFieldFilter | null;
+    /**
+     * 
+     * @type {StringFieldFilter}
+     * @memberof DeckFilter
+     */
+    'anime_link'?: StringFieldFilter | null;
+}
+/**
  * Paginated response for deck listings
  * @export
  * @interface DeckPaginationResponse
  */
 export interface DeckPaginationResponse {
-    /**
-     * 
-     * @type {Array<DeckSummarySchema>}
-     * @memberof DeckPaginationResponse
-     */
-    'items': Array<DeckSummarySchema>;
     /**
      * 
      * @type {number}
@@ -455,11 +680,66 @@ export interface DeckPaginationResponse {
     'per_page': number;
     /**
      * 
+     * @type {Array<DeckSummarySchema>}
+     * @memberof DeckPaginationResponse
+     */
+    'items': Array<DeckSummarySchema>;
+    /**
+     * 
      * @type {number}
      * @memberof DeckPaginationResponse
      */
     'total_pages': number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DeckPaginationResponse
+     */
+    'has_next': boolean;
 }
+/**
+ * 
+ * @export
+ * @interface DeckQuery
+ */
+export interface DeckQuery {
+    /**
+     * 
+     * @type {DeckFilter}
+     * @memberof DeckQuery
+     */
+    'filter'?: DeckFilter | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeckQuery
+     */
+    'order_by'?: DeckQueryOrderByEnum | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeckQuery
+     */
+    'page'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeckQuery
+     */
+    'per_page'?: number;
+}
+
+export const DeckQueryOrderByEnum = {
+    AnimeNameAsc: 'anime_name asc',
+    AnimeNameDesc: 'anime_name desc',
+    AnimeName: 'anime_name',
+    CardCountAsc: 'card_count asc',
+    CardCountDesc: 'card_count desc',
+    CardCount: 'card_count'
+} as const;
+
+export type DeckQueryOrderByEnum = typeof DeckQueryOrderByEnum[keyof typeof DeckQueryOrderByEnum];
+
 /**
  * Schema for deck summary in listings
  * @export
@@ -494,37 +774,76 @@ export interface DeckSummarySchema {
 /**
  * 
  * @export
- * @interface EnumFliedFilterCardType
+ * @interface EnumFieldFilterCardCollection
  */
-export interface EnumFliedFilterCardType {
+export interface EnumFieldFilterCardCollection {
+    /**
+     * 
+     * @type {CardCollection}
+     * @memberof EnumFieldFilterCardCollection
+     */
+    'eq'?: CardCollection | null;
+    /**
+     * 
+     * @type {CardCollection}
+     * @memberof EnumFieldFilterCardCollection
+     */
+    'ne'?: CardCollection | null;
+    /**
+     * 
+     * @type {Array<CardCollection>}
+     * @memberof EnumFieldFilterCardCollection
+     */
+    'in'?: Array<CardCollection> | null;
+    /**
+     * 
+     * @type {Array<CardCollection>}
+     * @memberof EnumFieldFilterCardCollection
+     */
+    'not_in'?: Array<CardCollection> | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof EnumFieldFilterCardCollection
+     */
+    'is_null'?: boolean | null;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface EnumFieldFilterCardType
+ */
+export interface EnumFieldFilterCardType {
     /**
      * 
      * @type {CardType}
-     * @memberof EnumFliedFilterCardType
+     * @memberof EnumFieldFilterCardType
      */
     'eq'?: CardType | null;
     /**
      * 
      * @type {CardType}
-     * @memberof EnumFliedFilterCardType
+     * @memberof EnumFieldFilterCardType
      */
     'ne'?: CardType | null;
     /**
      * 
      * @type {Array<CardType>}
-     * @memberof EnumFliedFilterCardType
+     * @memberof EnumFieldFilterCardType
      */
     'in'?: Array<CardType> | null;
     /**
      * 
      * @type {Array<CardType>}
-     * @memberof EnumFliedFilterCardType
+     * @memberof EnumFieldFilterCardType
      */
     'not_in'?: Array<CardType> | null;
     /**
      * 
      * @type {boolean}
-     * @memberof EnumFliedFilterCardType
+     * @memberof EnumFieldFilterCardType
      */
     'is_null'?: boolean | null;
 }
@@ -533,76 +852,136 @@ export interface EnumFliedFilterCardType {
 /**
  * 
  * @export
- * @interface EnumFliedFilterInt
+ * @interface EnumFieldFilterInt
  */
-export interface EnumFliedFilterInt {
+export interface EnumFieldFilterInt {
     /**
      * 
      * @type {number}
-     * @memberof EnumFliedFilterInt
+     * @memberof EnumFieldFilterInt
      */
     'eq'?: number | null;
     /**
      * 
      * @type {number}
-     * @memberof EnumFliedFilterInt
+     * @memberof EnumFieldFilterInt
      */
     'ne'?: number | null;
     /**
      * 
      * @type {Array<number>}
-     * @memberof EnumFliedFilterInt
+     * @memberof EnumFieldFilterInt
      */
     'in'?: Array<number> | null;
     /**
      * 
      * @type {Array<number>}
-     * @memberof EnumFliedFilterInt
+     * @memberof EnumFieldFilterInt
      */
     'not_in'?: Array<number> | null;
     /**
      * 
      * @type {boolean}
-     * @memberof EnumFliedFilterInt
+     * @memberof EnumFieldFilterInt
      */
     'is_null'?: boolean | null;
 }
 /**
  * 
  * @export
- * @interface EnumFliedFilterUUID
+ * @interface EnumFieldFilterSummaryCardState
  */
-export interface EnumFliedFilterUUID {
+export interface EnumFieldFilterSummaryCardState {
+    /**
+     * 
+     * @type {SummaryCardState}
+     * @memberof EnumFieldFilterSummaryCardState
+     */
+    'eq'?: SummaryCardState | null;
+    /**
+     * 
+     * @type {SummaryCardState}
+     * @memberof EnumFieldFilterSummaryCardState
+     */
+    'ne'?: SummaryCardState | null;
+    /**
+     * 
+     * @type {Array<SummaryCardState>}
+     * @memberof EnumFieldFilterSummaryCardState
+     */
+    'in'?: Array<SummaryCardState> | null;
+    /**
+     * 
+     * @type {Array<SummaryCardState>}
+     * @memberof EnumFieldFilterSummaryCardState
+     */
+    'not_in'?: Array<SummaryCardState> | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof EnumFieldFilterSummaryCardState
+     */
+    'is_null'?: boolean | null;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface EnumFieldFilterUUID
+ */
+export interface EnumFieldFilterUUID {
     /**
      * 
      * @type {string}
-     * @memberof EnumFliedFilterUUID
+     * @memberof EnumFieldFilterUUID
      */
     'eq'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof EnumFliedFilterUUID
+     * @memberof EnumFieldFilterUUID
      */
     'ne'?: string | null;
     /**
      * 
      * @type {Array<string>}
-     * @memberof EnumFliedFilterUUID
+     * @memberof EnumFieldFilterUUID
      */
     'in'?: Array<string> | null;
     /**
      * 
      * @type {Array<string>}
-     * @memberof EnumFliedFilterUUID
+     * @memberof EnumFieldFilterUUID
      */
     'not_in'?: Array<string> | null;
     /**
      * 
      * @type {boolean}
-     * @memberof EnumFliedFilterUUID
+     * @memberof EnumFieldFilterUUID
      */
     'is_null'?: boolean | null;
+}
+/**
+ * 
+ * @export
+ * @interface Eq
+ */
+export interface Eq {
+}
+/**
+ * 
+ * @export
+ * @interface Gt
+ */
+export interface Gt {
+}
+/**
+ * 
+ * @export
+ * @interface Gte
+ */
+export interface Gte {
 }
 /**
  * 
@@ -631,7 +1010,96 @@ export interface HealthResponse {
     'status': string;
 }
 /**
- * Filter for string fields with text-specific operators
+ * 
+ * @export
+ * @interface Lt
+ */
+export interface Lt {
+}
+/**
+ * 
+ * @export
+ * @interface Lte
+ */
+export interface Lte {
+}
+/**
+ * 
+ * @export
+ * @interface Ne
+ */
+export interface Ne {
+}
+/**
+ * Filter for numeric fields
+ * @export
+ * @interface NumericFieldFilter
+ */
+export interface NumericFieldFilter {
+    /**
+     * 
+     * @type {Eq}
+     * @memberof NumericFieldFilter
+     */
+    'eq'?: Eq | null;
+    /**
+     * 
+     * @type {Ne}
+     * @memberof NumericFieldFilter
+     */
+    'ne'?: Ne | null;
+    /**
+     * 
+     * @type {Gt}
+     * @memberof NumericFieldFilter
+     */
+    'gt'?: Gt | null;
+    /**
+     * 
+     * @type {Lt}
+     * @memberof NumericFieldFilter
+     */
+    'lt'?: Lt | null;
+    /**
+     * 
+     * @type {Gte}
+     * @memberof NumericFieldFilter
+     */
+    'gte'?: Gte | null;
+    /**
+     * 
+     * @type {Lte}
+     * @memberof NumericFieldFilter
+     */
+    'lte'?: Lte | null;
+    /**
+     * 
+     * @type {Array<NumericFieldFilterInInner>}
+     * @memberof NumericFieldFilter
+     */
+    'in'?: Array<NumericFieldFilterInInner> | null;
+    /**
+     * 
+     * @type {Array<NumericFieldFilterInInner>}
+     * @memberof NumericFieldFilter
+     */
+    'not_in'?: Array<NumericFieldFilterInInner> | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof NumericFieldFilter
+     */
+    'is_null'?: boolean | null;
+}
+/**
+ * 
+ * @export
+ * @interface NumericFieldFilterInInner
+ */
+export interface NumericFieldFilterInInner {
+}
+/**
+ * Filter for string fields
  * @export
  * @interface StringFieldFilter
  */
@@ -717,6 +1185,49 @@ export const SummaryCardState = {
 export type SummaryCardState = typeof SummaryCardState[keyof typeof SummaryCardState];
 
 
+/**
+ * Entry filter for SummaryCardUsers model - used as submodel filter in ArrayFieldFilter
+ * @export
+ * @interface SummaryCardUsersFilter
+ */
+export interface SummaryCardUsersFilter {
+    /**
+     * 
+     * @type {Array<SummaryCardUsersFilter>}
+     * @memberof SummaryCardUsersFilter
+     */
+    'and'?: Array<SummaryCardUsersFilter> | null;
+    /**
+     * 
+     * @type {Array<SummaryCardUsersFilter>}
+     * @memberof SummaryCardUsersFilter
+     */
+    'or'?: Array<SummaryCardUsersFilter> | null;
+    /**
+     * 
+     * @type {NumericFieldFilter}
+     * @memberof SummaryCardUsersFilter
+     */
+    'card_id'?: NumericFieldFilter | null;
+    /**
+     * 
+     * @type {EnumFieldFilterCardCollection}
+     * @memberof SummaryCardUsersFilter
+     */
+    'collection'?: EnumFieldFilterCardCollection | null;
+    /**
+     * 
+     * @type {EnumFieldFilterSummaryCardState}
+     * @memberof SummaryCardUsersFilter
+     */
+    'state'?: EnumFieldFilterSummaryCardState | null;
+    /**
+     * 
+     * @type {NumericFieldFilter}
+     * @memberof SummaryCardUsersFilter
+     */
+    'count'?: NumericFieldFilter | null;
+}
 /**
  * 
  * @export
@@ -1292,7 +1803,7 @@ export const CardApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * 
+         * Get cards with filtering support.  The new filter system supports: - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm - Computed fields: author_username (demonstrates custom logic)  Example filter usage: {     \"filter\": {         \"name\": {\"contains\": \"Naruto\"},         \"author_username\": {\"icontains\": \"user\"},         \"rank\": {\"eq\": \"S\"}     } }
          * @summary Get Cards
          * @param {CardQuery} cardQuery 
          * @param {*} [options] Override http request option.
@@ -1378,7 +1889,7 @@ export const CardApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
+         * Get cards with filtering support.  The new filter system supports: - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm - Computed fields: author_username (demonstrates custom logic)  Example filter usage: {     \"filter\": {         \"name\": {\"contains\": \"Naruto\"},         \"author_username\": {\"icontains\": \"user\"},         \"rank\": {\"eq\": \"S\"}     } }
          * @summary Get Cards
          * @param {CardQuery} cardQuery 
          * @param {*} [options] Override http request option.
@@ -1432,7 +1943,7 @@ export const CardApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.getCardUsersSummaryByCollectionApiCardCardIdUsersSummaryCollectionGet(cardId, collection, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Get cards with filtering support.  The new filter system supports: - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm - Computed fields: author_username (demonstrates custom logic)  Example filter usage: {     \"filter\": {         \"name\": {\"contains\": \"Naruto\"},         \"author_username\": {\"icontains\": \"user\"},         \"rank\": {\"eq\": \"S\"}     } }
          * @summary Get Cards
          * @param {CardQuery} cardQuery 
          * @param {*} [options] Override http request option.
@@ -1489,7 +2000,7 @@ export class CardApi extends BaseAPI {
     }
 
     /**
-     * 
+     * Get cards with filtering support.  The new filter system supports: - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm - Computed fields: author_username (demonstrates custom logic)  Example filter usage: {     \"filter\": {         \"name\": {\"contains\": \"Naruto\"},         \"author_username\": {\"icontains\": \"user\"},         \"rank\": {\"eq\": \"S\"}     } }
      * @summary Get Cards
      * @param {CardQuery} cardQuery 
      * @param {*} [options] Override http request option.
@@ -1547,15 +2058,15 @@ export const DeckApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * Get all decks (anime grouped by anime_link) with pagination and optional search
+         * Get all decks (anime grouped by anime_link) with pagination, search and sorting
          * @summary Get Decks
-         * @param {number} [page] 
-         * @param {number} [perPage] 
-         * @param {string | null} [query] 
+         * @param {DeckQuery} deckQuery 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getDecksApiDeckGet: async (page?: number, perPage?: number, query?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getDecksApiDeckPost: async (deckQuery: DeckQuery, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deckQuery' is not null or undefined
+            assertParamExists('getDecksApiDeckPost', 'deckQuery', deckQuery)
             const localVarPath = `/api/deck/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1564,27 +2075,18 @@ export const DeckApiAxiosParamCreator = function (configuration?: Configuration)
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (perPage !== undefined) {
-                localVarQueryParameter['per_page'] = perPage;
-            }
-
-            if (query !== undefined) {
-                localVarQueryParameter['query'] = query;
-            }
-
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deckQuery, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1615,18 +2117,16 @@ export const DeckApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Get all decks (anime grouped by anime_link) with pagination and optional search
+         * Get all decks (anime grouped by anime_link) with pagination, search and sorting
          * @summary Get Decks
-         * @param {number} [page] 
-         * @param {number} [perPage] 
-         * @param {string | null} [query] 
+         * @param {DeckQuery} deckQuery 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getDecksApiDeckGet(page?: number, perPage?: number, query?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeckPaginationResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getDecksApiDeckGet(page, perPage, query, options);
+        async getDecksApiDeckPost(deckQuery: DeckQuery, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeckPaginationResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDecksApiDeckPost(deckQuery, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DeckApi.getDecksApiDeckGet']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DeckApi.getDecksApiDeckPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -1650,16 +2150,14 @@ export const DeckApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.getDeckDetailApiDeckDetailGet(animeLink, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get all decks (anime grouped by anime_link) with pagination and optional search
+         * Get all decks (anime grouped by anime_link) with pagination, search and sorting
          * @summary Get Decks
-         * @param {number} [page] 
-         * @param {number} [perPage] 
-         * @param {string | null} [query] 
+         * @param {DeckQuery} deckQuery 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getDecksApiDeckGet(page?: number, perPage?: number, query?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<DeckPaginationResponse> {
-            return localVarFp.getDecksApiDeckGet(page, perPage, query, options).then((request) => request(axios, basePath));
+        getDecksApiDeckPost(deckQuery: DeckQuery, options?: RawAxiosRequestConfig): AxiosPromise<DeckPaginationResponse> {
+            return localVarFp.getDecksApiDeckPost(deckQuery, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1684,17 +2182,15 @@ export class DeckApi extends BaseAPI {
     }
 
     /**
-     * Get all decks (anime grouped by anime_link) with pagination and optional search
+     * Get all decks (anime grouped by anime_link) with pagination, search and sorting
      * @summary Get Decks
-     * @param {number} [page] 
-     * @param {number} [perPage] 
-     * @param {string | null} [query] 
+     * @param {DeckQuery} deckQuery 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DeckApi
      */
-    public getDecksApiDeckGet(page?: number, perPage?: number, query?: string | null, options?: RawAxiosRequestConfig) {
-        return DeckApiFp(this.configuration).getDecksApiDeckGet(page, perPage, query, options).then((request) => request(this.axios, this.basePath));
+    public getDecksApiDeckPost(deckQuery: DeckQuery, options?: RawAxiosRequestConfig) {
+        return DeckApiFp(this.configuration).getDecksApiDeckPost(deckQuery, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

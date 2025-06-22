@@ -11,7 +11,7 @@ class CardMetadataContainer(MetadataContainer):
 
     def get_entity_code(self) -> str:
         return "card"
-    
+
     def __init__(self):
         super().__init__()
         
@@ -24,4 +24,4 @@ class CardMetadataContainer(MetadataContainer):
         self.add_field(PropertyFieldMetadata(Card.author, "author"))
         self.add_field(PropertyFieldMetadata(Card.image, "image"))
         self.add_field(PropertyFieldMetadata(Card.mp4, "mp4"))
-        self.add_field(PropertyFieldMetadata(Card.webm, "webm")) 
+        self.add_field(PropertyFieldMetadata(Card.webm, "webm"))

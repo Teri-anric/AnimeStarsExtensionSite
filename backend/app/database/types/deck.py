@@ -12,7 +12,7 @@ class DeckSummaryDTO:
     anime_link: str
     anime_name: str | None
     card_count: int
-    preview_cards: List[Card]
+    preview_cards: list[dict | Card]
 
 
 @dataclass
@@ -31,4 +31,4 @@ class DeckDetailDTO:
     """DTO for detailed deck view with all cards"""
     anime_link: str
     anime_name: str | None
-    cards: List[Card] 
+    cards: List[Card | dict] 

@@ -7,9 +7,7 @@ from uuid import UUID
 
 class CardRepository(
     CRUDRepository[Card, UUID], PaginationRepository[Card], BaseRepository
-):
-    entry_code = "card"  # Specify the entry code for filter service
-    
+):    
     @property
     def entry_class(self) -> type[Card]:
         return Card

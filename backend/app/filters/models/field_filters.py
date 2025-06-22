@@ -2,6 +2,7 @@ from abc import ABC
 from pydantic import BaseModel, Field
 from typing import Any, Generic, TypeVar, TYPE_CHECKING
 from enum import Enum
+from datetime import datetime
 
 if TYPE_CHECKING:
     from .entry_filters import BaseEntryFilter
@@ -39,6 +40,33 @@ class NumericFieldFilter(FieldFilter):
     lte: int | float | None = None
     in_: list[int | float] | None = Field(None, alias="in")
     not_in: list[int | float] | None = None
+    is_null: bool | None = None
+
+
+class DateTimeFieldFilter(FieldFilter):
+    """Filter for datetime fields with user-friendly operators"""
+    # Exact datetime comparisons
+    eq: datetime | None = None
+    ne: datetime | None = None
+    before: datetime | None = None  # before specific datetime
+    after: datetime | None = None   # after specific datetime
+    between: tuple[datetime, datetime] | None = None  # between two dates
+    
+    # Relative date filters (more user-friendly)
+    today: bool | None = None           # created/updated today
+    yesterday: bool | None = None       # created/updated yesterday
+    this_week: bool | None = None       # created/updated this week
+    last_week: bool | None = None       # created/updated last week
+    this_month: bool | None = None      # created/updated this month
+    last_month: bool | None = None      # created/updated last month
+    this_year: bool | None = None       # created/updated this year
+    last_year: bool | None = None       # created/updated last year
+    
+    # Days-based filters
+    last_n_days: int | None = None      # created/updated in last N days
+    older_than_days: int | None = None  # created/updated more than N days ago
+    
+    # Null checks
     is_null: bool | None = None
 
 
