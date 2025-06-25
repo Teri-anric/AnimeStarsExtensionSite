@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
 import { createAuthenticatedClient } from "../../utils/apiClient";
 import { HealthApi } from "../../client";
 
@@ -15,24 +14,21 @@ interface HealthInfo {
     ping: number;
     uptime_formatted: string;
     database_stats: {
-        total_cards: number;
-        total_users: number;
-        cards_with_stats: number;
-        cards_stats_today: number;
-    };
+        total_cards: number | null;
+        total_users: number | null;
+        cards_with_stats: number | null;
+        cards_stats_today: number | null;
+    } | null;
 }
 
-const fetchAllReactions = async (token?: string) => {
-    const response = await fetch('https://api.otakugifs.xyz/gif/allreactions', {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-    });
+const fetchAllReactions = async () => {
+    const response = await fetch('https://api.otakugifs.xyz/gif/allreactions');
     const data = await response.json();
     return data.reactions;
 }
 
-const fetchGif = async (reaction: string, token?: string) => {
+const fetchGif = async (reaction: string) => {
     const response = await fetch(`https://api.otakugifs.xyz/gif?reaction=${reaction}`, {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
     });
     const data = await response.json();
     return data.url;
@@ -45,7 +41,6 @@ const RandomAnimeGifPage = () => {
     const [healthInfo, setHealthInfo] = useState<HealthInfo | null>(null);
     const [gifHistory, setGifHistory] = useState<GifHistoryItem[]>([]);
     const [showHistory, setShowHistory] = useState<boolean>(false);
-    const { token } = useAuth();
 
     // Load gif history from localStorage
     useEffect(() => {
@@ -105,9 +100,9 @@ const RandomAnimeGifPage = () => {
     const fetchNewGif = async () => {
         setLoading(true);
         try {
-            const reactions = await fetchAllReactions(token || undefined);
+            const reactions = await fetchAllReactions();
             const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
-            const gifUrl = await fetchGif(randomReaction, token || undefined);
+            const gifUrl = await fetchGif(randomReaction);
             
             setGif(gifUrl);
             setCurrentReaction(randomReaction);
@@ -201,25 +196,27 @@ const RandomAnimeGifPage = () => {
                             <span className="status-value">{healthInfo.uptime_formatted}</span>
                         </div>
 
-                        <div className="status-section">
-                            <h4>Database Stats</h4>
-                            <div className="status-item">
-                                <span className="status-label">Total Cards:</span>
-                                <span className="status-value">{healthInfo.database_stats.total_cards.toLocaleString()}</span>
+                        {healthInfo.database_stats && (
+                            <div className="status-section">
+                                <h4>Database Stats</h4>
+                                <div className="status-item">
+                                    <span className="status-label">Total Cards:</span>
+                                    <span className="status-value">{(healthInfo.database_stats.total_cards ?? 0).toLocaleString()}</span>
+                                </div>
+                                <div className="status-item">
+                                    <span className="status-label">Total Users:</span>
+                                    <span className="status-value">{(healthInfo.database_stats.total_users ?? 0).toLocaleString()}</span>
+                                </div>
+                                <div className="status-item">
+                                    <span className="status-label">Cards with Stats:</span>
+                                    <span className="status-value">{(healthInfo.database_stats.cards_with_stats ?? 0).toLocaleString()}</span>
+                                </div>
+                                <div className="status-item">
+                                    <span className="status-label">Stats Today:</span>
+                                    <span className="status-value">{(healthInfo.database_stats.cards_stats_today ?? 0).toLocaleString()}</span>
+                                </div>
                             </div>
-                            <div className="status-item">
-                                <span className="status-label">Total Users:</span>
-                                <span className="status-value">{healthInfo.database_stats.total_users.toLocaleString()}</span>
-                            </div>
-                            <div className="status-item">
-                                <span className="status-label">Cards with Stats:</span>
-                                <span className="status-value">{healthInfo.database_stats.cards_with_stats.toLocaleString()}</span>
-                            </div>
-                            <div className="status-item">
-                                <span className="status-label">Stats Today:</span>
-                                <span className="status-value">{healthInfo.database_stats.cards_stats_today.toLocaleString()}</span>
-                            </div>
-                        </div>
+                        )}
 
                         <div className="status-item timestamp">
                             <span className="status-label">Last Updated:</span>

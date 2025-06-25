@@ -914,46 +914,16 @@ export interface HealthResponse {
     'ping': number;
     /**
      * 
-     * @type {number}
-     * @memberof HealthResponse
-     */
-    'uptime_seconds': number;
-    /**
-     * 
      * @type {string}
      * @memberof HealthResponse
      */
     'uptime_formatted': string;
     /**
      * 
-     * @type {string}
-     * @memberof HealthResponse
-     */
-    'version': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof HealthResponse
-     */
-    'environment': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof HealthResponse
-     */
-    'timestamp': string;
-    /**
-     * 
      * @type {object}
      * @memberof HealthResponse
      */
     'database_stats': object;
-    /**
-     * 
-     * @type {object}
-     * @memberof HealthResponse
-     */
-    'system_info': object;
 }
 /**
  * 
