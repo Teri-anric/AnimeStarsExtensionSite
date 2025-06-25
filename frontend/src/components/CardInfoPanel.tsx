@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FiExternalLink } from 'react-icons/fi';
 import { CardSchema } from '../client';
 import { useDomain } from '../context/DomainContext';
@@ -39,7 +38,6 @@ const CardInfoRow = ({
 
 const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) => {
   const { currentDomain } = useDomain();
-  const navigate = useNavigate();
 
   const getCardMediaUrl = (path: string | null) => {
     if (!path) return '';
