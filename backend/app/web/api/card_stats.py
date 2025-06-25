@@ -9,6 +9,7 @@ from app.web.deps import CardUsersStatsRepositoryDep
 
 router = APIRouter(prefix="/card/stats", tags=["card-stats"])
 
+
 @router.get("/last")
 async def get_last_card_users_stats(
     card_id: int,
@@ -29,5 +30,5 @@ async def get_last_card_users_stats_bulk(
 async def get_card_users_stats_by_card_id(
     query: CardUsersStatsQuery,
     repo: CardUsersStatsRepositoryDep,
-) -> CardUsersStatsSchema:
-    return await repo.get_card_users_stats(query.card_id)
+) -> CardUsersStatsResponse:
+    return await repo.search(query.build())

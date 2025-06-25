@@ -388,6 +388,49 @@ export interface CardUsersStatsQuery {
 /**
  * 
  * @export
+ * @interface CardUsersStatsResponse
+ */
+export interface CardUsersStatsResponse {
+    /**
+     * 
+     * @type {number}
+     * @memberof CardUsersStatsResponse
+     */
+    'total': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardUsersStatsResponse
+     */
+    'page': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardUsersStatsResponse
+     */
+    'per_page': number;
+    /**
+     * 
+     * @type {Array<CardUsersStatsSchema>}
+     * @memberof CardUsersStatsResponse
+     */
+    'items': Array<CardUsersStatsSchema>;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardUsersStatsResponse
+     */
+    'total_pages': number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CardUsersStatsResponse
+     */
+    'has_next': boolean;
+}
+/**
+ * 
+ * @export
  * @interface CardUsersStatsSchema
  */
 export interface CardUsersStatsSchema {
@@ -2004,7 +2047,7 @@ export const CardStatsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardUsersStatsSchema>> {
+        async getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardUsersStatsResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CardStatsApi.getCardUsersStatsByCardIdApiCardStatsPost']?.[localVarOperationServerIndex]?.url;
@@ -2053,7 +2096,7 @@ export const CardStatsApiFactory = function (configuration?: Configuration, base
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig): AxiosPromise<CardUsersStatsSchema> {
+        getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig): AxiosPromise<CardUsersStatsResponse> {
             return localVarFp.getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery, options).then((request) => request(axios, basePath));
         },
         /**

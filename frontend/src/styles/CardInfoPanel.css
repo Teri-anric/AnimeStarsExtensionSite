@@ -21,7 +21,7 @@
   position: fixed;
   top: 0;
   right: 0;
-  width: 450px;
+  width: 500px;
   height: 100vh;
   background-color: var(--ui-bg);
   border-left: 1px solid var(--bdc-3);
@@ -138,6 +138,14 @@
 
 .card-info-row:last-child {
   border-bottom: none;
+}
+
+/* Special styling for the chart section */
+.card-info-details .card-stats-chart {
+  margin-top: 1.5rem;
+  border-top: 2px solid var(--bdc-3);
+  padding-top: 1.5rem;
+  background-color: var(--ui-bg-2);
 }
 
 .card-info-row .label {

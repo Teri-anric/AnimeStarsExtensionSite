@@ -3,6 +3,7 @@ from typing import Generic, TypeVar
 from pydantic import Field
 from ...filters.models import BaseEntryFilter
 from ...database.types.order_by import OrderBy
+from ...database.types.pagination import PaginationQuery
 
 T = TypeVar("T")
 F = TypeVar("F", bound=BaseEntryFilter)
@@ -38,6 +39,13 @@ class BasePaginationQuery(BaseSchema, Generic[F, S]):
             return None
         return OrderBy(sorts=[sort.to_sort() for sort in self.order_by])
 
+    def build(self):
+        return PaginationQuery(
+            page=self.page,
+            per_page=self.per_page,
+            filter=self.filter,
+            order_by=self.build_order_by(),
+        )
 
 
 class BasePaginationResponse(BaseSchema, Generic[T]):

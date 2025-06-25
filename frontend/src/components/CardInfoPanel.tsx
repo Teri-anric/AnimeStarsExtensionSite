@@ -2,7 +2,9 @@ import React from 'react';
 import { FiExternalLink } from 'react-icons/fi';
 import { CardSchema } from '../client';
 import { useDomain } from '../context/DomainContext';
+import CardStatsChart from './CardStatsChart';
 import '../styles/CardInfoPanel.css';
+import '../styles/CardStatsChart.css';
 
 interface CardInfoPanelProps {
   card: CardSchema | null;
@@ -146,6 +148,9 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
             {card.updated_at && (
               <CardInfoRow label="Updated" value={formatDate(card.updated_at)} />
             )}
+
+            {/* Card Statistics Chart */}
+            <CardStatsChart cardId={card.card_id} />
           </div>
         </div>
       </div>

@@ -1,0 +1,94 @@
+.card-stats-chart {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--panel-bg, #f8f9fa);
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e9ecef);
+}
+
+.chart-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.chart-title h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.individual-chart {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 250px;
+}
+
+.stats-loading,
+.stats-error,
+.stats-no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--text-muted, #6c757d);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.stats-error {
+  color: var(--error-color, #dc3545);
+}
+
+.stats-loading {
+  color: var(--primary-color, #0d6efd);
+}
+
+.stats-no-data {
+  color: var(--text-muted, #6c757d);
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .card-stats-chart {
+    background: var(--panel-bg-dark, #343a40);
+    border-color: var(--border-color-dark, #495057);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-stats-chart {
+    padding: 0.75rem;
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .individual-chart {
+    height: 200px;
+    padding: 0.75rem;
+  }
+  
+  .chart-title h3 {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 1200px) and (min-width: 769px) {
+  .charts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+} 
