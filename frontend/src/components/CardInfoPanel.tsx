@@ -1,10 +1,10 @@
 import React from 'react';
-import { FiExternalLink } from 'react-icons/fi';
+import { FiExternalLink, FiMaximize2, FiClipboard } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 import { CardSchema } from '../client';
 import { useDomain } from '../context/DomainContext';
-import CardStatsChart from './CardStatsChart';
+import CardStatsDisplay from './CardStatsDisplay';
 import '../styles/CardInfoPanel.css';
-import '../styles/CardStatsChart.css';
 
 interface CardInfoPanelProps {
   card: CardSchema | null;
@@ -26,13 +26,28 @@ const CardInfoRow = ({
   };
   
   return (
-    <div className="card-info-row" onClick={copyValueToClipboard}>
+    <div className="card-info-row">
       <span className="label">{label}</span>
       <div className="value-container">
         <span className="value">{value}</span>
-        {externalLink && <a href={externalLink} target="_blank" rel="noopener noreferrer">
-          <FiExternalLink />
-        </a>}
+        <div 
+          onClick={copyValueToClipboard}
+          className="action-button-arrow"
+          title="Copy to clipboard"
+        >
+          <FiClipboard />
+        </div>
+        {externalLink && (
+          <a 
+            href={externalLink} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="action-button-arrow external-link-red"
+            title="Open in Anisite"
+          >
+            <FiExternalLink />
+          </a>
+        )}
       </div>
     </div>
   );
@@ -40,6 +55,7 @@ const CardInfoRow = ({
 
 const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) => {
   const { currentDomain } = useDomain();
+  const navigate = useNavigate();
 
   const getCardMediaUrl = (path: string | null) => {
     if (!path) return '';
@@ -59,10 +75,33 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
     return url.toString();
   };
 
-  const formatDate = (dateString: string | null) => {
+  const formatTimeAgo = (dateString: string | null) => {
     if (!dateString) return 'Unknown';
     try {
-      return new Date(dateString).toLocaleDateString();
+      const now = new Date();
+      const date = new Date(dateString);
+      const diffInMs = now.getTime() - date.getTime();
+      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+      const diffInDays = Math.floor(diffInHours / 24);
+      const diffInWeeks = Math.floor(diffInDays / 7);
+      const diffInMonths = Math.floor(diffInDays / 30);
+      const diffInYears = Math.floor(diffInDays / 365);
+
+      if (diffInMs < 0) return 'Future date';
+      if (diffInHours < 1) {
+        const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+        return diffInMinutes <= 0 ? 'Just now' : `${diffInMinutes}m ago`;
+      } else if (diffInHours < 24) {
+        return `${diffInHours}h ago`;
+      } else if (diffInDays < 7) {
+        return `${diffInDays}d ago`;
+      } else if (diffInWeeks < 4) {
+        return `${diffInWeeks}w ago`;
+      } else if (diffInMonths < 12) {
+        return `${diffInMonths}mo ago`;
+      } else {
+        return `${diffInYears}y ago`;
+      }
     } catch {
       return 'Unknown';
     }
@@ -83,9 +122,18 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
       <div className={`card-info-panel ${isOpen ? 'open' : ''}`}>
         <div className="card-info-header">
           <h2>Card Details</h2>
-          <button className="close-button" onClick={onClose}>
-            ×
-          </button>
+          <div className="header-buttons">
+            <button 
+              className="full-page-button" 
+              onClick={() => navigate(`/card/${card.card_id}`)}
+              title="Open full page"
+            >
+              <FiMaximize2 />
+            </button>
+            <button className="close-button" onClick={onClose}>
+              ×
+            </button>
+          </div>
         </div>
         
         <div className="card-info-content">
@@ -142,15 +190,15 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
             )}
             
             {card.created_at && (
-              <CardInfoRow label="Created" value={formatDate(card.created_at)} />
+              <CardInfoRow label="Created" value={formatTimeAgo(card.created_at)} />
             )}
             
             {card.updated_at && (
-              <CardInfoRow label="Updated" value={formatDate(card.updated_at)} />
+              <CardInfoRow label="Updated" value={formatTimeAgo(card.updated_at)} />
             )}
 
-            {/* Card Statistics Chart */}
-            <CardStatsChart cardId={card.card_id} />
+            {/* Card Statistics Display */}
+            <CardStatsDisplay cardId={card.card_id} />
           </div>
         </div>
       </div>

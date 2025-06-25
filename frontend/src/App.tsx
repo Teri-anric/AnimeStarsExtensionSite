@@ -6,6 +6,7 @@ import {
   LoginPage,
   RegisterPage,
   CardsPage, 
+  CardDetailPage,
   RandomAnimeGifPage, 
   AccountSettingsPage 
 } from './pages';
@@ -33,6 +34,11 @@ function App() {
                   <Route path="/cards" element={
                     <ProtectedRoute>
                       <CardsPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/card/:cardId" element={
+                    <ProtectedRoute>
+                      <CardDetailPage />
                     </ProtectedRoute>
                   } />
                   <Route path="/decks" element={

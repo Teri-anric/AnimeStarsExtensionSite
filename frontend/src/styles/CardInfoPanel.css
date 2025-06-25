@@ -5,7 +5,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   z-index: 998;
   opacity: 0;
   visibility: hidden;
@@ -21,16 +21,18 @@
   position: fixed;
   top: 0;
   right: 0;
-  width: 500px;
+  width: 480px;
   height: 100vh;
   background-color: var(--ui-bg);
   border-left: 1px solid var(--bdc-3);
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
   z-index: 999;
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
   color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-info-panel.open {
@@ -41,32 +43,62 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--bdc-3);
   background-color: var(--ui-bg-2);
   position: sticky;
   top: 0;
   z-index: 1;
+  flex-shrink: 0;
 }
 
 .card-info-header h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: white;
+  line-height: 1.3;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.full-page-button {
+  background: var(--accent, #007bff);
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.full-page-button:hover {
+  background: var(--accent-s, #0056b3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
 .close-button {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 20px;
   color: #aaa;
   cursor: pointer;
-  padding: 5px;
-  border-radius: 4px;
-  transition: color 0.2s, background-color 0.2s;
-  width: 32px;
-  height: 32px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,7 +110,8 @@
 }
 
 .card-info-content {
-  padding: 10px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .card-info-media {
@@ -87,18 +120,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
+  min-height: 280px;
   max-height: 400px;
   overflow: hidden;
+  padding: 16px;
 }
 
 .card-info-image,
 .card-info-video {
   width: auto;
-  height:auto;
-  max-height: 300px;
+  height: auto;
+  max-width: 100%;
+  max-height: 350px;
   object-fit: contain;
-  border-radius: 16px;
+  border-radius: 12px;
 }
 
 /* Inline Action Buttons */
@@ -106,22 +141,23 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border: 1px solid var(--bdc-3);
-  border-radius: 16px;
+  border-radius: 20px;
   background-color: var(--ui-bg-accent);
   color: white;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-decoration: none;
 }
 
 .action-button-inline:hover {
   background-color: var(--accent);
   border-color: var(--accent);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .card-info-details {
@@ -132,7 +168,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 16px 0;
   border-bottom: 1px solid var(--bdc-3);
 }
 
@@ -140,30 +176,33 @@
   border-bottom: none;
 }
 
-/* Special styling for the chart section */
-.card-info-details .card-stats-chart {
-  margin-top: 1.5rem;
+/* Special styling for the stats display section */
+.card-info-details .card-stats-display {
+  margin-top: 24px;
   border-top: 2px solid var(--bdc-3);
-  padding-top: 1.5rem;
+  padding-top: 24px;
   background-color: var(--ui-bg-2);
+  border-radius: 12px;
+  padding: 20px;
 }
 
 .card-info-row .label {
   font-weight: 600;
   color: #aaa;
-  font-size: 14px;
+  font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   flex-shrink: 0;
-  margin-right: 15px;
+  margin-right: 16px;
 }
 
 .card-info-row .value {
   color: white;
-  font-size: 16px;
+  font-size: 15px;
   text-align: right;
   word-break: break-word;
   flex: 1;
+  font-weight: 500;
 }
 
 .card-info-row .value.link {
@@ -180,7 +219,7 @@
 .value-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex: 1;
   justify-content: flex-end;
 }
@@ -188,9 +227,9 @@
 .action-button-arrow {
   background: none;
   border: 1px solid var(--bdc-3);
-  border-radius: 4px;
-  width: 20px;
-  height: 20px;
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
   color: #aaa;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -208,52 +247,161 @@
   transform: scale(1.1);
 }
 
+.external-link-red {
+  color: #ff4757 !important;
+}
+
+.external-link-red:hover {
+  background-color: #ff4757 !important;
+  border-color: #ff4757 !important;
+  color: white !important;
+}
+
 .rank-badge {
-  padding: 4px 12px !important;
-  border-radius: 16px !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
   font-weight: bold !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
   color: white !important;
   text-align: center !important;
   min-width: 40px;
   display: inline-block;
 }
 
-/* Responsive Design */
+/* Mobile Responsive Design */
 @media (max-width: 768px) {
   .card-info-panel {
     width: 100vw;
     right: 0;
   }
-  
+
+  .card-info-header {
+    padding: 12px 16px;
+  }
+
+  .card-info-header h2 {
+    font-size: 16px;
+  }
+
+  .full-page-button,
+  .close-button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .card-info-media {
+    min-height: 220px;
+    max-height: 300px;
+    padding: 12px;
+  }
+
+  .card-info-image,
+  .card-info-video {
+    max-height: 250px;
+  }
+
+  .card-info-details {
+    padding: 16px;
+  }
+
   .card-info-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+    padding: 12px 0;
   }
-  
+
   .card-info-row .value {
     text-align: left;
+    width: 100%;
+    font-size: 14px;
   }
-  
+
   .card-info-row .label {
     margin-right: 0;
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .value-container {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
   }
 
   .action-button-inline {
-    padding: 8px 14px;
+    padding: 10px 16px;
     font-size: 14px;
     align-self: stretch;
     justify-content: center;
+    margin-top: 4px;
+  }
+
+  .card-info-details .card-stats-display {
+    margin-top: 16px;
+    padding-top: 16px;
+    padding: 16px;
+  }
+
+  .action-button-arrow {
+    width: 28px;
+    height: 28px;
   }
 }
 
+/* Small Mobile */
+@media (max-width: 480px) {
+  .card-info-header {
+    padding: 10px 12px;
+  }
+
+  .card-info-header h2 {
+    font-size: 15px;
+  }
+
+  .full-page-button,
+  .close-button {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .card-info-media {
+    min-height: 180px;
+    max-height: 250px;
+    padding: 8px;
+  }
+
+  .card-info-details {
+    padding: 12px;
+  }
+
+  .card-info-row {
+    padding: 10px 0;
+  }
+
+  .card-info-row .label {
+    font-size: 11px;
+  }
+
+  .card-info-row .value {
+    font-size: 13px;
+  }
+
+  .action-button-inline {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Tablet Responsive Design */
 @media (min-width: 769px) and (max-width: 1024px) {
   .card-info-panel {
-    width: 400px;
+    width: 420px;
   }
 }
 
+/* Large Screen */
 @media (min-width: 1200px) {
   .card-info-panel {
     width: 500px;

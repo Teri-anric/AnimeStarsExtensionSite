@@ -7,13 +7,15 @@ interface CardProps {
   variant?: 'default' | 'preview';
   className?: string;
   onClick?: () => void;
+  canOpenFullPage?: boolean;
 }
 
 const Card: React.FC<CardProps> = ({ 
   card, 
   variant = 'default', 
   className = '', 
-  onClick 
+  onClick,
+  canOpenFullPage = true
 }) => {
   const { currentDomain } = useDomain();
 
@@ -26,6 +28,14 @@ const Card: React.FC<CardProps> = ({
     return `rank-${rank.toLowerCase()}`;
   };
 
+  const clickHandler = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (canOpenFullPage && card.card_id && (event.shiftKey || event.ctrlKey || event.metaKey)) {
+      window.open(`/card/${card.card_id}`, '_blank');
+    } else {
+      onClick?.();
+    }
+  };
+
   const baseClass = variant === 'preview' ? 'preview-card' : 'card-item';
   const combinedClassName = `${baseClass} ${getRankClass(card.rank)} ${className}`.trim();
 
@@ -33,7 +43,7 @@ const Card: React.FC<CardProps> = ({
     <div 
       key={card.id} 
       className={combinedClassName}
-      onClick={onClick}
+      onClick={clickHandler}
       style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
       <div className="card-content">
