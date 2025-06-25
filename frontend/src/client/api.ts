@@ -1885,10 +1885,10 @@ export const CardStatsApiAxiosParamCreator = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCardUsersStatsByCardIdApiCardStatsStatsPost: async (cardUsersStatsQuery: CardUsersStatsQuery, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getCardUsersStatsByCardIdApiCardStatsPost: async (cardUsersStatsQuery: CardUsersStatsQuery, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'cardUsersStatsQuery' is not null or undefined
-            assertParamExists('getCardUsersStatsByCardIdApiCardStatsStatsPost', 'cardUsersStatsQuery', cardUsersStatsQuery)
-            const localVarPath = `/api/card/stats/stats`;
+            assertParamExists('getCardUsersStatsByCardIdApiCardStatsPost', 'cardUsersStatsQuery', cardUsersStatsQuery)
+            const localVarPath = `/api/card/stats/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1921,10 +1921,10 @@ export const CardStatsApiAxiosParamCreator = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getLastCardUsersStatsApiCardStatsStatsLastGet: async (cardId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getLastCardUsersStatsApiCardStatsLastGet: async (cardId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'cardId' is not null or undefined
-            assertParamExists('getLastCardUsersStatsApiCardStatsStatsLastGet', 'cardId', cardId)
-            const localVarPath = `/api/card/stats/stats/last`;
+            assertParamExists('getLastCardUsersStatsApiCardStatsLastGet', 'cardId', cardId)
+            const localVarPath = `/api/card/stats/last`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1951,6 +1951,42 @@ export const CardStatsApiAxiosParamCreator = function (configuration?: Configura
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Get Last Card Users Stats Bulk
+         * @param {Array<number>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLastCardUsersStatsBulkApiCardStatsLastBulkGet: async (requestBody: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('getLastCardUsersStatsBulkApiCardStatsLastBulkGet', 'requestBody', requestBody)
+            const localVarPath = `/api/card/stats/last/bulk`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1968,10 +2004,10 @@ export const CardStatsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardUsersStatsSchema>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery, options);
+        async getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardUsersStatsSchema>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['CardStatsApi.getCardUsersStatsByCardIdApiCardStatsStatsPost']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['CardStatsApi.getCardUsersStatsByCardIdApiCardStatsPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1981,10 +2017,23 @@ export const CardStatsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getLastCardUsersStatsApiCardStatsStatsLastGet(cardId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CardUsersStatsSchema>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getLastCardUsersStatsApiCardStatsStatsLastGet(cardId, options);
+        async getLastCardUsersStatsApiCardStatsLastGet(cardId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CardUsersStatsSchema>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLastCardUsersStatsApiCardStatsLastGet(cardId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['CardStatsApi.getLastCardUsersStatsApiCardStatsStatsLastGet']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['CardStatsApi.getLastCardUsersStatsApiCardStatsLastGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get Last Card Users Stats Bulk
+         * @param {Array<number>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLastCardUsersStatsBulkApiCardStatsLastBulkGet(requestBody: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CardUsersStatsSchema>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLastCardUsersStatsBulkApiCardStatsLastBulkGet(requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CardStatsApi.getLastCardUsersStatsBulkApiCardStatsLastBulkGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -2004,8 +2053,8 @@ export const CardStatsApiFactory = function (configuration?: Configuration, base
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig): AxiosPromise<CardUsersStatsSchema> {
-            return localVarFp.getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery, options).then((request) => request(axios, basePath));
+        getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig): AxiosPromise<CardUsersStatsSchema> {
+            return localVarFp.getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2014,8 +2063,18 @@ export const CardStatsApiFactory = function (configuration?: Configuration, base
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getLastCardUsersStatsApiCardStatsStatsLastGet(cardId: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<CardUsersStatsSchema>> {
-            return localVarFp.getLastCardUsersStatsApiCardStatsStatsLastGet(cardId, options).then((request) => request(axios, basePath));
+        getLastCardUsersStatsApiCardStatsLastGet(cardId: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<CardUsersStatsSchema>> {
+            return localVarFp.getLastCardUsersStatsApiCardStatsLastGet(cardId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get Last Card Users Stats Bulk
+         * @param {Array<number>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLastCardUsersStatsBulkApiCardStatsLastBulkGet(requestBody: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<Array<CardUsersStatsSchema>> {
+            return localVarFp.getLastCardUsersStatsBulkApiCardStatsLastBulkGet(requestBody, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2035,8 +2094,8 @@ export class CardStatsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CardStatsApi
      */
-    public getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig) {
-        return CardStatsApiFp(this.configuration).getCardUsersStatsByCardIdApiCardStatsStatsPost(cardUsersStatsQuery, options).then((request) => request(this.axios, this.basePath));
+    public getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery: CardUsersStatsQuery, options?: RawAxiosRequestConfig) {
+        return CardStatsApiFp(this.configuration).getCardUsersStatsByCardIdApiCardStatsPost(cardUsersStatsQuery, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2047,8 +2106,20 @@ export class CardStatsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CardStatsApi
      */
-    public getLastCardUsersStatsApiCardStatsStatsLastGet(cardId: number, options?: RawAxiosRequestConfig) {
-        return CardStatsApiFp(this.configuration).getLastCardUsersStatsApiCardStatsStatsLastGet(cardId, options).then((request) => request(this.axios, this.basePath));
+    public getLastCardUsersStatsApiCardStatsLastGet(cardId: number, options?: RawAxiosRequestConfig) {
+        return CardStatsApiFp(this.configuration).getLastCardUsersStatsApiCardStatsLastGet(cardId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get Last Card Users Stats Bulk
+     * @param {Array<number>} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CardStatsApi
+     */
+    public getLastCardUsersStatsBulkApiCardStatsLastBulkGet(requestBody: Array<number>, options?: RawAxiosRequestConfig) {
+        return CardStatsApiFp(this.configuration).getLastCardUsersStatsBulkApiCardStatsLastBulkGet(requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

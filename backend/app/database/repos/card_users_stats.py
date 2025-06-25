@@ -28,3 +28,14 @@ class CardUsersStatsRepository(
             .distinct(CardUsersStats.collection)
         )
         return results
+
+    async def get_last_card_users_stats_bulk(
+        self, card_ids: list[int]
+    ) -> list[CardUsersStats]:
+        results = await self.scalars(
+            select(CardUsersStats)
+            .where(CardUsersStats.card_id.in_(card_ids))
+            .order_by(CardUsersStats.card_id, CardUsersStats.collection, CardUsersStats.created_at.desc())
+            .distinct(CardUsersStats.card_id, CardUsersStats.collection)
+        )
+        return results

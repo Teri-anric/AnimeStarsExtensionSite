@@ -9,7 +9,7 @@ from app.web.deps import CardUsersStatsRepositoryDep
 
 router = APIRouter(prefix="/card/stats", tags=["card-stats"])
 
-@router.get("/stats/last")
+@router.get("/last")
 async def get_last_card_users_stats(
     card_id: int,
     repo: CardUsersStatsRepositoryDep,
@@ -17,7 +17,15 @@ async def get_last_card_users_stats(
     return await repo.get_last_card_users_stats(card_id)
 
 
-@router.post("/stats")
+@router.get("/last/bulk")
+async def get_last_card_users_stats_bulk(
+    card_ids: list[int],
+    repo: CardUsersStatsRepositoryDep,
+) -> list[CardUsersStatsSchema]:
+    return await repo.get_last_card_users_stats_bulk(card_ids)
+
+
+@router.post("/")
 async def get_card_users_stats_by_card_id(
     query: CardUsersStatsQuery,
     repo: CardUsersStatsRepositoryDep,
