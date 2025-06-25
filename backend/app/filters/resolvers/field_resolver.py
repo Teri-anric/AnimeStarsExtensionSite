@@ -104,7 +104,7 @@ class FieldConditionResolver(BaseResolver):
             else:
                 conditions.append(column.is_not(None))
         
-                return self._combine_conditions(conditions)
+        return self._combine_conditions(conditions)
 
     def _resolve_datetime_filter(self, filter_obj: DateTimeFieldFilter, column: Column) -> ClauseElement | None:
         """Resolve datetime field filter with user-friendly operators"""

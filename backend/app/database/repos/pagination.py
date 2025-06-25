@@ -12,7 +12,6 @@ from ...filters.models import BaseEntryFilter
 
 T = TypeVar("T")
 
-
 class PaginationRepository(BaseRepository, Generic[T], ABC):
     def __init__(self, *args, filter_service: FilterService | None = None, **kwargs):
         super().__init__(*args, **kwargs)

@@ -13,6 +13,10 @@ class CardUsersStatsRepository(
     @property
     def entry_class(self) -> type[CardUsersStats]:
         return CardUsersStats
+    
+    @property
+    def entry_code(self) -> str:
+        return "card_users_stats"
 
     async def get_last_card_users_stats(
         self, card_id: int

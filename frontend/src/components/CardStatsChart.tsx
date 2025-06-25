@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -44,13 +44,12 @@ const CardStatsChart: React.FC<CardStatsChartProps> = ({ cardId, className = '' 
   const [error, setError] = useState<string>('');
   const { isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    if (isAuthenticated && cardId) {
-      fetchCardStats();
+  const fetchCardStats = useCallback(async () => {
+    if (!isAuthenticated || !cardId) {
+      setLoading(false);
+      return;
     }
-  }, [cardId, isAuthenticated]);
 
-  const fetchCardStats = async () => {
     try {
       setLoading(true);
       setError('');
@@ -81,7 +80,11 @@ const CardStatsChart: React.FC<CardStatsChartProps> = ({ cardId, className = '' 
     } finally {
       setLoading(false);
     }
-  };
+  }, [cardId, isAuthenticated]);
+
+  useEffect(() => {
+    fetchCardStats();
+  }, [fetchCardStats]);
 
   const getCollectionDisplayName = (collection: CardCollection): string => {
     switch (collection) {
