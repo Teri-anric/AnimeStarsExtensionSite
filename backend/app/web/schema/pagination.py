@@ -1,12 +1,11 @@
 from .base import BaseSchema
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Any, Dict
 from pydantic import Field
-from ...filters.models import BaseEntryFilter
 from ...database.types.order_by import OrderBy
 from ...database.types.pagination import PaginationQuery
 
 T = TypeVar("T")
-F = TypeVar("F", bound=BaseEntryFilter)
+F = TypeVar("F")
 S = TypeVar("S")
 
 
@@ -18,8 +17,8 @@ class SortGeneric(BaseSchema, Generic[S]):
         return OrderBy.Sort(property=self.property, direction=self.direction)
 
 class BasePaginationQuery(BaseSchema, Generic[F, S]):
-    filter: F | None = Field(default=None, description="Filter by the pagination")
-    order_by: S | None | list[SortGeneric[S]] = Field(default=None, description="Order by the pagination")
+    filter: F | None = Field(default=None, description="Filter for the pagination")
+    order_by: S | None | list[SortGeneric[S]] = Field(default=None, description="Order by for the pagination")
     page: int = 1
     per_page: int = 50
 

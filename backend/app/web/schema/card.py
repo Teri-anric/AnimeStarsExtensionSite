@@ -3,8 +3,7 @@ from uuid import UUID
 from ...database.models.animestars.card import CardType
 from .pagination import BasePaginationQuery, BasePaginationResponse
 from .base import BaseSchema
-from typing import Literal
-from ...filters.entries.card_filter import CardFilter
+from typing import Literal, Dict, Any
 from datetime import datetime
 
 class CardSchema(BaseSchema):
@@ -68,8 +67,23 @@ CardSort = Literal[
 ]
 
 
-
-class CardQuery(BasePaginationQuery[CardFilter, CardSort]):
+class CardQuery(BasePaginationQuery[dict, CardSort]):
+    """
+    Card query with universal filtering support.
+    
+    Examples of filter usage:
+    {
+        "filter": {
+            "name": {"contains": "naruto"},
+            "rank": {"eq": "s"},
+            "author_user": {"username": {"icontains": "test"}},
+            "and": [
+                {"name": {"contains": "dragon"}},
+                {"rank": {"in": ["s", "a"]}}
+            ]
+        }
+    }
+    """
     pass
 
 
