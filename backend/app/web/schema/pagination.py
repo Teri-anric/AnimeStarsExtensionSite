@@ -43,8 +43,8 @@ class BasePaginationQuery(BaseSchema, Generic[F, S]):
         return PaginationQuery(
             page=self.page,
             per_page=self.per_page,
-            filter=self.filter.to_dict(),
-            order_by=self.build_order_by(),
+            filter=self.filter.to_dict() if self.filter else None,
+            order_by=self.build_order_by() if self.order_by else None,
         )
 
 
