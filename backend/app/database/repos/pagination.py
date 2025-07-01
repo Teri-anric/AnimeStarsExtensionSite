@@ -5,14 +5,13 @@ from sqlalchemy import select, delete, update, Select, func, asc, desc
 from .base import BaseRepository
 from ..types.pagination import Pagination, PaginationQuery
 from ..types.order_by import OrderBy
-from ...filters import FilterService, default_filter_service
+from ...filters import filter_service
 
 T = TypeVar("T")
 
 class PaginationRepository(BaseRepository, Generic[T], ABC):
-    def __init__(self, *args, filter_service: FilterService | None = None, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.filter_service = filter_service or default_filter_service
 
     async def search(self, query: PaginationQuery, *args, **kwargs) -> Pagination[T]:
         return await self.paginate(select(self.entry_class), query, *args, **kwargs)
@@ -71,10 +70,8 @@ class PaginationRepository(BaseRepository, Generic[T], ABC):
         if not filter_data:
             return stmt
             
-        # Use the new universal filter service
-        return self.filter_service.apply_filters(stmt, self.entry_class, filter_data)
-        
-    
+        return filter_service.apply_filters(stmt, self.entry_class, filter_data)
+
     async def get_by(self, filter_data: dict) -> list[T]:
         return await self.scalars(self._apply_filter(select(self.entry_class), filter_data))
 

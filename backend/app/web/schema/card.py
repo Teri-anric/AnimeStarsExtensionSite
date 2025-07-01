@@ -1,10 +1,11 @@
-from pydantic import field_validator
 from uuid import UUID
 from ...database.models.animestars.card import CardType
 from .pagination import BasePaginationQuery, BasePaginationResponse
 from .base import BaseSchema
+from ...filters import BaseFilter, UUIDEntryFilter, IntegerEntryFilter, StringEntryFilter, EnumEntryFilter, DateTimeEntryFilter
 from typing import Literal
 from datetime import datetime
+from pydantic import field_validator
 
 class CardSchema(BaseSchema):
     id: UUID
@@ -27,63 +28,40 @@ class CardSchema(BaseSchema):
             return CardType(v.lower())
         return v
 
+
 CardSort = Literal[
-    "id asc",
-    "id desc",
     "id",
-    "card_id asc",
-    "card_id desc",
     "card_id",
-    "name asc",
-    "name desc",
     "name",
-    "rank asc",
-    "rank desc",
     "rank",
-    "anime_name asc",
-    "anime_name desc",
     "anime_name",
-    "anime_link asc",
-    "anime_link desc",
     "anime_link",
-    "author asc",
-    "author desc",
     "author",
-    "image asc",
-    "image desc",
     "image",
-    "mp4 asc",
-    "mp4 desc",
     "mp4",
-    "webm asc",
-    "webm desc",
     "webm",
-    "created_at asc",
-    "created_at desc",
     "created_at",
-    "updated_at asc",
-    "updated_at desc",
     "updated_at",
 ]
 
 
-class CardQuery(BasePaginationQuery[dict, CardSort]):
-    """
-    Card query with universal filtering support.
-    
-    Examples of filter usage:
-    {
-        "filter": {
-            "name": {"contains": "naruto"},
-            "rank": {"eq": "s"},
-            "author_user": {"username": {"icontains": "test"}},
-            "and": [
-                {"name": {"contains": "dragon"}},
-                {"rank": {"in": ["s", "a"]}}
-            ]
-        }
-    }
-    """
+class CardFilter(BaseFilter):
+    """Filter schema for Card model"""
+    id: UUIDEntryFilter | None  = None
+    card_id: IntegerEntryFilter | None = None
+    name: StringEntryFilter | None = None
+    rank: EnumEntryFilter[CardType] | None = None
+    anime_name: StringEntryFilter | None = None
+    anime_link: StringEntryFilter | None = None
+    author: StringEntryFilter | None = None
+    image: StringEntryFilter | None = None
+    mp4: StringEntryFilter | None = None
+    webm: StringEntryFilter | None = None
+    created_at: DateTimeEntryFilter | None = None
+    updated_at: DateTimeEntryFilter | None = None
+
+
+class CardQuery(BasePaginationQuery[CardFilter, CardSort | str]):
     pass
 
 

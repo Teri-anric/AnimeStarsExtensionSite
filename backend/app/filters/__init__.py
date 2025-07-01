@@ -26,13 +26,6 @@ from .types import (
     DateFilter,
     EnumFilter,
 )
-from .schema import (
-    CardFilter,
-    UserFilter,
-    CardUsersStatsFilter,
-    DeckFilter,
-    CardRarity,
-)
 
 __all__ = [
     # Main service
@@ -68,11 +61,4 @@ __all__ = [
     "DateTimeFilter",
     "DateFilter",
     "EnumFilter",
-    
-    # Example schemas
-    "CardFilter",
-    "UserFilter",
-    "CardUsersStatsFilter",
-    "DeckFilter",
-    "CardRarity",
 ]

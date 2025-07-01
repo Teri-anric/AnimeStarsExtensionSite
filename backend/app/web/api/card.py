@@ -7,7 +7,6 @@ from app.web.schema.card import (
     CardSchema,
 )
 from app.web.deps import CardRepositoryDep
-from app.database.types.pagination import PaginationQuery
 
 router = APIRouter(prefix="/card", tags=["card"])
 
@@ -33,14 +32,7 @@ async def get_cards(
         }
     }
     """
-    return await repo.search(
-        PaginationQuery(
-            page=query.page,
-            per_page=query.per_page,
-            filter=query.filter,
-            order_by=query.build_order_by(),
-        )
-    )
+    return await repo.search(query.build())
 
 
 @router.get("/{card_id}")
