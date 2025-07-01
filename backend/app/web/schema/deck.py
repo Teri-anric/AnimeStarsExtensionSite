@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional, Literal
+from pydantic import Field
+from typing import List, Literal
 from .card import CardSchema
 from .base import BaseSchema
 from .pagination import BasePaginationResponse, BasePaginationQuery
-from app.filters.entries.desk_filter import DeckFilter
 
 class DeckSummarySchema(BaseSchema):
     """Schema for deck summary in listings"""
@@ -35,5 +34,5 @@ DeckSort = Literal[
 ]
 
 
-class DeckQuery(BasePaginationQuery[DeckFilter, DeckSort]):
+class DeckQuery(BasePaginationQuery[dict, DeckSort]):
     pass

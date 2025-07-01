@@ -3,7 +3,7 @@ from uuid import UUID
 from ...database.models.animestars.card import CardType
 from .pagination import BasePaginationQuery, BasePaginationResponse
 from .base import BaseSchema
-from typing import Literal, Dict, Any
+from typing import Literal
 from datetime import datetime
 
 class CardSchema(BaseSchema):

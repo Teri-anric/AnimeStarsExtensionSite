@@ -1,5 +1,5 @@
 from .base import BaseSchema
-from typing import Generic, TypeVar, Any, Dict
+from typing import Generic, TypeVar
 from pydantic import Field
 from ...database.types.order_by import OrderBy
 from ...database.types.pagination import PaginationQuery
