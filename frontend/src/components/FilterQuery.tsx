@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { GenericFilter, EntityFilterConfig } from '../types/filter';
 import AdvancedFilter from './AdvancedFilter';
 import '../styles/FilterQuery.css';
@@ -21,6 +22,9 @@ export interface FilterQueryProps<T = GenericFilter> {
   currentSort?: string;
   onSortChange?: (value: string) => void;
   
+  // URL integration
+  useUrlParams?: boolean; // Enable URL parameter synchronization (default: true)
+  
   // Search functionality
   onSearch?: () => void;
   
@@ -42,12 +46,15 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
   onFilterChange,
   currentSort,
   onSortChange,
+  useUrlParams = true,
   onSearch,
   title,
   showModeToggle = true,
   defaultMode,
   className = ''
 }: FilterQueryProps<T>) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   // Extract configuration from either config object or individual props
   const entityConfig = config || {
     entityName: title || 'Entity',
@@ -61,18 +68,94 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
     }
   };
 
-  const [filterMode, setFilterMode] = useState<'short' | 'advanced'>(
-    config?.defaults.filterMode || defaultMode || 'short'
-  );
-  const [showAdvancedFilter, setShowAdvancedFilter] = useState(
-    (config?.defaults.filterMode || defaultMode || 'short') === 'advanced'
-  );
-  const [shortFilterValues, setShortFilterValues] = useState<Record<string, string>>(
-    config?.defaults.shortFilterValues || {}
-  );
+  // URL parameter integration
+  const getInitialSort = () => {
+    if (useUrlParams) {
+      const urlSort = searchParams.get('sort');
+      if (urlSort) return urlSort;
+    }
+    return currentSort || entityConfig.defaults.sort;
+  };
+
+  const getInitialMode = () => {
+    if (useUrlParams) {
+      const urlMode = searchParams.get('mode');
+      if (urlMode === 'short' || urlMode === 'advanced') return urlMode;
+    }
+    return entityConfig.defaults.filterMode || defaultMode || 'short';
+  };
+
+  const getInitialShortFilterValues = () => {
+    if (useUrlParams) {
+      const urlShortFilter = searchParams.get('shortFilter');
+      if (urlShortFilter) {
+        try {
+          return JSON.parse(urlShortFilter) as Record<string, string>;
+        } catch (e) {
+          console.warn('Failed to parse short filter from URL:', e);
+        }
+      }
+    }
+    return entityConfig.defaults.shortFilterValues || {};
+  };
+
+  const [filterMode, setFilterMode] = useState<'short' | 'advanced'>(getInitialMode);
+  const [showAdvancedFilter, setShowAdvancedFilter] = useState(getInitialMode() === 'advanced');
+  const [shortFilterValues, setShortFilterValues] = useState<Record<string, string>>(getInitialShortFilterValues);
+  const [sortValue, setSortValue] = useState(getInitialSort);
   
   // Refs for auto-resizing inputs
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  // Function to update URL parameters
+  const updateUrlParams = (updates: { 
+    sort?: string; 
+    shortFilter?: Record<string, string>; 
+    advancedFilter?: GenericFilter | null;
+    mode?: string 
+  }) => {
+    if (!useUrlParams) return;
+
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
+      
+      if (updates.sort !== undefined) {
+        if (updates.sort) {
+          newParams.set('sort', updates.sort);
+        } else {
+          newParams.delete('sort');
+        }
+      }
+      
+      // Handle short filter values
+      if (updates.shortFilter !== undefined) {
+        if (Object.keys(updates.shortFilter).some(key => updates.shortFilter![key])) {
+          newParams.set('shortFilter', JSON.stringify(updates.shortFilter));
+        } else {
+          newParams.delete('shortFilter');
+        }
+      }
+      
+      // Handle advanced filter
+      if (updates.advancedFilter !== undefined) {
+        if (updates.advancedFilter) {
+          newParams.set('filter', JSON.stringify(updates.advancedFilter));
+        } else {
+          newParams.delete('filter');
+        }
+      }
+      
+      if (updates.mode !== undefined) {
+        if (updates.mode && updates.mode !== (defaultMode || 'short')) {
+          newParams.set('mode', updates.mode);
+        } else {
+          newParams.delete('mode');
+        }
+      }
+      
+      return newParams;
+    });
+  };
 
   const adjustInputWidth = (input: HTMLInputElement, value: string, placeholder: string) => {
     const span = document.createElement('span');
@@ -103,22 +186,91 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
     }
   }, [shortFilterValues, filterMode, entityConfig.shortFilterFields]);
 
+  // Sync external currentSort with internal sortValue
+  useEffect(() => {
+    if (currentSort !== undefined && currentSort !== sortValue) {
+      setSortValue(currentSort);
+      updateUrlParams({ sort: currentSort });
+    }
+  }, [currentSort]);
+
+  // Initialize filter from URL if in advanced mode
+  useEffect(() => {
+    if (useUrlParams && filterMode === 'advanced') {
+      const urlFilter = searchParams.get('filter');
+      if (urlFilter && !filter) {
+        try {
+          const parsedFilter = JSON.parse(urlFilter);
+          onFilterChange(parsedFilter as T);
+        } catch (e) {
+          console.warn('Failed to parse advanced filter from URL:', e);
+        }
+      }
+    }
+  }, [filterMode, useUrlParams]);
+
   const handleModeToggle = () => {
     if (filterMode === 'short') {
+      // Switching to advanced mode
       setFilterMode('advanced');
       setShowAdvancedFilter(true);
+      updateUrlParams({ mode: 'advanced' });
+      
+      // If we have short filter values, convert them to advanced filter
+      if (Object.keys(shortFilterValues).some(key => shortFilterValues[key])) {
+        let convertedFilter: T | null = null;
+        
+        if (entityConfig.buildShortFilter) {
+          convertedFilter = entityConfig.buildShortFilter(shortFilterValues);
+        } else {
+          // Default conversion logic
+          const filters: GenericFilter[] = [];
+          
+          entityConfig.shortFilterFields.forEach(field => {
+            const value = shortFilterValues[field.key];
+            if (value && value.trim()) {
+              if (field.type === 'text') {
+                filters.push({
+                  [field.key]: { icontains: value.trim() }
+                });
+              } else {
+                filters.push({
+                  [field.key]: { eq: value }
+                });
+              }
+            }
+          });
+
+          if (filters.length === 1) {
+            convertedFilter = filters[0] as T;
+          } else if (filters.length > 1) {
+            convertedFilter = { and: filters } as T;
+          }
+        }
+        
+        if (convertedFilter) {
+          onFilterChange(convertedFilter);
+          updateUrlParams({ advancedFilter: convertedFilter });
+        }
+      }
     } else {
+      // Switching to short mode
       setFilterMode('short');
       setShowAdvancedFilter(false);
       onFilterChange(null);
+      setShortFilterValues({});
+      updateUrlParams({ mode: 'short', shortFilter: {}, advancedFilter: null });
     }
   };
 
   const handleShortFilterChange = (key: string, value: string) => {
-    setShortFilterValues(prev => ({
-      ...prev,
+    const newValues = {
+      ...shortFilterValues,
       [key]: value
-    }));
+    };
+    
+    setShortFilterValues(newValues);
+    updateUrlParams({ shortFilter: newValues });
   };
 
   const handleShortFilterSearch = (e: React.FormEvent) => {
@@ -158,6 +310,8 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
     }
 
     onFilterChange(resultFilter);
+    // Update URL with the generated filter
+    updateUrlParams({ advancedFilter: resultFilter });
     if (onSearch) {
       onSearch();
     }
@@ -165,6 +319,7 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
 
   const handleAdvancedFilterChange = (newFilter: GenericFilter | null) => {
     onFilterChange(newFilter as T);
+    updateUrlParams({ advancedFilter: newFilter });
   };
 
   const handleAdvancedFilterClose = () => {
@@ -214,19 +369,24 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
     </div>
   );
 
+  const handleSortChange = (newSort: string) => {
+    setSortValue(newSort);
+    updateUrlParams({ sort: newSort });
+    if (onSortChange) {
+      onSortChange(newSort);
+    }
+  };
+
   const renderSortOptions = () => {
-    const effectiveCurrentSort = currentSort || entityConfig.defaults.sort;
-    const effectiveOnSortChange = onSortChange;
-    
-    if (!entityConfig.sortOptions.length || !effectiveOnSortChange) return null;
+    if (!entityConfig.sortOptions.length) return null;
     
     return (
       <div className="sort-options">
         <label className="sort-label">
           Sort by:
           <select
-            value={effectiveCurrentSort}
-            onChange={(e) => effectiveOnSortChange(e.target.value)}
+            value={sortValue}
+            onChange={(e) => handleSortChange(e.target.value)}
             className="sort-select"
           >
             {entityConfig.sortOptions.map((option) => (

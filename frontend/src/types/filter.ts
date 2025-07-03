@@ -4,7 +4,7 @@ export type FilterOperator =
   // String operators
   | 'eq' | 'ne' | 'contains' | 'icontains' | 'not_contains' | 'is_null'
   // Number operators
-  | 'in' | 'not_in'
+  | 'in' | 'not_in' | 'gt' | 'gte' | 'lt' | 'lte'
   // Date operators
   | 'today' | 'yesterday' | 'this_week' | 'last_week' 
   | 'this_month' | 'last_month' | 'this_year' | 'last_year'

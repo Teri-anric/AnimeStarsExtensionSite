@@ -11,25 +11,29 @@ import {
 import '../styles/AdvancedFilter.css';
 
 const stringOperators = [
-  { value: 'eq', label: 'Equals' },
-  { value: 'ne', label: 'Not Equals' },
-  { value: 'contains', label: 'Contains (case sensitive)' },
+  { value: 'eq', label: '=' },
+  { value: 'ne', label: '!=' },
+  { value: 'contains', label: 'Contains' },
   { value: 'icontains', label: 'Contains (case insensitive)' },
   { value: 'not_contains', label: 'Does not contain' },
   { value: 'is_null', label: 'Is empty' }
 ];
 
 const numberOperators = [
-  { value: 'eq', label: 'Equals' },
-  { value: 'ne', label: 'Not Equals' },
+  { value: 'eq', label: '=' },
+  { value: 'ne', label: '!=' },
   { value: 'in', label: 'In list' },
   { value: 'not_in', label: 'Not in list' },
-  { value: 'is_null', label: 'Is empty' }
+  { value: 'is_null', label: 'Is empty' },
+  { value: 'gt', label: '>' },
+  { value: 'gte', label: '>=' },
+  { value: 'lt', label: '<' },
+  { value: 'lte', label: '<=' }
 ];
 
 const enumOperators = [
-  { value: 'eq', label: 'Equals' },
-  { value: 'ne', label: 'Not Equals' },
+  { value: 'eq', label: '=' },
+  { value: 'ne', label: '!=' },
   { value: 'in', label: 'In list' },
   { value: 'not_in', label: 'Not in list' },
   { value: 'is_null', label: 'Is empty' }
@@ -53,7 +57,8 @@ const datetimeOperators = [
 ];
 
 const booleanOperators = [
-  { value: 'eq', label: 'Equals' },
+  { value: 'eq', label: 'is' },
+  { value: 'ne', label: 'is not' },
   { value: 'is_null', label: 'Is empty' }
 ];
 

@@ -6,7 +6,7 @@ export const deckFilterConfig: EntityFilterConfig = {
   fieldOptions: [
     { value: 'anime_name', label: 'Anime Name', type: 'string' },
     { value: 'anime_link', label: 'Anime Link', type: 'string' },
-    { value: 'cards_count', label: 'Number of Cards', type: 'number' },
+    { value: 'card_count', label: 'Number of Cards', type: 'number' },
   ],
 
   shortFilterFields: [
@@ -43,8 +43,8 @@ export const deckFilterConfig: EntityFilterConfig = {
   sortOptions: [
     { value: 'anime_name asc', label: 'Anime Name (A-Z)' },
     { value: 'anime_name desc', label: 'Anime Name (Z-A)' },
-    { value: 'cards_count desc', label: 'Most Cards' },
-    { value: 'cards_count asc', label: 'Least Cards' },
+    { value: 'card_count desc', label: 'Most Cards' },
+    { value: 'card_count asc', label: 'Least Cards' },
   ],
 
   defaults: {

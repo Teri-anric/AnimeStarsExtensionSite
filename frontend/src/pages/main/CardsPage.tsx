@@ -22,16 +22,16 @@ const CardsPage = () => {
   const [selectedCard, setSelectedCard] = useState<CardSchema | null>(null);
   const [isCardInfoOpen, setIsCardInfoOpen] = useState(false);
   
-  // Get values from URL parameters
+  // Get values from URL parameters (FilterQuery now handles filter and sort)
   const page = parseInt(searchParams.get('page') || '1');
   const sortBy = searchParams.get('sort') || cardFilterConfig.defaults.sort;
   const filterParam = searchParams.get('filter');
   
-  // Parse filter from URL
+  // Parse filter from URL (FilterQuery now handles this, but we need it for API calls)
   const [currentFilter, setCurrentFilter] = useState<CardFilter | null>(() => {
     if (filterParam) {
       try {
-        return JSON.parse(decodeURIComponent(filterParam));
+        return JSON.parse(filterParam);
       } catch (e) {
         console.error('Failed to parse filter from URL:', e);
         return null;
@@ -49,10 +49,10 @@ const CardsPage = () => {
   }, [isAuthenticated, page, currentFilter, sortBy]);
 
   useEffect(() => {
-    // Update filter state when URL changes
+    // Update filter state when URL changes (FilterQuery manages the URL, we just read from it)
     if (filterParam) {
       try {
-        const parsedFilter = JSON.parse(decodeURIComponent(filterParam));
+        const parsedFilter = JSON.parse(filterParam);
         setCurrentFilter(parsedFilter);
       } catch (e) {
         console.error('Failed to parse filter from URL:', e);
@@ -118,17 +118,20 @@ const CardsPage = () => {
 
   const handleFilterChange = (filter: CardFilter | null) => {
     setCurrentFilter(filter);
-    const filterParam = filter ? encodeURIComponent(JSON.stringify(filter)) : null;
-    updateSearchParams({ filter: filterParam, page: '1' });
+    // FilterQuery now handles URL updates automatically
+    // Reset to first page when filter changes
+    updateSearchParams({ page: '1' });
   };
 
   const handleSortChange = (value: string) => {
-    updateSearchParams({ sort: value, page: '1' });
+    // FilterQuery now handles URL updates automatically
+    // Reset to first page when sort changes
+    updateSearchParams({ page: '1' });
   };
 
   const handleSearch = () => {
     // This is called by FilterQuery when search is triggered
-    // The filter change will already be handled by handleFilterChange
+    // Reset to first page when searching
     updateSearchParams({ page: '1' });
   };
 
