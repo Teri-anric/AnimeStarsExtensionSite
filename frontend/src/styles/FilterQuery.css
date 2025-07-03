@@ -1,0 +1,229 @@
+.filter-query {
+  background-color: var(--ui-bg);
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  padding: 16px;
+  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.filter-mode-selector {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--bdc-3);
+}
+
+.filter-mode-button {
+  background-color: var(--ui-bg-2);
+  color: white !important;
+  border: 1px solid var(--bdc-3);
+  padding: 8px 16px;
+  border-radius: var(--main-border-radius);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-mode-button:hover {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.filter-mode-button.active {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Short filter styles */
+.short-filter {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+}
+
+.compact-form {
+  margin: 0;
+}
+
+.short-filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-field {
+  display: flex;
+  align-items: center;
+}
+
+.compact-input {
+  padding: 6px 10px;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  font-size: 14px;
+  min-width: 120px;
+  max-width: none;
+  flex: 0 0 auto;
+  background-color: var(--ui-bg-2);
+  color: white !important;
+  transition: border-color 0.2s, width 0.2s;
+  width: 120px;
+}
+
+.compact-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.compact-input::placeholder {
+  color: #aaa;
+}
+
+.compact-select {
+  padding: 6px 10px;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  font-size: 14px;
+  min-width: 120px;
+  max-width: 180px;
+  flex: 1;
+  background-color: var(--ui-bg-2);
+  color: white !important;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.compact-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.search-button {
+  background-color: var(--accent);
+  color: white !important;
+  border: none;
+  padding: 6px 15px;
+  border-radius: var(--main-border-radius);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.search-button:hover {
+  background-color: var(--accent-s);
+}
+
+/* Filter query content layout */
+.filter-query-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filter-section {
+  flex: 1;
+}
+
+/* Sort options styles */
+.sort-options {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px 0;
+  border-top: 1px solid var(--bdc-3);
+}
+
+.sort-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #ccc;
+  font-weight: 500;
+}
+
+.sort-select {
+  padding: 6px 10px;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  font-size: 14px;
+  min-width: 180px;
+  background-color: var(--ui-bg-2);
+  color: white !important;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Layout adjustments for combined filter and sort */
+@media (min-width: 1024px) {
+  .filter-query-content {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .filter-section {
+    flex: 1;
+  }
+  
+  .sort-options {
+    flex: 0 0 auto;
+    border-top: none;
+    border-left: 1px solid var(--bdc-3);
+    padding-left: 20px;
+    margin-left: 20px;
+    padding-top: 0;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .filter-mode-selector {
+    justify-content: center;
+  }
+  
+  .filter-mode-button {
+    width: 100%;
+  }
+  
+  .short-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-field {
+    width: 100%;
+  }
+  
+  .compact-input,
+  .compact-select {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .search-button {
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .sort-options {
+    justify-content: center;
+  }
+  
+  .sort-select {
+    min-width: auto;
+    width: 100%;
+  }
+} 

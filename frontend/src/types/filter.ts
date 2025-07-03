@@ -24,7 +24,7 @@ export interface FilterCondition {
 }
 
 export interface GenericFilter {
-  [field: string]: FilterCondition | GenericFilter | GenericFilter[];
+  [field: string]: FilterCondition | GenericFilter | GenericFilter[] | undefined;
   and?: GenericFilter[];
   or?: GenericFilter[];
 }
@@ -48,4 +48,49 @@ export interface UniversalFilterProps<T = GenericFilter> {
   initialFilter?: T | null;
   fieldOptions: FieldOption[];
   title?: string;
+}
+
+// Extended configuration types
+export interface ShortFilterField {
+  key: string;
+  type: 'text' | 'select';
+  placeholder?: string;
+  options?: Array<{ value: string; label: string }>;
+}
+
+export interface SortOption {
+  value: string;
+  label: string;
+}
+
+// Unified entity filter configuration
+export interface EntityFilterConfig<T = GenericFilter> {
+  // Basic entity information
+  entityName: string;
+  
+  // Field options for advanced filter
+  fieldOptions: FieldOption[];
+  
+  // Short filter configuration
+  shortFilterFields: ShortFilterField[];
+  
+  // Custom filter building logic for short filters
+  buildShortFilter?: (values: Record<string, string>) => T | null;
+  
+  // Sort options
+  sortOptions: SortOption[];
+  
+  // Default values
+  defaults: {
+    sort: string;
+    filterMode: 'short' | 'advanced';
+    shortFilterValues?: Record<string, string>;
+  };
+  
+  // Optional UI configuration
+  ui?: {
+    title?: string;
+    showModeToggle?: boolean;
+    className?: string;
+  };
 } 
