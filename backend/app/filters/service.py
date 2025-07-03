@@ -1,43 +1,53 @@
-from typing import Any
-from sqlalchemy.sql.elements import ClauseElement
-from .parser.filter_parser import FilterParser
-from .resolvers.condition_resolver import ConditionResolver
-from .metadata import MetadataProvider
-from .models.base_filters import BaseFilter
+from typing import Any, Dict, List, Set
+from sqlalchemy import and_
+from sqlalchemy.sql import Select
+import logging
+
+from .operators import FilterOperators
+from .joins import JoinManager
+from .conditions import ConditionBuilder
+
+logger = logging.getLogger(__name__)
 
 
 class FilterService:
-    """Service that orchestrates filter parsing and resolution"""
+    """Universal filtering service that works with any SQLAlchemy model"""
     
-    def __init__(self, metadata_provider: MetadataProvider):
-        self.metadata_provider = metadata_provider
-        self.parser = FilterParser(metadata_provider)
-        self.resolver = ConditionResolver(metadata_provider)
+    def __init__(self):
+        self.operator_map = FilterOperators.get_operator_map()
+        self.join_manager = JoinManager()
+        self.condition_builder = ConditionBuilder(self.operator_map)
     
-    def register_entry_filter(self, filter_class) -> "FilterService":
-        """Register an entry filter class"""
-        self.parser.register_entry_filter(filter_class)
-        return self
-    
-    def parse_and_resolve(
+    def apply_filters(
         self, 
-        filter_data: Any, 
-        entry_code: str | None = None,
-        model_class: type | None = None
-    ) -> ClauseElement | None:
-        """Parse filter data and resolve to SQL condition"""
-        # Parse the filter data
-        parsed_filter = self.parser.parse(filter_data, entry_code)
-        if parsed_filter is None:
-            return None
+        stmt: Select, 
+        model_class, 
+        filters: Dict[str, Any] | None
+    ) -> Select:
+        """Apply filters to a SQLAlchemy select statement"""
+        if not filters:
+            return stmt
         
-        # Resolve to SQL condition
-        return self.resolver.resolve(parsed_filter, model_class)
+        try:
+            # Collect and apply necessary joins
+            joins_needed = self.join_manager.collect_required_joins(model_class, filters)
+            stmt = self.join_manager.apply_joins(stmt, model_class, joins_needed)
+            
+            # Build and apply conditions
+            conditions = self.condition_builder.build_conditions(model_class, filters)
+            if conditions:
+                stmt = stmt.where(and_(*conditions))
+            
+            return stmt
+            
+        except Exception as e:
+            logger.error(f"Error applying filters: {e}")
+            return stmt
     
-    def parse(self, filter_data: Any, entry_code: str | None = None) -> BaseFilter | None:
-        """Parse filter data into filter models"""
-        return self.parser.parse(filter_data, entry_code)
-    
-    def resolve(self, filter_obj: BaseFilter, model_class: type | None = None) -> ClauseElement | None:
-        """Resolve filter to SQL condition"""
-        return self.resolver.resolve(filter_obj, model_class) 
+    def get_supported_operators(self) -> list[str]:
+        """Get list of all supported operators"""
+        return FilterOperators.get_supported_operators()
+
+
+# Global instance for backward compatibility
+filter_service = FilterService() 

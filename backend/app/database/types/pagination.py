@@ -1,10 +1,8 @@
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Dict, Any
 
 from pydantic import BaseModel, ConfigDict
 
-from .filter import BaseFilter
 from .order_by import OrderBy
-from ...filters.models import BaseEntryFilter
 
 T = TypeVar("T")
 
@@ -31,4 +29,4 @@ class PaginationQuery(BaseModel):
     per_page: int = 10
 
     order_by: OrderBy | None = None
-    filter: BaseFilter | BaseEntryFilter | None = None
+    filter: Dict[str, Any] | None = None

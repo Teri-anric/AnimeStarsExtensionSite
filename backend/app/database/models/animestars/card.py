@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Enum, ForeignKey, Integer
+from sqlalchemy.orm import relationship
 from ...enum import CardType
 from ..base import Base, TimestampMixin, UUIDPKMixin
 from .user import AnimestarsUser
@@ -16,6 +17,9 @@ class Card(Base, UUIDPKMixin, TimestampMixin):
     anime_link: str = Column(String, nullable=True)
 
     author: str = Column(String, ForeignKey(AnimestarsUser.username), nullable=True)
+    
+    # Relationship to access the author user object
+    author_user = relationship("AnimestarsUser", foreign_keys=[author], lazy="select")
 
     image: str = Column(String, nullable=True)
     mp4: str = Column(String, nullable=True)

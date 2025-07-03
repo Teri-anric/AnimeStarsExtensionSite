@@ -1,48 +1,64 @@
-from .service import FilterService
-from .models import (
-    BaseFilter,
+from .service import FilterService, filter_service
+from .operators import FilterOperators
+from .joins import JoinManager
+from .conditions import ConditionBuilder
+from .types import (
     BaseEntryFilter,
-    FieldFilter,
-    EnumFieldFilter,
-    StringFieldFilter,
-    NumericFieldFilter,
-    BooleanFieldFilter,
+    StringEntryFilter,
+    NumericEntryFilter,
+    DateTimeEntryFilter,
+    DateEntryFilter,
+    EnumEntryFilter,
+    UUIDEntryFilter,
+    BooleanEntryFilter,
+    IntegerEntryFilter,
+    FloatEntryFilter,
+    BaseFilter,
+    LogicalOperators,
+    ArrayEntryFilter,
+    # Convenience aliases
+    StringFilter,
+    IntFilter,
+    FloatFilter,
+    BoolFilter,
+    UUIDFilter,
+    DateTimeFilter,
+    DateFilter,
+    EnumFilter,
 )
-from .resolvers import ConditionResolver, FieldConditionResolver
-from .parser import FilterParser
-from .entries.card_filter import CardFilter
-from .metadata import (
-    MetadataContainer,
-    MetadataProvider,
-    CardMetadataContainer,
-    default_metadata_provider,
-)
-from .metadata.field_metadata import BaseFieldMetadata, PropertyFieldMetadata
 
 __all__ = [
-    # Core services
+    # Main service
     "FilterService",
-    "FilterParser",
-    "ConditionResolver",
-    "FieldConditionResolver",
+    "filter_service",
     
-    # Models
-    "BaseFilter",
+    # Core components
+    "FilterOperators",
+    "JoinManager", 
+    "ConditionBuilder",
+    
+    # Base filter types
     "BaseEntryFilter",
-    "FieldFilter", 
-    "EnumFieldFilter",
-    "StringFieldFilter",
-    "NumericFieldFilter",
-    "BooleanFieldFilter",
+    "StringEntryFilter",
+    "NumericEntryFilter",
+    "DateTimeEntryFilter",
+    "DateEntryFilter",
+    "EnumEntryFilter",
+    "UUIDEntryFilter",
+    "BooleanEntryFilter",
+    "IntegerEntryFilter",
+    "FloatEntryFilter",
+    "BaseFilter",
+    "LogicalOperators",
+    "ArrayEntryFilter",
     
-    # Metadata
-    "MetadataContainer",
-    "MetadataProvider",
-    "BaseFieldMetadata",
-    "PropertyFieldMetadata",
-    "CardMetadataContainer",
-    "default_metadata_provider",
-    
-    # Entry filters
-    "CardFilter",
+    # Convenience aliases
+    "StringFilter",
+    "IntFilter",
+    "FloatFilter",
+    "BoolFilter",
+    "UUIDFilter",
+    "DateTimeFilter",
+    "DateFilter",
+    "EnumFilter",
 ]
