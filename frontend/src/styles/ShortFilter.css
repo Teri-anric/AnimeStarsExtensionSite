@@ -11,7 +11,7 @@
   margin: 0;
 }
 
-.filter-group {
+.short-filters {
   display: flex;
   gap: 10px;
   align-items: center;
@@ -79,7 +79,7 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .filter-group {
+  .short-filters {
     flex-direction: column;
     align-items: stretch;
   }

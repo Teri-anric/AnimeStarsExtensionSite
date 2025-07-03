@@ -5,7 +5,7 @@ import { createAuthenticatedClient } from '../../utils/apiClient';
 import { CardApi, CardSchema, CardType, CardQuery, CardFilter } from '../../client';
 import '../../styles/Cards.css';
 import ShortFilter from '../../components/ShortFilter';
-import AdvancedFilter from '../../components/AdvancedFilter';
+import CardAdvancedFilter from '../../components/CardAdvancedFilter';
 import Card from '../../components/Card';
 import CardInfoPanel from '../../components/CardInfoPanel';
 import SortOptions, { SortOption } from '../../components/SortOptions';
@@ -297,7 +297,7 @@ const CardsPage = () => {
         )}
 
         {showAdvancedFilter && (
-          <AdvancedFilter
+          <CardAdvancedFilter
             onFilterChange={handleAdvancedFilterChange}
             onClose={handleAdvancedFilterClose}
             initialFilter={advancedFilter}

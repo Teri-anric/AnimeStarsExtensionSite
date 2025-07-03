@@ -56,7 +56,7 @@ const ShortFilter: React.FC<ShortFilterProps> = ({
   return (
     <div className="short-filter">
       <form onSubmit={onSearch} className="compact-form">
-        <div className="filter-group">
+        <div className="short-filters">
           <input
             type="text"
             value={nameFilter}

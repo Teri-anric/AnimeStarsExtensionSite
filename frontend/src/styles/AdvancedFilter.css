@@ -48,6 +48,129 @@
   gap: 15px;
 }
 
+.filter-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.filter-group {
+  background-color: var(--ui-bg-2);
+  border: 2px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  padding: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--bdc-3);
+  width: 100%;
+}
+
+.group-connector {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--accent);
+  color: white !important;
+  padding: 5px 15px;
+  border-radius: var(--main-border-radius);
+  font-weight: bold;
+  font-size: 12px;
+  border: 2px solid var(--ui-bg);
+}
+
+.filter-group-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.group-operator {
+  min-width: 80px;
+  padding: 8px 12px;
+  border: 1px solid var(--accent);
+  border-radius: var(--main-border-radius);
+  background-color: var(--ui-bg);
+  color: var(--accent) !important;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.remove-group-button {
+  background-color: var(--accent-red);
+  color: white !important;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+.remove-group-button:hover {
+  background-color: #c82333;
+}
+
+.filter-group .filter-rules {
+  margin-top: 15px;
+  border-top: 1px solid var(--bdc-3);
+  padding-top: 15px;
+}
+
+.add-rule-button-small {
+  background-color: var(--accent-green);
+  color: white !important;
+  border: none;
+  padding: 8px 12px;
+  border-radius: var(--main-border-radius);
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+.add-rule-button-small:hover {
+  background-color: #45a049;
+}
+
+.filter-group-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.add-group-button {
+  background-color: var(--accent);
+  color: white !important;
+  border: none;
+  padding: 10px 16px;
+  border-radius: var(--main-border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.add-group-button:hover {
+  background-color: var(--accent-s);
+}
+
 .filter-rule {
   display: flex;
   align-items: center;
@@ -189,6 +312,48 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
+  .filter-groups {
+    gap: 20px;
+  }
+  
+  .filter-group {
+    padding: 15px;
+  }
+  
+  .filter-group-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .filter-group-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .group-operator {
+    min-width: auto;
+    flex: 1;
+  }
+  
+  .remove-group-button {
+    margin-left: 10px;
+  }
+  
+  .group-connector {
+    position: static;
+    transform: none;
+    margin-bottom: 10px;
+    align-self: center;
+  }
+  
+  .filter-group .filter-rules {
+    margin-top: 10px;
+    border-top: 1px solid var(--bdc-3);
+    padding-top: 10px;
+  }
+  
   .filter-rule {
     flex-direction: column;
     align-items: stretch;
@@ -208,9 +373,18 @@
     margin-top: 10px;
   }
   
+  .add-rule-button-small {
+    width: 100%;
+  }
+  
   .filter-actions {
     flex-direction: column;
     gap: 15px;
+  }
+  
+  .filter-group-actions {
+    width: 100%;
+    justify-content: center;
   }
   
   .filter-buttons {
@@ -218,7 +392,7 @@
     justify-content: center;
   }
   
-  .add-rule-button {
+  .add-group-button {
     width: 100%;
   }
 } 

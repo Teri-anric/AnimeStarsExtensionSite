@@ -1,34 +1,14 @@
 import React, { useState } from 'react';
-import { CardFilter, CardType } from '../client';
+import { 
+  GenericFilter, 
+  FilterRule, 
+  FilterGroup, 
+  UniversalFilterProps, 
+  FieldOption,
+  FilterOperator,
+  FieldType 
+} from '../types/filter';
 import '../styles/AdvancedFilter.css';
-
-interface FilterRule {
-  id: string;
-  field: string;
-  operator: string;
-  value: string;
-  logicalOperator?: 'and' | 'or';
-}
-
-interface AdvancedFilterProps {
-  onFilterChange: (filter: CardFilter | null) => void;
-  onClose: () => void;
-  initialFilter?: CardFilter | null;
-}
-
-const fieldOptions = [
-  { value: 'name', label: 'Card Name', type: 'string' },
-  { value: 'card_id', label: 'Card ID', type: 'number' },
-  { value: 'rank', label: 'Rank', type: 'enum' },
-  { value: 'anime_name', label: 'Anime Name', type: 'string' },
-  { value: 'anime_link', label: 'Anime Link', type: 'string' },
-  { value: 'author', label: 'Author', type: 'string' },
-  { value: 'image', label: 'Image Path', type: 'string' },
-  { value: 'mp4', label: 'MP4 Path', type: 'string' },
-  { value: 'webm', label: 'WebM Path', type: 'string' },
-  { value: 'created_at', label: 'Created Date', type: 'datetime' },
-  { value: 'updated_at', label: 'Updated Date', type: 'datetime' }
-];
 
 const stringOperators = [
   { value: 'eq', label: 'Equals' },
@@ -72,124 +52,216 @@ const datetimeOperators = [
   { value: 'is_null', label: 'Is empty' }
 ];
 
-const rankOptions = [
-  { value: 'ass', label: 'ASS' },
-  { value: 's', label: 'S' },
-  { value: 'a', label: 'A' },
-  { value: 'b', label: 'B' },
-  { value: 'c', label: 'C' },
-  { value: 'd', label: 'D' },
-  { value: 'e', label: 'E' }
+const booleanOperators = [
+  { value: 'eq', label: 'Equals' },
+  { value: 'is_null', label: 'Is empty' }
 ];
 
-const parseFilterToRules = (filter: CardFilter): FilterRule[] => {
-  console.log('Parsing filter to rules:', filter);
-  const rules: FilterRule[] = [];
+const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[]): FilterGroup[] => {
+  console.log('Parsing filter to groups:', filter);
+  const groups: FilterGroup[] = [];
+  let groupId = 1;
   let ruleId = 1;
 
-  const parseFieldFilter = (fieldName: string, fieldFilter: any, logicalOp: 'and' | 'or' = 'and'): FilterRule[] => {
-    const fieldRules: FilterRule[] = [];
+  const parseFieldFilter = (fieldName: string, fieldFilter: any): FilterRule => {
+    const operators = Object.keys(fieldFilter);
+    const operator = operators[0] as FilterOperator;
+    const value = fieldFilter[operator];
     
-    Object.entries(fieldFilter).forEach(([operator, value]) => {
-      if (operator === 'is_null' && value === true) {
-        fieldRules.push({
-          id: (ruleId++).toString(),
-          field: fieldName,
-          operator: 'is_null',
-          value: '',
-          logicalOperator: logicalOp
-        });
-      } else if (operator === 'in' || operator === 'not_in') {
-        const arrayValue = Array.isArray(value) ? value.join(', ') : String(value);
-        fieldRules.push({
-          id: (ruleId++).toString(),
-          field: fieldName,
-          operator,
-          value: arrayValue,
-          logicalOperator: logicalOp
-        });
-      } else {
-        fieldRules.push({
-          id: (ruleId++).toString(),
-          field: fieldName,
-          operator,
-          value: String(value),
-          logicalOperator: logicalOp
-        });
-      }
-    });
-    
-    return fieldRules;
+    let ruleValue = '';
+    if (operator === 'is_null' && value === true) {
+      ruleValue = '';
+    } else if (operator === 'in' || operator === 'not_in') {
+      ruleValue = Array.isArray(value) ? value.join(', ') : String(value);
+    } else {
+      ruleValue = String(value);
+    }
+
+    return {
+      id: (ruleId++).toString(),
+      field: fieldName,
+      operator,
+      value: ruleValue
+    };
   };
 
-  const processFilter = (currentFilter: CardFilter, logicalOp: 'and' | 'or' = 'and') => {
-    Object.entries(currentFilter).forEach(([key, value]) => {
-      if (key === 'and' && Array.isArray(value)) {
-        value.forEach(subFilter => processFilter(subFilter, 'and'));
-      } else if (key === 'or' && Array.isArray(value)) {
-        value.forEach(subFilter => processFilter(subFilter, 'or'));
-      } else if (fieldOptions.some(f => f.value === key)) {
-        rules.push(...parseFieldFilter(key, value, logicalOp));
+  const parseSubFilter = (subFilter: GenericFilter): FilterGroup | null => {
+    const rules: FilterRule[] = [];
+    let groupOperator: 'and' | 'or' = 'and';
+
+    // Check if this subfilter has and/or operators
+    if (subFilter.and && Array.isArray(subFilter.and)) {
+      groupOperator = 'and';
+      subFilter.and.forEach(item => {
+        Object.entries(item).forEach(([key, value]) => {
+          if (fieldOptions.some(f => f.value === key)) {
+            rules.push(parseFieldFilter(key, value));
+          }
+        });
+      });
+    } else if (subFilter.or && Array.isArray(subFilter.or)) {
+      groupOperator = 'or';
+      subFilter.or.forEach(item => {
+        Object.entries(item).forEach(([key, value]) => {
+          if (fieldOptions.some(f => f.value === key)) {
+            rules.push(parseFieldFilter(key, value));
+          }
+        });
+      });
+    } else {
+      // Single field filter
+      Object.entries(subFilter).forEach(([key, value]) => {
+        if (fieldOptions.some(f => f.value === key)) {
+          rules.push(parseFieldFilter(key, value));
+        }
+      });
+    }
+
+    if (rules.length > 0) {
+      return {
+        id: (groupId++).toString(),
+        logicalOperator: groupOperator,
+        rules
+      };
+    }
+
+    return null;
+  };
+
+  const processFilter = (currentFilter: GenericFilter): void => {
+    if (currentFilter.and && Array.isArray(currentFilter.and)) {
+      // Create separate groups for each item in the AND array
+      currentFilter.and.forEach(subFilter => {
+        const group = parseSubFilter(subFilter);
+        if (group) {
+          groups.push(group);
+        }
+      });
+    } else if (currentFilter.or && Array.isArray(currentFilter.or)) {
+      // Create separate groups for each item in the OR array  
+      currentFilter.or.forEach(subFilter => {
+        const group = parseSubFilter(subFilter);
+        if (group) {
+          groups.push(group);
+        }
+      });
+    } else {
+      // Single level filter - create one group
+      const group = parseSubFilter(currentFilter);
+      if (group) {
+        groups.push(group);
       }
-    });
+    }
   };
 
   processFilter(filter);
-  return rules;
+
+  return groups.length > 0 ? groups : [{
+    id: '1',
+    logicalOperator: 'and',
+    rules: []
+  }];
 };
 
-const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose, initialFilter }) => {
-  const [rules, setRules] = useState<FilterRule[]>(() => {
+const AdvancedFilter: React.FC<UniversalFilterProps> = ({ 
+  onFilterChange, 
+  onClose, 
+  initialFilter, 
+  fieldOptions,
+  title = 'Advanced Filter'
+}) => {
+  const [groups, setGroups] = useState<FilterGroup[]>(() => {
     if (initialFilter) {
-      return parseFilterToRules(initialFilter);
+      return parseFilterToGroups(initialFilter, fieldOptions);
     }
-    return [];
+    return [{
+      id: '1',
+      logicalOperator: 'and',
+      rules: []
+    }];
   });
 
-  const addRule = () => {
-    const newRule: FilterRule = {
+  const addGroup = () => {
+    const newGroup: FilterGroup = {
       id: Date.now().toString(),
-      field: 'name',
-      operator: 'ilike',
-      value: '',
-      logicalOperator: 'and'
+      logicalOperator: 'and',
+      rules: []
     };
-    setRules([...rules, newRule]);
+    setGroups([...groups, newGroup]);
   };
 
-  const removeRule = (id: string) => {
-    if (rules.length > 1) {
-      setRules(rules.filter(rule => rule.id !== id));
+  const removeGroup = (groupId: string) => {
+    if (groups.length > 1) {
+      setGroups(groups.filter(group => group.id !== groupId));
     }
   };
 
-  const updateRule = (id: string, field: keyof FilterRule, value: string) => {
-    setRules(rules.map(rule => {
-      if (rule.id === id) {
-        const updatedRule = { ...rule, [field]: value };
-        
-        // If field is changed to rank, set appropriate operator
-        if (field === 'field' && value === 'rank' && rule.operator === 'ilike') {
-          updatedRule.operator = 'eq';
-          console.log('Changed operator to eq for rank field');
-        }
-        // If field is changed from rank to string field, set appropriate operator
-        else if (field === 'field' && rule.field === 'rank' && value !== 'rank') {
-          const fieldType = getFieldType(value);
-          if (fieldType === 'string') {
-            updatedRule.operator = 'ilike';
-            console.log('Changed operator to ilike for string field');
-          }
-        }
-        
-        console.log('Updated rule:', updatedRule);
-        return updatedRule;
+  const updateGroupOperator = (groupId: string, operator: 'and' | 'or') => {
+    setGroups(groups.map(group => 
+      group.id === groupId 
+        ? { ...group, logicalOperator: operator }
+        : group
+    ));
+  };
+
+  const addRule = (groupId: string) => {
+    const firstField = fieldOptions[0];
+    const newRule: FilterRule = {
+      id: Date.now().toString(),
+      field: firstField?.value || '',
+      operator: firstField?.type === 'string' ? 'icontains' : 'eq',
+      value: ''
+    };
+    
+    setGroups(groups.map(group => 
+      group.id === groupId 
+        ? { ...group, rules: [...group.rules, newRule] }
+        : group
+    ));
+  };
+
+  const removeRule = (groupId: string, ruleId: string) => {
+    setGroups(groups.map(group => {
+      if (group.id === groupId) {
+        const updatedRules = group.rules.filter(rule => rule.id !== ruleId);
+        return { ...group, rules: updatedRules };
       }
-      return rule;
+      return group;
     }));
   };
 
-  const getOperatorsForField = (fieldType: string) => {
+  const updateRule = (groupId: string, ruleId: string, field: keyof FilterRule, value: string) => {
+    setGroups(groups.map(group => {
+      if (group.id === groupId) {
+        const updatedRules = group.rules.map(rule => {
+          if (rule.id === ruleId) {
+            const updatedRule = { ...rule, [field]: value };
+            
+            // If field is changed, set appropriate operator based on field type
+            if (field === 'field') {
+              const fieldType = getFieldType(value);
+              if (fieldType === 'string' && !['eq', 'ne', 'contains', 'icontains', 'not_contains', 'is_null'].includes(rule.operator)) {
+                updatedRule.operator = 'icontains';
+              } else if (fieldType === 'enum' && !['eq', 'ne', 'in', 'not_in', 'is_null'].includes(rule.operator)) {
+                updatedRule.operator = 'eq';
+              } else if (fieldType === 'number' && !['eq', 'ne', 'in', 'not_in', 'is_null'].includes(rule.operator)) {
+                updatedRule.operator = 'eq';
+              } else if (fieldType === 'boolean' && !['eq', 'is_null'].includes(rule.operator)) {
+                updatedRule.operator = 'eq';
+              }
+            }
+            
+            return updatedRule;
+          }
+          return rule;
+        });
+        return { ...group, rules: updatedRules };
+      }
+      return group;
+    }));
+  };
+
+  const getOperatorsForField = (fieldType: FieldType) => {
     switch (fieldType) {
       case 'string':
         return stringOperators;
@@ -199,24 +271,34 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
         return enumOperators;
       case 'datetime':
         return datetimeOperators;
+      case 'boolean':
+        return booleanOperators;
       default:
         return stringOperators;
     }
   };
 
-  const getFieldType = (fieldName: string) => {
+  const getFieldType = (fieldName: string): FieldType => {
     const field = fieldOptions.find(f => f.value === fieldName);
     return field?.type || 'string';
   };
 
-  const buildFilter = (): CardFilter | null => {
-    const validRules = rules.filter(rule => rule.value.trim() !== '' || rule.operator === 'is_null');
+  const getFieldEnumOptions = (fieldName: string) => {
+    const field = fieldOptions.find(f => f.value === fieldName);
+    return field?.enumOptions || [];
+  };
+
+  const buildFilter = (): GenericFilter | null => {
+    const validGroups = groups.map(group => ({
+      ...group,
+      rules: group.rules.filter(rule => rule.value.trim() !== '' || rule.operator === 'is_null')
+    })).filter(group => group.rules.length > 0);
     
-    if (validRules.length === 0) {
+    if (validGroups.length === 0) {
       return null;
     }
 
-    const buildFieldFilter = (rule: FilterRule): Partial<CardFilter> => {
+    const buildFieldFilter = (rule: FilterRule): Partial<GenericFilter> => {
       const fieldType = getFieldType(rule.field);
       let filterValue: any;
 
@@ -227,9 +309,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
         if (values.length === 0) {
           return {}; // Skip empty lists
         }
-        if (fieldType === 'enum') {
-          filterValue = { [rule.operator]: values as CardType[] };
-        } else if (fieldType === 'number') {
+        if (fieldType === 'number') {
           const numValues = values.map(v => parseInt(v)).filter(v => !isNaN(v));
           if (numValues.length === 0) {
             return {}; // Skip if no valid numbers
@@ -245,8 +325,9 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
             return {}; // Skip invalid number
           }
           filterValue = { [rule.operator]: numValue };
-        } else if (fieldType === 'enum') {
-          filterValue = { [rule.operator]: rule.value as CardType };
+        } else if (fieldType === 'boolean') {
+          const boolValue = rule.value.toLowerCase() === 'true';
+          filterValue = { [rule.operator]: boolValue };
         } else {
           filterValue = { [rule.operator]: rule.value };
         }
@@ -255,63 +336,51 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
       return { [rule.field]: filterValue };
     };
 
-    if (validRules.length === 1) {
-      return buildFieldFilter(validRules[0]) as CardFilter;
+    const buildGroupFilter = (group: FilterGroup): GenericFilter | null => {
+      const validRules = group.rules.filter(rule => rule.value.trim() !== '' || rule.operator === 'is_null');
+      if (validRules.length === 0) {
+        return null;
+      }
+
+      if (validRules.length === 1) {
+        return buildFieldFilter(validRules[0]) as GenericFilter;
+      }
+
+      const ruleFilters = validRules.map(rule => buildFieldFilter(rule) as GenericFilter);
+      return { [group.logicalOperator]: ruleFilters };
+    };
+
+    if (validGroups.length === 1) {
+      return buildGroupFilter(validGroups[0]);
     }
 
-    // Group rules by logical operator
-    const andRules: FilterRule[] = [];
-    const orRules: FilterRule[] = [];
-
-    validRules.forEach((rule, index) => {
-      if (index === 0 || rule.logicalOperator === 'and') {
-        andRules.push(rule);
-      } else {
-        orRules.push(rule);
-      }
-    });
-
-    let filter: CardFilter = {};
-
-    if (andRules.length > 0) {
-      if (andRules.length === 1) {
-        filter = buildFieldFilter(andRules[0]) as CardFilter;
-      } else {
-        filter.and = andRules.map(rule => buildFieldFilter(rule) as CardFilter);
-      }
+    // Multiple groups - combine with AND logic between groups
+    const groupFilters = validGroups.map(group => buildGroupFilter(group)).filter(Boolean) as GenericFilter[];
+    
+    if (groupFilters.length === 1) {
+      return groupFilters[0];
     }
 
-    if (orRules.length > 0) {
-      const orFilters = orRules.map(rule => buildFieldFilter(rule) as CardFilter);
-      if (filter.and || Object.keys(filter).length > 0) {
-        // Combine existing filter with OR rules
-        filter = {
-          or: [
-            filter,
-            ...(orFilters.length === 1 ? orFilters : [{ or: orFilters }])
-          ]
-        };
-      } else {
-        filter.or = orFilters;
-      }
-    }
-
-    return filter;
+    return { and: groupFilters };
   };
 
   const applyFilter = () => {
     const filter = buildFilter();
-    console.log('Advanced filter applying:', JSON.stringify(filter, null, 2));
-    console.log('Current rules:', JSON.stringify(rules, null, 2));
+    console.log('Universal filter applying:', JSON.stringify(filter, null, 2));
+    console.log('Current groups:', JSON.stringify(groups, null, 2));
     onFilterChange(filter);
   };
 
   const clearFilter = () => {
-    setRules([]);
+    setGroups([{
+      id: '1',
+      logicalOperator: 'and',
+      rules: []
+    }]);
     onFilterChange(null);
   };
 
-  const renderValueInput = (rule: FilterRule) => {
+  const renderValueInput = (groupId: string, rule: FilterRule) => {
     const fieldType = getFieldType(rule.field);
     
     if (rule.operator === 'is_null') {
@@ -329,7 +398,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
         <input
           type="number"
           value={rule.value}
-          onChange={(e) => updateRule(rule.id, 'value', e.target.value)}
+          onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
           placeholder="Number of days..."
           className="filter-input"
           min="1"
@@ -343,21 +412,38 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
         <input
           type="datetime-local"
           value={rule.value}
-          onChange={(e) => updateRule(rule.id, 'value', e.target.value)}
+          onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
           className="filter-input"
         />
       );
     }
 
-    if (rule.field === 'rank' && (rule.operator === 'eq' || rule.operator === 'ne')) {
+    // Boolean input
+    if (fieldType === 'boolean') {
       return (
         <select
           value={rule.value}
-          onChange={(e) => updateRule(rule.id, 'value', e.target.value)}
+          onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
           className="filter-input"
         >
-          <option value="">Select rank...</option>
-          {rankOptions.map(option => (
+          <option value="">Select value...</option>
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+      );
+    }
+
+    // Enum fields with single selection
+    if (fieldType === 'enum' && (rule.operator === 'eq' || rule.operator === 'ne')) {
+      const enumOptions = getFieldEnumOptions(rule.field);
+      return (
+        <select
+          value={rule.value}
+          onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
+          className="filter-input"
+        >
+          <option value="">Select value...</option>
+          {enumOptions.map(option => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
@@ -366,23 +452,30 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
       );
     }
 
+    // Multi-value input for 'in' and 'not_in' operators
     if (rule.operator === 'in' || rule.operator === 'not_in') {
+      const enumOptions = getFieldEnumOptions(rule.field);
+      const placeholder = fieldType === 'enum' && enumOptions.length > 0
+        ? enumOptions.slice(0, 3).map(o => o.value).join(',')
+        : 'value1,value2,value3';
+        
       return (
         <input
           type="text"
           value={rule.value}
-          onChange={(e) => updateRule(rule.id, 'value', e.target.value)}
-          placeholder={fieldType === 'enum' ? 'ass,s,a' : 'value1,value2,value3'}
+          onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
+          placeholder={placeholder}
           className="filter-input"
         />
       );
     }
 
+    // Default input
     return (
       <input
         type={fieldType === 'number' ? 'number' : 'text'}
         value={rule.value}
-        onChange={(e) => updateRule(rule.id, 'value', e.target.value)}
+        onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
         placeholder="Enter value..."
         className="filter-input"
       />
@@ -392,66 +485,94 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
   return (
     <div className="advanced-filter">
       <div className="advanced-filter-header">
-        <h3>Advanced Filter</h3>
+        <h3>{title}</h3>
         <button onClick={onClose} className="close-button">×</button>
       </div>
 
-      <div className="filter-rules">
-        {rules.map((rule, index) => (
-          <div key={rule.id} className="filter-rule">
-            {index > 0 && (
-              <select
-                value={rule.logicalOperator || 'and'}
-                onChange={(e) => updateRule(rule.id, 'logicalOperator', e.target.value)}
-                className="logical-operator"
-              >
-                <option value="and">AND</option>
-                <option value="or">OR</option>
-              </select>
-            )}
+      <div className="filter-groups">
+        {groups.map((group, groupIndex) => (
+          <div key={group.id} className="filter-group">
+            <div className="filter-group-header">
+              {groupIndex > 0 && (
+                <div className="group-connector">AND</div>
+              )}
+              
+              <div className="filter-group-controls">
+                <select
+                  value={group.logicalOperator}
+                  onChange={(e) => updateGroupOperator(group.id, e.target.value as 'and' | 'or')}
+                  className="group-operator"
+                >
+                  <option value="and">AND</option>
+                  <option value="or">OR</option>
+                </select>
+                
+                {groups.length > 1 && (
+                  <button
+                    onClick={() => removeGroup(group.id)}
+                    className="remove-group-button"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            </div>
 
-            <select
-              value={rule.field}
-              onChange={(e) => updateRule(rule.id, 'field', e.target.value)}
-              className="field-select"
-            >
-              {fieldOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
+            <div className="filter-rules">
+              {group.rules.map((rule) => (
+                <div key={rule.id} className="filter-rule">
+                  <select
+                    value={rule.field}
+                    onChange={(e) => updateRule(group.id, rule.id, 'field', e.target.value)}
+                    className="field-select"
+                  >
+                    {fieldOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={rule.operator}
+                    onChange={(e) => updateRule(group.id, rule.id, 'operator', e.target.value)}
+                    className="operator-select"
+                  >
+                    {getOperatorsForField(getFieldType(rule.field)).map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  {renderValueInput(group.id, rule)}
+
+                  <button
+                    onClick={() => removeRule(group.id, rule.id)}
+                    className="remove-rule-button"
+                  >
+                    Remove
+                  </button>
+                </div>
               ))}
-            </select>
-
-            <select
-              value={rule.operator}
-              onChange={(e) => updateRule(rule.id, 'operator', e.target.value)}
-              className="operator-select"
-            >
-              {getOperatorsForField(getFieldType(rule.field)).map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-
-            {renderValueInput(rule)}
-
-            {rules.length > 1 && (
+              
               <button
-                onClick={() => removeRule(rule.id)}
-                className="remove-rule-button"
+                onClick={() => addRule(group.id)}
+                className="add-rule-button-small"
               >
-                Remove
+                Add Rule to Group
               </button>
-            )}
+            </div>
           </div>
         ))}
       </div>
 
       <div className="filter-actions">
-        <button onClick={addRule} className="add-rule-button">
-          Add Rule
-        </button>
+        <div className="filter-group-actions">
+          <button onClick={addGroup} className="add-group-button">
+            Add Group
+          </button>
+        </div>
         
         <div className="filter-buttons">
           <button onClick={clearFilter} className="clear-button">
@@ -466,4 +587,4 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onFilterChange, onClose
   );
 };
 
-export default AdvancedFilter;
+export default AdvancedFilter; 
