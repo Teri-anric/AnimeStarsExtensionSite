@@ -30,7 +30,14 @@ class PaginationRepository(BaseRepository, Generic[T], ABC):
             total = await self._total(base_stmt)
 
         items = await self._execute_search(stmt, *args, **kwargs)
-        return Pagination(
+        if kwargs.get("is_dto", False):
+            return Pagination(
+                total=total,
+                page=query.page,
+                per_page=query.per_page,
+                items=items,
+            )
+        return Pagination[T](
             total=total,
             page=query.page,
             per_page=query.per_page,

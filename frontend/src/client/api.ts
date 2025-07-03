@@ -26,6 +26,31 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface ArrayEntryFilterCardSchema
+ */
+export interface ArrayEntryFilterCardSchema {
+    /**
+     * 
+     * @type {IntegerEntryFilter}
+     * @memberof ArrayEntryFilterCardSchema
+     */
+    'length'?: IntegerEntryFilter | null;
+    /**
+     * 
+     * @type {CardSchema}
+     * @memberof ArrayEntryFilterCardSchema
+     */
+    'any'?: CardSchema | null;
+    /**
+     * 
+     * @type {CardSchema}
+     * @memberof ArrayEntryFilterCardSchema
+     */
+    'all'?: CardSchema | null;
+}
+/**
+ * 
+ * @export
  * @enum {string}
  */
 
@@ -40,7 +65,7 @@ export type CardCollection = typeof CardCollection[keyof typeof CardCollection];
 
 
 /**
- * Entry filter for Card model - pure data model
+ * Filter schema for Card model
  * @export
  * @interface CardFilter
  */
@@ -59,76 +84,82 @@ export interface CardFilter {
     'or'?: Array<CardFilter> | null;
     /**
      * 
-     * @type {EnumFieldFilterUUID}
+     * @type {CardFilter}
      * @memberof CardFilter
      */
-    'id'?: EnumFieldFilterUUID | null;
+    'not'?: CardFilter | null;
     /**
      * 
-     * @type {EnumFieldFilterInt}
+     * @type {UUIDEntryFilter}
      * @memberof CardFilter
      */
-    'card_id'?: EnumFieldFilterInt | null;
+    'id'?: UUIDEntryFilter | null;
     /**
      * 
-     * @type {StringFieldFilter}
+     * @type {IntegerEntryFilter}
      * @memberof CardFilter
      */
-    'name'?: StringFieldFilter | null;
+    'card_id'?: IntegerEntryFilter | null;
     /**
      * 
-     * @type {EnumFieldFilterCardType}
+     * @type {StringEntryFilter}
      * @memberof CardFilter
      */
-    'rank'?: EnumFieldFilterCardType | null;
+    'name'?: StringEntryFilter | null;
     /**
      * 
-     * @type {StringFieldFilter}
+     * @type {EnumEntryFilterCardType}
      * @memberof CardFilter
      */
-    'anime_name'?: StringFieldFilter | null;
+    'rank'?: EnumEntryFilterCardType | null;
     /**
      * 
-     * @type {StringFieldFilter}
+     * @type {StringEntryFilter}
      * @memberof CardFilter
      */
-    'anime_link'?: StringFieldFilter | null;
+    'anime_name'?: StringEntryFilter | null;
     /**
      * 
-     * @type {StringFieldFilter}
+     * @type {StringEntryFilter}
      * @memberof CardFilter
      */
-    'author'?: StringFieldFilter | null;
+    'anime_link'?: StringEntryFilter | null;
     /**
      * 
-     * @type {StringFieldFilter}
+     * @type {StringEntryFilter}
      * @memberof CardFilter
      */
-    'image'?: StringFieldFilter | null;
+    'author'?: StringEntryFilter | null;
     /**
      * 
-     * @type {StringFieldFilter}
+     * @type {StringEntryFilter}
      * @memberof CardFilter
      */
-    'mp4'?: StringFieldFilter | null;
+    'image'?: StringEntryFilter | null;
     /**
      * 
-     * @type {StringFieldFilter}
+     * @type {StringEntryFilter}
      * @memberof CardFilter
      */
-    'webm'?: StringFieldFilter | null;
+    'mp4'?: StringEntryFilter | null;
     /**
      * 
-     * @type {DateTimeFieldFilter}
+     * @type {StringEntryFilter}
      * @memberof CardFilter
      */
-    'created_at'?: DateTimeFieldFilter | null;
+    'webm'?: StringEntryFilter | null;
     /**
      * 
-     * @type {DateTimeFieldFilter}
+     * @type {DateTimeEntryFilter}
      * @memberof CardFilter
      */
-    'updated_at'?: DateTimeFieldFilter | null;
+    'created_at'?: DateTimeEntryFilter | null;
+    /**
+     * 
+     * @type {DateTimeEntryFilter}
+     * @memberof CardFilter
+     */
+    'updated_at'?: DateTimeEntryFilter | null;
 }
 /**
  * 
@@ -312,7 +343,7 @@ export type CardType = typeof CardType[keyof typeof CardType];
 
 
 /**
- * 
+ * Filter schema for CardUsersStats model
  * @export
  * @interface CardUsersStatsFilter
  */
@@ -331,28 +362,46 @@ export interface CardUsersStatsFilter {
     'or'?: Array<CardUsersStatsFilter> | null;
     /**
      * 
-     * @type {EnumFieldFilterUUID}
+     * @type {CardUsersStatsFilter}
      * @memberof CardUsersStatsFilter
      */
-    'id'?: EnumFieldFilterUUID | null;
+    'not'?: CardUsersStatsFilter | null;
     /**
      * 
-     * @type {NumericFieldFilter}
+     * @type {UUIDEntryFilter}
      * @memberof CardUsersStatsFilter
      */
-    'card_id'?: NumericFieldFilter | null;
+    'id'?: UUIDEntryFilter | null;
     /**
      * 
-     * @type {EnumFieldFilterCardCollection}
+     * @type {IntegerEntryFilter}
      * @memberof CardUsersStatsFilter
      */
-    'collection'?: EnumFieldFilterCardCollection | null;
+    'card_id'?: IntegerEntryFilter | null;
     /**
      * 
-     * @type {NumericFieldFilter}
+     * @type {EnumEntryFilterCardCollection}
      * @memberof CardUsersStatsFilter
      */
-    'count'?: NumericFieldFilter | null;
+    'collection'?: EnumEntryFilterCardCollection | null;
+    /**
+     * 
+     * @type {IntegerEntryFilter}
+     * @memberof CardUsersStatsFilter
+     */
+    'count'?: IntegerEntryFilter | null;
+    /**
+     * 
+     * @type {DateTimeEntryFilter}
+     * @memberof CardUsersStatsFilter
+     */
+    'created_at'?: DateTimeEntryFilter | null;
+    /**
+     * 
+     * @type {DateTimeEntryFilter}
+     * @memberof CardUsersStatsFilter
+     */
+    'updated_at'?: DateTimeEntryFilter | null;
 }
 /**
  * 
@@ -474,107 +523,83 @@ export interface CardUsersStatsSchema {
 
 
 /**
- * Filter for datetime fields with user-friendly operators
+ * DateTime field filters
  * @export
- * @interface DateTimeFieldFilter
+ * @interface DateTimeEntryFilter
  */
-export interface DateTimeFieldFilter {
+export interface DateTimeEntryFilter {
     /**
      * 
      * @type {string}
-     * @memberof DateTimeFieldFilter
+     * @memberof DateTimeEntryFilter
      */
     'eq'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof DateTimeFieldFilter
+     * @memberof DateTimeEntryFilter
      */
     'ne'?: string | null;
     /**
      * 
+     * @type {boolean}
+     * @memberof DateTimeEntryFilter
+     */
+    'is_null'?: boolean | null;
+    /**
+     * 
      * @type {string}
-     * @memberof DateTimeFieldFilter
+     * @memberof DateTimeEntryFilter
+     */
+    'gt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof DateTimeEntryFilter
+     */
+    'gte'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof DateTimeEntryFilter
+     */
+    'lt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof DateTimeEntryFilter
+     */
+    'lte'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof DateTimeEntryFilter
      */
     'before'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof DateTimeFieldFilter
+     * @memberof DateTimeEntryFilter
      */
     'after'?: string | null;
     /**
      * 
-     * @type {Array<any>}
-     * @memberof DateTimeFieldFilter
+     * @type {Array<string>}
+     * @memberof DateTimeEntryFilter
      */
-    'between'?: Array<any> | null;
+    'between'?: Array<string> | null;
     /**
      * 
-     * @type {boolean}
-     * @memberof DateTimeFieldFilter
+     * @type {Array<string>}
+     * @memberof DateTimeEntryFilter
      */
-    'today'?: boolean | null;
+    'in'?: Array<string> | null;
     /**
      * 
-     * @type {boolean}
-     * @memberof DateTimeFieldFilter
+     * @type {Array<string>}
+     * @memberof DateTimeEntryFilter
      */
-    'yesterday'?: boolean | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DateTimeFieldFilter
-     */
-    'this_week'?: boolean | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DateTimeFieldFilter
-     */
-    'last_week'?: boolean | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DateTimeFieldFilter
-     */
-    'this_month'?: boolean | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DateTimeFieldFilter
-     */
-    'last_month'?: boolean | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DateTimeFieldFilter
-     */
-    'this_year'?: boolean | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DateTimeFieldFilter
-     */
-    'last_year'?: boolean | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof DateTimeFieldFilter
-     */
-    'last_n_days'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof DateTimeFieldFilter
-     */
-    'older_than_days'?: number | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DateTimeFieldFilter
-     */
-    'is_null'?: boolean | null;
+    'not_in'?: Array<string> | null;
 }
 /**
  * Schema for detailed deck view with all cards
@@ -602,35 +627,35 @@ export interface DeckDetailSchema {
     'cards': Array<CardSchema>;
 }
 /**
- * Entry filter for Deck model - pure data model
+ * 
  * @export
  * @interface DeckFilter
  */
 export interface DeckFilter {
     /**
      * 
-     * @type {Array<DeckFilter>}
+     * @type {ArrayEntryFilterCardSchema}
      * @memberof DeckFilter
      */
-    'and'?: Array<DeckFilter> | null;
+    'cards'?: ArrayEntryFilterCardSchema | null;
     /**
      * 
-     * @type {Array<DeckFilter>}
+     * @type {StringEntryFilter}
      * @memberof DeckFilter
      */
-    'or'?: Array<DeckFilter> | null;
+    'anime_name'?: StringEntryFilter | null;
     /**
      * 
-     * @type {StringFieldFilter}
+     * @type {StringEntryFilter}
      * @memberof DeckFilter
      */
-    'anime_name'?: StringFieldFilter | null;
+    'anime_link'?: StringEntryFilter | null;
     /**
      * 
-     * @type {StringFieldFilter}
+     * @type {IntegerEntryFilter}
      * @memberof DeckFilter
      */
-    'anime_link'?: StringFieldFilter | null;
+    'card_count'?: IntegerEntryFilter | null;
 }
 /**
  * Paginated response for deck listings
@@ -731,11 +756,11 @@ export interface DeckSummarySchema {
      */
     'card_count': number;
     /**
-     * First 6 cards for preview
+     * 
      * @type {Array<CardSchema>}
      * @memberof DeckSummarySchema
      */
-    'preview_cards'?: Array<CardSchema>;
+    'cards'?: Array<CardSchema>;
 }
 /**
  * 
@@ -754,176 +779,81 @@ export type Direction = typeof Direction[keyof typeof Direction];
 /**
  * 
  * @export
- * @interface EnumFieldFilterCardCollection
+ * @interface EnumEntryFilterCardCollection
  */
-export interface EnumFieldFilterCardCollection {
+export interface EnumEntryFilterCardCollection {
     /**
      * 
      * @type {CardCollection}
-     * @memberof EnumFieldFilterCardCollection
+     * @memberof EnumEntryFilterCardCollection
      */
     'eq'?: CardCollection | null;
     /**
      * 
      * @type {CardCollection}
-     * @memberof EnumFieldFilterCardCollection
+     * @memberof EnumEntryFilterCardCollection
      */
     'ne'?: CardCollection | null;
     /**
      * 
+     * @type {boolean}
+     * @memberof EnumEntryFilterCardCollection
+     */
+    'is_null'?: boolean | null;
+    /**
+     * 
      * @type {Array<CardCollection>}
-     * @memberof EnumFieldFilterCardCollection
+     * @memberof EnumEntryFilterCardCollection
      */
     'in'?: Array<CardCollection> | null;
     /**
      * 
      * @type {Array<CardCollection>}
-     * @memberof EnumFieldFilterCardCollection
+     * @memberof EnumEntryFilterCardCollection
      */
     'not_in'?: Array<CardCollection> | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof EnumFieldFilterCardCollection
-     */
-    'is_null'?: boolean | null;
 }
 
 
 /**
  * 
  * @export
- * @interface EnumFieldFilterCardType
+ * @interface EnumEntryFilterCardType
  */
-export interface EnumFieldFilterCardType {
+export interface EnumEntryFilterCardType {
     /**
      * 
      * @type {CardType}
-     * @memberof EnumFieldFilterCardType
+     * @memberof EnumEntryFilterCardType
      */
     'eq'?: CardType | null;
     /**
      * 
      * @type {CardType}
-     * @memberof EnumFieldFilterCardType
+     * @memberof EnumEntryFilterCardType
      */
     'ne'?: CardType | null;
     /**
      * 
+     * @type {boolean}
+     * @memberof EnumEntryFilterCardType
+     */
+    'is_null'?: boolean | null;
+    /**
+     * 
      * @type {Array<CardType>}
-     * @memberof EnumFieldFilterCardType
+     * @memberof EnumEntryFilterCardType
      */
     'in'?: Array<CardType> | null;
     /**
      * 
      * @type {Array<CardType>}
-     * @memberof EnumFieldFilterCardType
+     * @memberof EnumEntryFilterCardType
      */
     'not_in'?: Array<CardType> | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof EnumFieldFilterCardType
-     */
-    'is_null'?: boolean | null;
 }
 
 
-/**
- * 
- * @export
- * @interface EnumFieldFilterInt
- */
-export interface EnumFieldFilterInt {
-    /**
-     * 
-     * @type {number}
-     * @memberof EnumFieldFilterInt
-     */
-    'eq'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof EnumFieldFilterInt
-     */
-    'ne'?: number | null;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof EnumFieldFilterInt
-     */
-    'in'?: Array<number> | null;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof EnumFieldFilterInt
-     */
-    'not_in'?: Array<number> | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof EnumFieldFilterInt
-     */
-    'is_null'?: boolean | null;
-}
-/**
- * 
- * @export
- * @interface EnumFieldFilterUUID
- */
-export interface EnumFieldFilterUUID {
-    /**
-     * 
-     * @type {string}
-     * @memberof EnumFieldFilterUUID
-     */
-    'eq'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof EnumFieldFilterUUID
-     */
-    'ne'?: string | null;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof EnumFieldFilterUUID
-     */
-    'in'?: Array<string> | null;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof EnumFieldFilterUUID
-     */
-    'not_in'?: Array<string> | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof EnumFieldFilterUUID
-     */
-    'is_null'?: boolean | null;
-}
-/**
- * 
- * @export
- * @interface Eq
- */
-export interface Eq {
-}
-/**
- * 
- * @export
- * @interface Gt
- */
-export interface Gt {
-}
-/**
- * 
- * @export
- * @interface Gte
- */
-export interface Gte {
-}
 /**
  * 
  * @export
@@ -969,114 +899,99 @@ export interface HealthResponse {
     'database_stats': object;
 }
 /**
- * 
+ * Integer field filters
  * @export
- * @interface Lt
+ * @interface IntegerEntryFilter
  */
-export interface Lt {
-}
-/**
- * 
- * @export
- * @interface Lte
- */
-export interface Lte {
-}
-/**
- * 
- * @export
- * @interface Ne
- */
-export interface Ne {
-}
-/**
- * Filter for numeric fields
- * @export
- * @interface NumericFieldFilter
- */
-export interface NumericFieldFilter {
+export interface IntegerEntryFilter {
     /**
      * 
-     * @type {Eq}
-     * @memberof NumericFieldFilter
+     * @type {number}
+     * @memberof IntegerEntryFilter
      */
-    'eq'?: Eq | null;
+    'eq'?: number | null;
     /**
      * 
-     * @type {Ne}
-     * @memberof NumericFieldFilter
+     * @type {number}
+     * @memberof IntegerEntryFilter
      */
-    'ne'?: Ne | null;
-    /**
-     * 
-     * @type {Gt}
-     * @memberof NumericFieldFilter
-     */
-    'gt'?: Gt | null;
-    /**
-     * 
-     * @type {Lt}
-     * @memberof NumericFieldFilter
-     */
-    'lt'?: Lt | null;
-    /**
-     * 
-     * @type {Gte}
-     * @memberof NumericFieldFilter
-     */
-    'gte'?: Gte | null;
-    /**
-     * 
-     * @type {Lte}
-     * @memberof NumericFieldFilter
-     */
-    'lte'?: Lte | null;
-    /**
-     * 
-     * @type {Array<NumericFieldFilterInInner>}
-     * @memberof NumericFieldFilter
-     */
-    'in'?: Array<NumericFieldFilterInInner> | null;
-    /**
-     * 
-     * @type {Array<NumericFieldFilterInInner>}
-     * @memberof NumericFieldFilter
-     */
-    'not_in'?: Array<NumericFieldFilterInInner> | null;
+    'ne'?: number | null;
     /**
      * 
      * @type {boolean}
-     * @memberof NumericFieldFilter
+     * @memberof IntegerEntryFilter
      */
     'is_null'?: boolean | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof IntegerEntryFilter
+     */
+    'gt'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof IntegerEntryFilter
+     */
+    'gte'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof IntegerEntryFilter
+     */
+    'lt'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof IntegerEntryFilter
+     */
+    'lte'?: number | null;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof IntegerEntryFilter
+     */
+    'between'?: Array<number> | null;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof IntegerEntryFilter
+     */
+    'in'?: Array<number> | null;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof IntegerEntryFilter
+     */
+    'not_in'?: Array<number> | null;
 }
 /**
- * 
- * @export
- * @interface NumericFieldFilterInInner
- */
-export interface NumericFieldFilterInInner {
-}
-/**
- * Order by the pagination
+ * Order by for the pagination
  * @export
  * @interface OrderBy
  */
 export interface OrderBy {
 }
 /**
- * Order by the pagination
+ * Order by for the pagination
  * @export
  * @interface OrderBy1
  */
 export interface OrderBy1 {
 }
 /**
- * Order by the pagination
+ * Order by for the pagination
  * @export
  * @interface OrderBy2
  */
 export interface OrderBy2 {
+}
+/**
+ * 
+ * @export
+ * @interface Property
+ */
+export interface Property {
 }
 /**
  * 
@@ -1112,67 +1027,6 @@ export type SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCard
 /**
  * 
  * @export
- * @interface SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAt
- */
-export interface SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAt {
-    /**
-     * 
-     * @type {string}
-     * @memberof SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAt
-     */
-    'property': SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAtPropertyEnum;
-    /**
-     * 
-     * @type {Direction}
-     * @memberof SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAt
-     */
-    'direction': Direction;
-}
-
-export const SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAtPropertyEnum = {
-    IdAsc: 'id asc',
-    IdDesc: 'id desc',
-    Id: 'id',
-    CardIdAsc: 'card_id asc',
-    CardIdDesc: 'card_id desc',
-    CardId: 'card_id',
-    NameAsc: 'name asc',
-    NameDesc: 'name desc',
-    Name: 'name',
-    RankAsc: 'rank asc',
-    RankDesc: 'rank desc',
-    Rank: 'rank',
-    AnimeNameAsc: 'anime_name asc',
-    AnimeNameDesc: 'anime_name desc',
-    AnimeName: 'anime_name',
-    AnimeLinkAsc: 'anime_link asc',
-    AnimeLinkDesc: 'anime_link desc',
-    AnimeLink: 'anime_link',
-    AuthorAsc: 'author asc',
-    AuthorDesc: 'author desc',
-    Author: 'author',
-    ImageAsc: 'image asc',
-    ImageDesc: 'image desc',
-    Image: 'image',
-    Mp4Asc: 'mp4 asc',
-    Mp4Desc: 'mp4 desc',
-    Mp4: 'mp4',
-    WebmAsc: 'webm asc',
-    WebmDesc: 'webm desc',
-    Webm: 'webm',
-    CreatedAtAsc: 'created_at asc',
-    CreatedAtDesc: 'created_at desc',
-    CreatedAt: 'created_at',
-    UpdatedAtAsc: 'updated_at asc',
-    UpdatedAtDesc: 'updated_at desc',
-    UpdatedAt: 'updated_at'
-} as const;
-
-export type SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAtPropertyEnum = typeof SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAtPropertyEnum[keyof typeof SortGenericLiteralIdAscIdDescIdCardIdAscCardIdDescCardIdNameAscNameDescNameRankAscRankDescRankAnimeNameAscAnimeNameDescAnimeNameAnimeLinkAscAnimeLinkDescAnimeLinkAuthorAscAuthorDescAuthorImageAscImageDescImageMp4AscMp4DescMp4WebmAscWebmDescWebmCreatedAtAscCreatedAtDescCreatedAtUpdatedAtAscUpdatedAtDescUpdatedAtPropertyEnum];
-
-/**
- * 
- * @export
  * @interface SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAt
  */
 export interface SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAt {
@@ -1202,77 +1056,104 @@ export const SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAtProperty
 export type SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAtPropertyEnum = typeof SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAtPropertyEnum[keyof typeof SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAtPropertyEnum];
 
 /**
- * Filter for string fields
+ * 
  * @export
- * @interface StringFieldFilter
+ * @interface SortGenericUnionLiteralIdCardIdNameRankAnimeNameAnimeLinkAuthorImageMp4WebmCreatedAtUpdatedAtStr
  */
-export interface StringFieldFilter {
+export interface SortGenericUnionLiteralIdCardIdNameRankAnimeNameAnimeLinkAuthorImageMp4WebmCreatedAtUpdatedAtStr {
+    /**
+     * 
+     * @type {Property}
+     * @memberof SortGenericUnionLiteralIdCardIdNameRankAnimeNameAnimeLinkAuthorImageMp4WebmCreatedAtUpdatedAtStr
+     */
+    'property': Property;
+    /**
+     * 
+     * @type {Direction}
+     * @memberof SortGenericUnionLiteralIdCardIdNameRankAnimeNameAnimeLinkAuthorImageMp4WebmCreatedAtUpdatedAtStr
+     */
+    'direction': Direction;
+}
+
+
+/**
+ * String field filters
+ * @export
+ * @interface StringEntryFilter
+ */
+export interface StringEntryFilter {
     /**
      * 
      * @type {string}
-     * @memberof StringFieldFilter
+     * @memberof StringEntryFilter
      */
     'eq'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof StringFieldFilter
+     * @memberof StringEntryFilter
      */
     'ne'?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof StringFieldFilter
+     * @type {boolean}
+     * @memberof StringEntryFilter
      */
-    'like'?: string | null;
+    'is_null'?: boolean | null;
     /**
      * 
      * @type {string}
-     * @memberof StringFieldFilter
-     */
-    'ilike'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof StringFieldFilter
-     */
-    'not_like'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof StringFieldFilter
+     * @memberof StringEntryFilter
      */
     'contains'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof StringFieldFilter
+     * @memberof StringEntryFilter
      */
     'icontains'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof StringFieldFilter
+     * @memberof StringEntryFilter
      */
-    'not_contains'?: string | null;
+    'like'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof StringEntryFilter
+     */
+    'ilike'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof StringEntryFilter
+     */
+    'not_like'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof StringEntryFilter
+     */
+    'startswith'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof StringEntryFilter
+     */
+    'endswith'?: string | null;
     /**
      * 
      * @type {Array<string>}
-     * @memberof StringFieldFilter
+     * @memberof StringEntryFilter
      */
     'in'?: Array<string> | null;
     /**
      * 
      * @type {Array<string>}
-     * @memberof StringFieldFilter
+     * @memberof StringEntryFilter
      */
     'not_in'?: Array<string> | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof StringFieldFilter
-     */
-    'is_null'?: boolean | null;
 }
 /**
  * 
@@ -1292,6 +1173,43 @@ export interface Token {
      * @memberof Token
      */
     'token_type'?: string;
+}
+/**
+ * UUID field filters
+ * @export
+ * @interface UUIDEntryFilter
+ */
+export interface UUIDEntryFilter {
+    /**
+     * 
+     * @type {string}
+     * @memberof UUIDEntryFilter
+     */
+    'eq'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UUIDEntryFilter
+     */
+    'ne'?: string | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UUIDEntryFilter
+     */
+    'is_null'?: boolean | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UUIDEntryFilter
+     */
+    'in'?: Array<string> | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UUIDEntryFilter
+     */
+    'not_in'?: Array<string> | null;
 }
 /**
  * 

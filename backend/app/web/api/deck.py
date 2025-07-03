@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
-from typing import Annotated, Optional
+from typing import Annotated
 
 from app.web.schema.deck import (
     DeckPaginationResponse,
@@ -7,7 +7,6 @@ from app.web.schema.deck import (
     DeckQuery
 )
 from app.web.deps import DeckRepositoryDep
-from app.database.types.pagination import PaginationQuery
 
 
 router = APIRouter(prefix="/deck", tags=["deck"])
@@ -19,15 +18,7 @@ async def get_decks(
     repo: DeckRepositoryDep = None,
 ) -> DeckPaginationResponse:
     """Get all decks (anime grouped by anime_link) with pagination, search and sorting"""
-    
-    return await repo.search(
-        PaginationQuery(
-            page=deck_query.page,
-            per_page=deck_query.per_page,
-            filter=deck_query.filter,
-            order_by=deck_query.build_order_by(),
-        )
-    )
+    return await repo.search(deck_query.build())
 
 
 @router.get("/detail")

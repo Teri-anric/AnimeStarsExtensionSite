@@ -172,9 +172,9 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
                 </div>
                 
                 <div className="deck-preview-cards">
-                  {deck.preview_cards && deck.preview_cards.length > 0 ? (
+                  {deck.cards && deck.cards.length > 0 ? (
                     <div className="preview-cards-grid">
-                      {deck.preview_cards.slice(0, 6).map((card) => (
+                      {deck.cards.slice(0, 6).map((card) => (
                         <Card key={card.id} card={card} variant="preview" />
                       ))}
                     </div>
