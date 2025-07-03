@@ -123,12 +123,6 @@ const CardsPage = () => {
     updateSearchParams({ page: '1' });
   };
 
-  const handleSortChange = (value: string) => {
-    // FilterQuery now handles URL updates automatically
-    // Reset to first page when sort changes
-    updateSearchParams({ page: '1' });
-  };
-
   const handleSearch = () => {
     // This is called by FilterQuery when search is triggered
     // Reset to first page when searching
@@ -161,7 +155,6 @@ const CardsPage = () => {
           filter={currentFilter as any}
           onFilterChange={(filter: any) => handleFilterChange(filter as CardFilter)}
           currentSort={sortBy}
-          onSortChange={handleSortChange}
           onSearch={handleSearch}
         />
       </div>

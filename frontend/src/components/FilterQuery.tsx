@@ -87,14 +87,15 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
 
   const getInitialShortFilterValues = () => {
     if (useUrlParams) {
-      const urlShortFilter = searchParams.get('shortFilter');
-      if (urlShortFilter) {
-        try {
-          return JSON.parse(urlShortFilter) as Record<string, string>;
-        } catch (e) {
-          console.warn('Failed to parse short filter from URL:', e);
+      // Instead of parsing shortFilter JSON, read individual URL parameters
+      const values: Record<string, string> = {};
+      entityConfig.shortFilterFields.forEach(field => {
+        const value = searchParams.get(field.key);
+        if (value) {
+          values[field.key] = value;
         }
-      }
+      });
+      return values;
     }
     return entityConfig.defaults.shortFilterValues || {};
   };
@@ -127,19 +128,27 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
         }
       }
       
-      // Handle short filter values
+      // Handle short filter values - set individual parameters for each field
       if (updates.shortFilter !== undefined) {
-        if (Object.keys(updates.shortFilter).some(key => updates.shortFilter![key])) {
-          newParams.set('shortFilter', JSON.stringify(updates.shortFilter));
-        } else {
-          newParams.delete('shortFilter');
-        }
+        // First, remove all existing short filter parameters
+        entityConfig.shortFilterFields.forEach(field => {
+          newParams.delete(field.key);
+        });
+        
+        // Then set new values for fields that have values
+        Object.entries(updates.shortFilter).forEach(([key, value]) => {
+          if (value && value.trim()) {
+            newParams.set(key, value);
+          }
+        });
       }
       
       // Handle advanced filter
       if (updates.advancedFilter !== undefined) {
         if (updates.advancedFilter) {
-          newParams.set('filter', JSON.stringify(updates.advancedFilter));
+          const filterJson = JSON.stringify(updates.advancedFilter);
+          console.log('Setting filter in URL:', filterJson);
+          newParams.set('filter', encodeURIComponent(filterJson));
         } else {
           newParams.delete('filter');
         }
@@ -194,20 +203,48 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
     }
   }, [currentSort]);
 
+  // Sync short filter values with URL parameters
+  useEffect(() => {
+    if (useUrlParams && filterMode === 'short') {
+      const urlValues: Record<string, string> = {};
+      entityConfig.shortFilterFields.forEach(field => {
+        const value = searchParams.get(field.key);
+        if (value) {
+          urlValues[field.key] = value;
+        }
+      });
+      
+      // Only update if values have actually changed
+      const hasChanges = Object.keys(urlValues).length !== Object.keys(shortFilterValues).length ||
+        Object.entries(urlValues).some(([key, value]) => shortFilterValues[key] !== value);
+      
+      if (hasChanges) {
+        setShortFilterValues(urlValues);
+      }
+    }
+  }, [useUrlParams, searchParams, filterMode, entityConfig.shortFilterFields]);
+
   // Initialize filter from URL if in advanced mode
   useEffect(() => {
-    if (useUrlParams && filterMode === 'advanced') {
+    if (useUrlParams) {
       const urlFilter = searchParams.get('filter');
-      if (urlFilter && !filter) {
+      const urlMode = searchParams.get('mode');
+      
+      if (urlFilter && urlMode === 'advanced') {
         try {
-          const parsedFilter = JSON.parse(urlFilter);
+          const parsedFilter = JSON.parse(decodeURIComponent(urlFilter));
+          console.log('Parsing filter from URL:', parsedFilter);
           onFilterChange(parsedFilter as T);
+          if (filterMode !== 'advanced') {
+            setFilterMode('advanced');
+            setShowAdvancedFilter(true);
+          }
         } catch (e) {
           console.warn('Failed to parse advanced filter from URL:', e);
         }
       }
     }
-  }, [filterMode, useUrlParams]);
+  }, [useUrlParams, searchParams]);
 
   const handleModeToggle = () => {
     if (filterMode === 'short') {

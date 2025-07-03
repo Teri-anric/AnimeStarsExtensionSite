@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   GenericFilter, 
   FilterRule, 
@@ -64,6 +64,7 @@ const booleanOperators = [
 
 const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[]): FilterGroup[] => {
   console.log('Parsing filter to groups:', filter);
+  console.log('Available field options:', fieldOptions.map(f => f.value));
   const groups: FilterGroup[] = [];
   let groupId = 1;
   let ruleId = 1;
@@ -91,33 +92,46 @@ const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[])
   };
 
   const parseSubFilter = (subFilter: GenericFilter): FilterGroup | null => {
+    console.log('Parsing subFilter:', subFilter);
     const rules: FilterRule[] = [];
     let groupOperator: 'and' | 'or' = 'and';
 
     // Check if this subfilter has and/or operators
     if (subFilter.and && Array.isArray(subFilter.and)) {
+      console.log('Found AND operation with', subFilter.and.length, 'items');
       groupOperator = 'and';
       subFilter.and.forEach(item => {
         Object.entries(item).forEach(([key, value]) => {
+          console.log('Processing AND item:', key, value);
           if (fieldOptions.some(f => f.value === key)) {
             rules.push(parseFieldFilter(key, value));
+          } else {
+            console.log('Field not found in options:', key);
           }
         });
       });
     } else if (subFilter.or && Array.isArray(subFilter.or)) {
+      console.log('Found OR operation with', subFilter.or.length, 'items');
       groupOperator = 'or';
       subFilter.or.forEach(item => {
         Object.entries(item).forEach(([key, value]) => {
+          console.log('Processing OR item:', key, value);
           if (fieldOptions.some(f => f.value === key)) {
             rules.push(parseFieldFilter(key, value));
+          } else {
+            console.log('Field not found in options:', key);
           }
         });
       });
     } else {
       // Single field filter
+      console.log('Processing single field filter');
       Object.entries(subFilter).forEach(([key, value]) => {
+        console.log('Processing field:', key, value);
         if (fieldOptions.some(f => f.value === key)) {
           rules.push(parseFieldFilter(key, value));
+        } else {
+          console.log('Field not found in options:', key);
         }
       });
     }
@@ -185,6 +199,15 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
       rules: []
     }];
   });
+
+  // Update groups when initialFilter changes (for URL parameters)
+  useEffect(() => {
+    if (initialFilter) {
+      console.log('AdvancedFilter: initialFilter changed, updating groups:', initialFilter);
+      const newGroups = parseFilterToGroups(initialFilter, fieldOptions);
+      setGroups(newGroups);
+    }
+  }, [initialFilter, fieldOptions]);
 
   const addGroup = () => {
     const newGroup: FilterGroup = {
@@ -347,11 +370,9 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
         return null;
       }
 
-      if (validRules.length === 1) {
-        return buildFieldFilter(validRules[0]) as GenericFilter;
-      }
-
       const ruleFilters = validRules.map(rule => buildFieldFilter(rule) as GenericFilter);
+      
+      // Always wrap in and/or operator, even for single rules
       return { [group.logicalOperator]: ruleFilters };
     };
 
