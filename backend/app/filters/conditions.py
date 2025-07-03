@@ -1,5 +1,5 @@
 from typing import Any
-from sqlalchemy import and_, or_, not_
+from sqlalchemy import and_, or_, not_, exists, func, select
 from sqlalchemy.sql.elements import ClauseElement
 import logging
 
@@ -117,19 +117,124 @@ class ConditionBuilder:
     ) -> ClauseElement | None:
         """Build conditions for relationship fields"""
         related_model = relationship_attr.property.mapper.class_
-        sub_conditions = []
         
-        for sub_field, sub_filters in field_filters.items():
-            if hasattr(related_model, sub_field):
-                related_attr = getattr(related_model, sub_field)
-                condition = self._apply_field_operators(related_attr, sub_filters)
+        # Handle ArrayEntryFilter operators (any, all, length)
+        if 'any' in field_filters:
+            return self._handle_any_operator(relationship_attr, field_filters['any'])
+        elif 'all' in field_filters:
+            return self._handle_all_operator(relationship_attr, field_filters['all'])
+        elif 'length' in field_filters:
+            return self._handle_length_operator(relationship_attr, field_filters['length'])
+        else:
+            # Regular relationship filtering (backward compatibility)
+            sub_conditions = []
+            for sub_field, sub_filters in field_filters.items():
+                if hasattr(related_model, sub_field):
+                    related_attr = getattr(related_model, sub_field)
+                    condition = self._apply_field_operators(related_attr, sub_filters)
+                    if condition is not None:
+                        sub_conditions.append(condition)
+                else:
+                    logger.warning(f"Sub-field {sub_field} not found in {related_model}")
+            
+            if sub_conditions:
+                # Use relationship.any() for regular relationship filtering
+                return relationship_attr.any(and_(*sub_conditions))
+        
+        return None
+    
+    def _handle_any_operator(
+        self, 
+        relationship_attr, 
+        filter_conditions: dict[str, Any]
+    ) -> ClauseElement | None:
+        """Handle 'any' operator for array/collection relationships"""
+        related_model = relationship_attr.property.mapper.class_
+        
+        # Build conditions for the related model
+        sub_conditions = []
+        for field_name, field_filter in filter_conditions.items():
+            if hasattr(related_model, field_name):
+                related_attr = getattr(related_model, field_name)
+                condition = self._apply_field_operators(related_attr, field_filter)
                 if condition is not None:
                     sub_conditions.append(condition)
             else:
-                logger.warning(f"Sub-field {sub_field} not found in {related_model}")
+                logger.warning(f"Field {field_name} not found in related model {related_model}")
         
         if sub_conditions:
-            return and_(*sub_conditions) if len(sub_conditions) > 1 else sub_conditions[0]
+            # Use relationship.any() with conditions
+            return relationship_attr.any(and_(*sub_conditions))
+        
+        return None
+    
+    def _handle_all_operator(
+        self, 
+        relationship_attr, 
+        filter_conditions: dict[str, Any]
+    ) -> ClauseElement | None:
+        """Handle 'all' operator for array/collection relationships"""
+        related_model = relationship_attr.property.mapper.class_
+        
+        # Build conditions for the related model
+        sub_conditions = []
+        for field_name, field_filter in filter_conditions.items():
+            if hasattr(related_model, field_name):
+                related_attr = getattr(related_model, field_name)
+                condition = self._apply_field_operators(related_attr, field_filter)
+                if condition is not None:
+                    sub_conditions.append(condition)
+            else:
+                logger.warning(f"Field {field_name} not found in related model {related_model}")
+        
+        if sub_conditions:
+            # For 'all', we need to ensure no related items exist that don't match the condition
+            # This is equivalent to: NOT EXISTS(related_items WHERE NOT condition)
+            return ~relationship_attr.any(not_(and_(*sub_conditions)))
+        
+        return None
+    
+    def _handle_length_operator(
+        self, 
+        relationship_attr, 
+        length_filter: dict[str, Any]
+    ) -> ClauseElement | None:
+        """Handle 'length' operator for array/collection relationships"""
+        # For length filtering on relationships, we need to count the related items
+        # This is a basic implementation - might need refinement for complex cases
+        from sqlalchemy import func, select
+        
+        # Get the foreign key for the relationship
+        related_model = relationship_attr.property.mapper.class_
+        
+        for operator, value in length_filter.items():
+            try:
+                # Build a subquery to count related items
+                count_subquery = (
+                    select(func.count(related_model.id))
+                    .where(relationship_attr.property.local_columns[0] == 
+                           relationship_attr.property.remote_columns[0])
+                    .scalar_subquery()
+                )
+                
+                if operator == 'eq':
+                    return count_subquery == value
+                elif operator == 'gt':
+                    return count_subquery > value
+                elif operator == 'gte':
+                    return count_subquery >= value
+                elif operator == 'lt':
+                    return count_subquery < value
+                elif operator == 'lte':
+                    return count_subquery <= value
+                else:
+                    logger.warning(f"Unsupported length operator: {operator}")
+            except Exception as e:
+                logger.error(f"Error building length condition: {e}")
+                # Fallback to a simpler approach
+                logger.info("Falling back to basic relationship length check")
+                return None
+        
         return None
     
     def _apply_field_operators(
@@ -143,6 +248,10 @@ class ConditionBuilder:
         for operator, value in field_filters.items():
             if operator not in self.operator_map:
                 logger.warning(f"Unknown operator: {operator}")
+                continue
+                
+            # Skip array operators as they are handled elsewhere
+            if operator in ['any', 'all', 'length']:
                 continue
                 
             try:

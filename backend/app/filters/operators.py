@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Any
+from sqlalchemy import exists, and_, or_
 
 
 class EnumHandler:
@@ -51,6 +52,11 @@ class FilterOperators:
                 EnumHandler.convert_value_for_db(val[0]), 
                 EnumHandler.convert_value_for_db(val[1])
             ),
+            
+            # Array operators for relationships
+            'any': None,  # Will be handled specially in ConditionBuilder
+            'all': None,  # Will be handled specially in ConditionBuilder
+            'length': lambda col, val: col.count() == val,
         }
     
     @staticmethod

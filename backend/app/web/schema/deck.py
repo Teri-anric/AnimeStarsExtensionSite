@@ -1,6 +1,6 @@
 from pydantic import Field, BaseModel
 from typing import List, Literal
-from .card import CardSchema
+from .card import CardSchema, CardFilter
 from .base import BaseSchema
 from .pagination import BasePaginationResponse, BasePaginationQuery
 from app.filters.types import ArrayEntryFilter, StringFilter, IntFilter, BaseFilter
@@ -37,9 +37,9 @@ DeckSort = Literal[
 
 
 class DeckFilter(BaseFilter):
-    cards: ArrayEntryFilter[CardSchema] | None = None
+    cards: ArrayEntryFilter[CardFilter] | None = None
     anime_name: StringFilter | None = None
-    anime_link: StringFilter | None = None
+    anime_link: StringFilter | None = None  
     card_count: IntFilter | None = None
 
 

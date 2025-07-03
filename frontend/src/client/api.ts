@@ -26,27 +26,27 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
- * @interface ArrayEntryFilterCardSchema
+ * @interface ArrayEntryFilterCardFilter
  */
-export interface ArrayEntryFilterCardSchema {
+export interface ArrayEntryFilterCardFilter {
     /**
      * 
      * @type {IntegerEntryFilter}
-     * @memberof ArrayEntryFilterCardSchema
+     * @memberof ArrayEntryFilterCardFilter
      */
     'length'?: IntegerEntryFilter | null;
     /**
      * 
-     * @type {CardSchema}
-     * @memberof ArrayEntryFilterCardSchema
+     * @type {CardFilter}
+     * @memberof ArrayEntryFilterCardFilter
      */
-    'any'?: CardSchema | null;
+    'any'?: CardFilter | null;
     /**
      * 
-     * @type {CardSchema}
-     * @memberof ArrayEntryFilterCardSchema
+     * @type {CardFilter}
+     * @memberof ArrayEntryFilterCardFilter
      */
-    'all'?: CardSchema | null;
+    'all'?: CardFilter | null;
 }
 /**
  * 
@@ -634,10 +634,28 @@ export interface DeckDetailSchema {
 export interface DeckFilter {
     /**
      * 
-     * @type {ArrayEntryFilterCardSchema}
+     * @type {Array<DeckFilter>}
      * @memberof DeckFilter
      */
-    'cards'?: ArrayEntryFilterCardSchema | null;
+    'and'?: Array<DeckFilter> | null;
+    /**
+     * 
+     * @type {Array<DeckFilter>}
+     * @memberof DeckFilter
+     */
+    'or'?: Array<DeckFilter> | null;
+    /**
+     * 
+     * @type {DeckFilter}
+     * @memberof DeckFilter
+     */
+    'not'?: DeckFilter | null;
+    /**
+     * 
+     * @type {ArrayEntryFilterCardFilter}
+     * @memberof DeckFilter
+     */
+    'cards'?: ArrayEntryFilterCardFilter | null;
     /**
      * 
      * @type {StringEntryFilter}
@@ -996,34 +1014,10 @@ export interface Property {
 /**
  * 
  * @export
- * @interface SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCount
+ * @interface Property1
  */
-export interface SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCount {
-    /**
-     * 
-     * @type {string}
-     * @memberof SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCount
-     */
-    'property': SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCountPropertyEnum;
-    /**
-     * 
-     * @type {Direction}
-     * @memberof SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCount
-     */
-    'direction': Direction;
+export interface Property1 {
 }
-
-export const SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCountPropertyEnum = {
-    AnimeNameAsc: 'anime_name asc',
-    AnimeNameDesc: 'anime_name desc',
-    AnimeName: 'anime_name',
-    CardCountAsc: 'card_count asc',
-    CardCountDesc: 'card_count desc',
-    CardCount: 'card_count'
-} as const;
-
-export type SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCountPropertyEnum = typeof SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCountPropertyEnum[keyof typeof SortGenericLiteralAnimeNameAscAnimeNameDescAnimeNameCardCountAscCardCountDescCardCountPropertyEnum];
-
 /**
  * 
  * @export
@@ -1058,15 +1052,36 @@ export type SortGenericLiteralIdCardIdCollectionCountCreatedAtUpdatedAtPropertyE
 /**
  * 
  * @export
+ * @interface SortGenericUnionLiteralAnimeNameAnimeLinkCardCountStr
+ */
+export interface SortGenericUnionLiteralAnimeNameAnimeLinkCardCountStr {
+    /**
+     * 
+     * @type {Property}
+     * @memberof SortGenericUnionLiteralAnimeNameAnimeLinkCardCountStr
+     */
+    'property': Property;
+    /**
+     * 
+     * @type {Direction}
+     * @memberof SortGenericUnionLiteralAnimeNameAnimeLinkCardCountStr
+     */
+    'direction': Direction;
+}
+
+
+/**
+ * 
+ * @export
  * @interface SortGenericUnionLiteralIdCardIdNameRankAnimeNameAnimeLinkAuthorImageMp4WebmCreatedAtUpdatedAtStr
  */
 export interface SortGenericUnionLiteralIdCardIdNameRankAnimeNameAnimeLinkAuthorImageMp4WebmCreatedAtUpdatedAtStr {
     /**
      * 
-     * @type {Property}
+     * @type {Property1}
      * @memberof SortGenericUnionLiteralIdCardIdNameRankAnimeNameAnimeLinkAuthorImageMp4WebmCreatedAtUpdatedAtStr
      */
-    'property': Property;
+    'property': Property1;
     /**
      * 
      * @type {Direction}

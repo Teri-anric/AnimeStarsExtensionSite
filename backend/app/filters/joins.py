@@ -71,14 +71,28 @@ class JoinManager:
         if not hasattr(attr.property, 'mapper'):
             return
             
-        # It's a relationship - add to joins needed
+        # It's a relationship - check if we need joins
         join_path = f"{current_path}.{field_name}" if current_path else field_name
-        joins_needed.add(join_path)
-        
-        # Recursively collect joins for sub-filters
         related_model = attr.property.mapper.class_
+        
         if isinstance(field_filters, dict):
-            self._collect_joins_recursive(related_model, field_filters, joins_needed, join_path)
+            # Check for ArrayEntryFilter operators
+            if 'any' in field_filters:
+                # For 'any' operator, we typically don't need explicit joins
+                # as relationship.any() handles the subquery internally
+                self._collect_joins_recursive(related_model, field_filters['any'], joins_needed, join_path)
+            elif 'all' in field_filters:
+                # For 'all' operator, we also don't need explicit joins
+                self._collect_joins_recursive(related_model, field_filters['all'], joins_needed, join_path)
+            elif 'length' in field_filters:
+                # Length filtering might need the relationship loaded but not necessarily joined
+                pass
+            else:
+                # Regular relationship filtering - may need joins depending on query complexity
+                # For simple EXISTS queries, we might not need joins
+                # But we add it to be safe - the SQL optimizer should handle it
+                joins_needed.add(join_path)
+                self._collect_joins_recursive(related_model, field_filters, joins_needed, join_path)
     
     def apply_joins(self, stmt: Select, model_class, join_paths: set[str]) -> Select:
         """Apply all necessary joins to the statement"""
@@ -89,26 +103,28 @@ class JoinManager:
     def _add_single_join(self, stmt: Select, model_class, join_path: str) -> Select:
         """Add a single join to the statement"""
         try:
-            parts = join_path.split('.')
+            path_parts = join_path.split('.')
             current_model = model_class
             
-            for part in parts:
-                if not hasattr(current_model, part):
+            for part in path_parts:
+                if hasattr(current_model, part):
+                    attr = getattr(current_model, part)
+                    if hasattr(attr.property, 'mapper'):
+                        # It's a relationship, add join
+                        stmt = stmt.join(attr)
+                        current_model = attr.property.mapper.class_
+                    else:
+                        logger.warning(f"Attribute {part} is not a relationship")
+                        break
+                else:
                     logger.warning(f"Attribute {part} not found in {current_model}")
                     break
                     
-                attr = getattr(current_model, part)
-                if not hasattr(attr.property, 'mapper'):
-                    logger.warning(f"Attribute {part} is not a relationship")
-                    break
-                    
-                related_model = attr.property.mapper.class_
-                stmt = stmt.join(attr)
-                current_model = related_model
-                
+            return stmt
         except InvalidRequestError as e:
-            logger.warning(f"Failed to add join for path {join_path}: {e}")
+            # Join might already exist or be invalid - log and continue
+            logger.warning(f"Could not add join for {join_path}: {e}")
+            return stmt
         except Exception as e:
-            logger.error(f"Unexpected error adding join for path {join_path}: {e}")
-        
-        return stmt
+            logger.error(f"Error adding join for {join_path}: {e}")
+            return stmt
