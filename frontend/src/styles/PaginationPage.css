@@ -131,6 +131,106 @@
   min-width: 150px;
 }
 
+.clickable-page-info {
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: var(--main-border-radius);
+  transition: all 0.2s ease;
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.clickable-page-info:hover {
+  background: var(--ui-bg-2);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.page-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  background: var(--ui-bg-2);
+  border: 1px solid var(--bdc);
+  border-radius: var(--main-border-radius);
+}
+
+.page-input-label {
+  color: var(--tt-2);
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.page-input {
+  width: 60px;
+  padding: 6px 8px;
+  border: 1px solid var(--bdc);
+  border-radius: 4px;
+  background: var(--ui-bg);
+  color: var(--tt);
+  font-size: 0.9rem;
+  text-align: center;
+  transition: border-color 0.2s ease;
+}
+
+.page-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
+}
+
+.page-input-submit {
+  padding: 6px 12px;
+  background: var(--accent);
+  color: var(--ui-text-color-on-accent);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.page-input-submit:hover:not(:disabled) {
+  background: var(--accent-s);
+  border-color: var(--accent-s);
+  transform: translateY(-1px);
+}
+
+.page-input-submit:disabled {
+  background: var(--ui-bg-3);
+  border-color: var(--bdc);
+  color: var(--tt-3);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.page-input-cancel {
+  padding: 4px 8px;
+  background: transparent;
+  color: var(--tt-2);
+  border: 1px solid var(--bdc);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.page-input-cancel:hover {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+  color: white;
+}
+
 /* Animation for loading state */
 @keyframes pulse {
   0% {
@@ -166,7 +266,7 @@
     gap: 15px;
   }
   
-  .pagination-button {
+  .pagination-button {  
     width: 100%;
     max-width: 200px;
   }

@@ -76,7 +76,11 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
   const [error, setError] = useState('');
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  
+    
+  // Page input state
+  const [showPageInput, setShowPageInput] = useState(false);
+  const [pageInputValue, setPageInputValue] = useState('');
+    
   // Get values from URL parameters
   const page = parseInt(searchParams.get('page') || '1');
   const sortBy = searchParams.get('sort') || filterConfig.defaults.sort;
@@ -176,14 +180,55 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
   };
 
   const handleFilterChange = (filter: F | null) => {
+    // Check if filter actually changed to avoid unnecessary page resets
+    const filterChanged = JSON.stringify(currentFilter) !== JSON.stringify(filter);
+    
     setCurrentFilter(filter);
-    // Reset to first page when filter changes
-    updateSearchParams({ page: '1' });
+    
+    // Only reset to first page when filter actually changes
+    if (filterChanged) {
+      updateSearchParams({ page: '1' });
+    }
   };
 
   const handleSearch = () => {
     // Reset to first page when searching
     updateSearchParams({ page: '1' });
+  };
+
+  const handlePageInputToggle = () => {
+    if (showPageInput) {
+      setShowPageInput(false);
+      setPageInputValue('');
+    } else {
+      setShowPageInput(true);
+      setPageInputValue(page.toString());
+    }
+  };
+
+  const handlePageInputChange = (value: string) => {
+    // Only allow numeric input
+    if (value === '' || /^\d+$/.test(value)) {
+      setPageInputValue(value);
+    }
+  };
+
+  const handlePageInputSubmit = () => {
+    const pageNumber = parseInt(pageInputValue);
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      handlePageChange(pageNumber);
+      setShowPageInput(false);
+      setPageInputValue('');
+    }
+  };
+
+  const handlePageInputKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handlePageInputSubmit();
+    } else if (e.key === 'Escape') {
+      setShowPageInput(false);
+      setPageInputValue('');
+    }
   };
 
   const renderPagination = () => {
@@ -201,12 +246,59 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
         
         <div className="pagination-info">
           {showPaginationInfo && (
-            <span className="pagination-text">
-              {paginationInfoTemplate 
-                ? paginationInfoTemplate(page, totalPages, total)
-                : `Page ${page} of ${totalPages} (${total} total)`
-              }
-            </span>
+            <>
+              {!showPageInput ? (
+                <span 
+                  className="pagination-text clickable-page-info" 
+                  onClick={handlePageInputToggle}
+                  title="Click to jump to page"
+                >
+                  {paginationInfoTemplate 
+                    ? paginationInfoTemplate(page, totalPages, total)
+                    : `Page ${page} of ${totalPages} (${total} total)`
+                  }
+                </span>
+              ) : (
+                <div className="page-input-container">
+                  <span className="page-input-label">Go to page:</span>
+                  <input
+                    type="text"
+                    value={pageInputValue}
+                    onChange={(e) => handlePageInputChange(e.target.value)}
+                    onKeyDown={handlePageInputKeyPress}
+                    onBlur={() => {
+                      // Auto-submit if valid when focus is lost
+                      const pageNumber = parseInt(pageInputValue);
+                      if (pageNumber >= 1 && pageNumber <= totalPages) {
+                        handlePageInputSubmit();
+                      } else {
+                        setShowPageInput(false);
+                        setPageInputValue('');
+                      }
+                    }}
+                    className="page-input"
+                    placeholder={`1-${totalPages}`}
+                    autoFocus
+                  />
+                  <button
+                    onClick={handlePageInputSubmit}
+                    disabled={!pageInputValue || parseInt(pageInputValue) < 1 || parseInt(pageInputValue) > totalPages}
+                    className="page-input-submit"
+                  >
+                    Go
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowPageInput(false);
+                      setPageInputValue('');
+                    }}
+                    className="page-input-cancel"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
         
@@ -277,6 +369,6 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
       </div>
     </div>
   );
-};
+};      
 
 export default PaginationPage; 
