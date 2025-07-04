@@ -1,9 +1,15 @@
 .deck-detail-container {
-  max-width: 1200px;
-  margin: 0 auto;
   padding: 20px;
+  margin: 0 auto;
+  color: white !important;
+  width: 100%;
   background: var(--bg);
   min-height: calc(100vh - 80px);
+  transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.deck-detail-container.with-panel {
+  margin-right: 400px;
 }
 
 .deck-detail-header {
@@ -91,8 +97,6 @@
   height: 100%;
   object-fit: cover;
 }
-
-
 
 .card-name {
   font-size: 1.1rem;
@@ -213,6 +217,10 @@
   .deck-detail-container {
     padding: 15px;
   }
+
+  .deck-detail-container.with-panel {
+    margin-right: 0;
+  }
   
   .deck-title {
     font-size: 2rem;
@@ -221,6 +229,18 @@
   .cards-grid {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 15px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .deck-detail-container.with-panel {
+    margin-right: 350px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .deck-detail-container.with-panel {
+    margin-right: 450px;
   }
 }
 

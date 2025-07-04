@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiExternalLink, FiMaximize2, FiClipboard } from 'react-icons/fi';
+import { FiExternalLink, FiMaximize2, FiClipboard, FiLayers } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { CardSchema } from '../client';
 import { useDomain } from '../context/DomainContext';
@@ -15,11 +15,13 @@ interface CardInfoPanelProps {
 const CardInfoRow = ({ 
   label, 
   value, 
-  externalLink 
+  externalLink,
+  addComponent 
 }: { 
   label: string, 
   value: any,
   externalLink?: string,
+  addComponent?: React.ReactNode,
 }) => {
   const copyValueToClipboard = () => {
     navigator.clipboard.writeText(value);
@@ -37,6 +39,7 @@ const CardInfoRow = ({
         >
           <FiClipboard />
         </div>
+        {addComponent}
         {externalLink && (
           <a 
             href={externalLink} 
@@ -186,7 +189,17 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
             )}
             
             {card.anime_link && (
-              <CardInfoRow label="Anime Link" value={card.anime_link} />
+              <CardInfoRow label="Anime Link" value={card.anime_link} addComponent={
+                <a
+                  href={`/deck/${encodeURIComponent(card.anime_link)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="action-button-arrow deck-button"
+                  title="View deck"
+                >
+                  <FiLayers />
+                </a>
+              }/>
             )}
             
             {card.created_at && (

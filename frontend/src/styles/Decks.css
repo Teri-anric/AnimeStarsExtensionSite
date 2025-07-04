@@ -1,7 +1,8 @@
 .decks-container {
-  max-width: 1200px;
-  margin: 0 auto;
   padding: 20px;
+  margin: 0 auto;
+  color: white !important;
+  width: 100%;
   background: var(--bg);
   min-height: calc(100vh - 80px);
 }
@@ -249,8 +250,6 @@
   height: 100%;
   object-fit: cover;
 }
-
-
 
 .preview-card .card-name {
   font-size: 0.9rem;
