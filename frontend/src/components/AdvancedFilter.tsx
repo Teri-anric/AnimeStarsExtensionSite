@@ -62,6 +62,12 @@ const booleanOperators = [
   { value: 'is_null', label: 'Is empty' }
 ];
 
+const arrayOperators = [
+  { value: 'any', label: 'Has any item that' },
+  { value: 'all', label: 'All items must' },
+  { value: 'length', label: 'Number of items' }
+];
+
 const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[]): FilterGroup[] => {
   console.log('Parsing filter to groups:', filter);
   console.log('Available field options:', fieldOptions.map(f => f.value));
@@ -237,8 +243,10 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
     const newRule: FilterRule = {
       id: Date.now().toString(),
       field: firstField?.value || '',
-      operator: firstField?.type === 'string' ? 'icontains' : 'eq',
-      value: ''
+      operator: firstField?.type === 'string' ? 'icontains' : 
+                firstField?.type === 'array' ? 'any' : 'eq',
+      value: '',
+      subEntity: undefined
     };
     
     setGroups(groups.map(group => 
@@ -276,7 +284,21 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
                 updatedRule.operator = 'eq';
               } else if (fieldType === 'boolean' && !['eq', 'is_null'].includes(rule.operator)) {
                 updatedRule.operator = 'eq';
+              } else if (fieldType === 'array' && !['any', 'all', 'length'].includes(rule.operator)) {
+                updatedRule.operator = 'any';
+                updatedRule.subEntity = undefined;
+                updatedRule.value = '';
               }
+              
+              // Clear subEntity if changing away from array field
+              if (fieldType !== 'array' && rule.subEntity) {
+                updatedRule.subEntity = undefined;
+              }
+            }
+            
+            // If subEntity field is changed, clear the value
+            if (field === 'subEntity') {
+              updatedRule.value = '';
             }
             
             return updatedRule;
@@ -301,6 +323,8 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
         return datetimeOperators;
       case 'boolean':
         return booleanOperators;
+      case 'array':
+        return arrayOperators;
       default:
         return stringOperators;
     }
@@ -314,6 +338,28 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
   const getFieldEnumOptions = (fieldName: string) => {
     const field = fieldOptions.find(f => f.value === fieldName);
     return field?.enumOptions || [];
+  };
+
+  const getSubEntityConfig = (fieldName: string) => {
+    const field = fieldOptions.find(f => f.value === fieldName);
+    return field?.subEntityConfig;
+  };
+
+  const getDefaultOperatorForSubField = (fieldType: FieldType): FilterOperator => {
+    switch (fieldType) {
+      case 'string':
+        return 'icontains';
+      case 'enum':
+        return 'eq';
+      case 'number':
+        return 'eq';
+      case 'boolean':
+        return 'eq';
+      case 'datetime':
+        return 'eq';
+      default:
+        return 'eq';
+    }
   };
 
   const buildFilter = (): GenericFilter | null => {
@@ -332,6 +378,59 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
 
       if (rule.operator === 'is_null') {
         filterValue = { is_null: true };
+      } else if (fieldType === 'array') {
+        // Handle array operators
+        if (rule.operator === 'length') {
+          const numValue = parseInt(rule.value);
+          if (isNaN(numValue)) {
+            return {}; // Skip invalid number
+          }
+          filterValue = { length: { eq: numValue } };
+        } else if (rule.operator === 'any' || rule.operator === 'all') {
+          // Handle sub-entity filters with proper operator selection
+          if (rule.subEntity && rule.value) {
+            const subEntityConfig = getSubEntityConfig(rule.field);
+            const subFieldConfig = subEntityConfig?.fieldOptions.find(f => f.value === rule.subEntity);
+            
+            // Use explicit operator or fall back to default
+            const operator = rule.subEntityOperator || getDefaultOperatorForSubField(subFieldConfig?.type || 'string');
+            
+            // Process value based on operator and field type
+            let processedValue: any = rule.value;
+            
+            if (operator === 'in' || operator === 'not_in') {
+              const values = rule.value.split(',').map(v => v.trim()).filter(v => v !== '');
+              if (values.length === 0) {
+                return {}; // Skip empty lists
+              }
+              if (subFieldConfig?.type === 'number') {
+                const numValues = values.map(v => parseInt(v)).filter(v => !isNaN(v));
+                if (numValues.length === 0) {
+                  return {}; // Skip if no valid numbers
+                }
+                processedValue = numValues;
+              } else {
+                processedValue = values;
+              }
+            } else if (subFieldConfig?.type === 'number') {
+              const numValue = parseInt(rule.value);
+              if (isNaN(numValue)) {
+                return {}; // Skip invalid number
+              }
+              processedValue = numValue;
+            } else if (subFieldConfig?.type === 'boolean') {
+              processedValue = rule.value.toLowerCase() === 'true';
+            }
+            
+            filterValue = {
+              [rule.operator]: {
+                [rule.subEntity]: { [operator]: processedValue }
+              }
+            };
+          } else {
+            return {}; // Skip invalid sub-entity filter
+          }
+        }
       } else if (rule.operator === 'in' || rule.operator === 'not_in') {
         const values = rule.value.split(',').map(v => v.trim()).filter(v => v !== '');
         if (values.length === 0) {
@@ -411,6 +510,95 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
     
     if (rule.operator === 'is_null') {
       return <span className="null-indicator">No value needed</span>;
+    }
+
+    // Array field handling
+    if (fieldType === 'array') {
+      if (rule.operator === 'length') {
+        return (
+          <input
+            type="number"
+            value={rule.value}
+            onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
+            placeholder="Number of items"
+            className="filter-input"
+            min="0"
+          />
+        );
+      } else if (rule.operator === 'any' || rule.operator === 'all') {
+        const subEntityConfig = getSubEntityConfig(rule.field);
+        if (!subEntityConfig) {
+          return <span className="null-indicator">No sub-entity config</span>;
+        }
+
+        // Get the selected sub-entity field info
+        const selectedSubField = rule.subEntity ? 
+          subEntityConfig.fieldOptions.find(f => f.value === rule.subEntity) : null;
+
+        return (
+          <div className="sub-entity-filter">
+            <select
+              value={rule.subEntity || ''}
+              onChange={(e) => updateRule(groupId, rule.id, 'subEntity', e.target.value)}
+              className="filter-input sub-entity-field"
+            >
+              <option value="">Select field...</option>
+              {subEntityConfig.fieldOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            
+            {/* Sub-entity operator selection */}
+            {rule.subEntity && selectedSubField && (
+              <select
+                value={rule.subEntityOperator || getDefaultOperatorForSubField(selectedSubField.type)}
+                onChange={(e) => updateRule(groupId, rule.id, 'subEntityOperator', e.target.value)}
+                className="filter-input sub-entity-operator"
+              >
+                {getOperatorsForField(selectedSubField.type).map(op => (
+                  <option key={op.value} value={op.value}>
+                    {op.label}
+                  </option>
+                ))}
+              </select>
+            )}
+            
+            {/* Render appropriate input based on sub-entity field type */}
+            {rule.subEntity && selectedSubField && (
+              selectedSubField.type === 'enum' && 
+              (rule.subEntityOperator === 'eq' || rule.subEntityOperator === 'ne' || !rule.subEntityOperator) ? (
+                <select
+                  value={rule.value}
+                  onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
+                  className="filter-input sub-entity-value"
+                >
+                  <option value="">Select value...</option>
+                  {selectedSubField.enumOptions?.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type={selectedSubField.type === 'number' ? 'number' : 'text'}
+                  value={rule.value}
+                  onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
+                  placeholder={
+                    rule.subEntityOperator === 'in' || rule.subEntityOperator === 'not_in' 
+                      ? 'value1,value2,value3'
+                      : 'Enter value...'
+                  }
+                  className="filter-input sub-entity-value"
+                />
+              )
+            )}
+          </div>
+        );
+      }
+      return <span className="null-indicator">Select operator first</span>;
     }
 
     // DateTime operators that don't need input

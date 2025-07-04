@@ -7,6 +7,38 @@ export const deckFilterConfig: EntityFilterConfig = {
     { value: 'anime_name', label: 'Anime Name', type: 'string' },
     { value: 'anime_link', label: 'Anime Link', type: 'string' },
     { value: 'card_count', label: 'Number of Cards', type: 'number' },
+    { 
+      value: 'cards', 
+      label: 'Cards', 
+      type: 'array',
+      subEntityConfig: {
+        entityName: 'Cards',
+        supportedOperators: ['any', 'all', 'length'],
+        fieldOptions: [
+          { value: 'name', label: 'Card Name', type: 'string' },
+          { value: 'card_id', label: 'Card ID', type: 'number' },
+          { 
+            value: 'rank', 
+            label: 'Rank', 
+            type: 'enum',
+            enumOptions: [
+              { value: 'ass', label: 'ASS' },
+              { value: 's', label: 'S' },
+              { value: 'a', label: 'A' },
+              { value: 'b', label: 'B' },
+              { value: 'c', label: 'C' },
+              { value: 'd', label: 'D' },
+              { value: 'e', label: 'E' }
+            ]
+          },
+          { value: 'anime_name', label: 'Card Anime Name', type: 'string' },
+          { value: 'anime_link', label: 'Card Anime Link', type: 'string' },
+          { value: 'author', label: 'Card Author', type: 'string' },
+          { value: 'created_at', label: 'Card Created Date', type: 'datetime' },
+          { value: 'updated_at', label: 'Card Updated Date', type: 'datetime' }
+        ]
+      }
+    }
   ],
 
   shortFilterFields: [
