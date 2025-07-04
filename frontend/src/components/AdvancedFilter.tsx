@@ -80,6 +80,64 @@ const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[])
     const operator = operators[0] as FilterOperator;
     const value = fieldFilter[operator];
     
+    const fieldType = fieldOptions.find(f => f.value === fieldName)?.type || 'string';
+    
+    // Handle array field sub-entity filters
+    if (fieldType === 'array' && (operator === 'any' || operator === 'all')) {
+      if (typeof value === 'object' && value !== null) {
+        // Extract sub-entity information
+        const subEntityFields = Object.keys(value);
+        if (subEntityFields.length > 0) {
+          const subEntity = subEntityFields[0];
+          const subEntityFilter = value[subEntity];
+          const subEntityOperators = Object.keys(subEntityFilter);
+          
+          if (subEntityOperators.length > 0) {
+            const subEntityOperator = subEntityOperators[0];
+            const subEntityValue = subEntityFilter[subEntityOperator];
+            
+            let ruleValue = '';
+            if (subEntityOperator === 'in' || subEntityOperator === 'not_in') {
+              ruleValue = Array.isArray(subEntityValue) ? subEntityValue.join(', ') : String(subEntityValue);
+            } else {
+              ruleValue = String(subEntityValue);
+            }
+            
+            return {
+              id: (ruleId++).toString(),
+              field: fieldName,
+              operator,
+              value: ruleValue,
+              subEntity,
+              subEntityOperator: subEntityOperator as FilterOperator
+            };
+          }
+        }
+      }
+      
+      // Fallback for malformed sub-entity filter
+      return {
+        id: (ruleId++).toString(),
+        field: fieldName,
+        operator,
+        value: '',
+        subEntity: undefined,
+        subEntityOperator: undefined
+      };
+    }
+    
+    // Handle array length operator
+    if (fieldType === 'array' && operator === 'length') {
+      const lengthValue = typeof value === 'object' && value.eq !== undefined ? value.eq : value;
+      return {
+        id: (ruleId++).toString(),
+        field: fieldName,
+        operator,
+        value: String(lengthValue)
+      };
+    }
+    
+    // Handle regular field filters
     let ruleValue = '';
     if (operator === 'is_null' && value === true) {
       ruleValue = '';
