@@ -257,7 +257,8 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
       if (Object.keys(shortFilterValues).some(key => shortFilterValues[key])) {
         let convertedFilter: T | null = null;
         
-        if (entityConfig.buildShortFilter) {
+        // Safely check for buildShortFilter
+        if (entityConfig && 'buildShortFilter' in entityConfig && entityConfig.buildShortFilter) {
           convertedFilter = entityConfig.buildShortFilter(shortFilterValues);
         } else {
           // Default conversion logic
@@ -316,7 +317,8 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
     // Use custom build filter function if provided, otherwise use default logic
     let resultFilter: T | null = null;
     
-    if (entityConfig.buildShortFilter) {
+    // Safely check for buildShortFilter
+    if (entityConfig && 'buildShortFilter' in entityConfig && entityConfig.buildShortFilter) {
       resultFilter = entityConfig.buildShortFilter(shortFilterValues);
     } else {
       // Default filter building logic
@@ -460,7 +462,7 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
               onClose={handleAdvancedFilterClose}
               initialFilter={filter}
               fieldOptions={entityConfig.fieldOptions}
-              title={`Advanced ${entityConfig.ui?.title || entityConfig.entityName || title || 'Filter'}`}
+              title={`Advanced ${(entityConfig as any).ui?.title || entityConfig.entityName || title || 'Filter'}`}
             />
           )}
         </div>
