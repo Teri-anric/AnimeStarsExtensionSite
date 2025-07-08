@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useDomain } from '../../context/DomainContext';
+import ExtensionStatus from '../../components/ExtensionStatus';
 import '../../styles/AccountSettings.css';
 
 const AccountSettingsPage = () => {
@@ -30,6 +31,14 @@ const AccountSettingsPage = () => {
             <label>Username</label>
             <div className="user-value">{username}</div>
           </div>
+        </div>
+        
+        <div className="settings-group">
+          <h2>Browser Extension</h2>
+          <div className="setting-description">
+            Connect the Anime Stars browser extension to sync your card statistics and get enhanced features.
+          </div>
+          <ExtensionStatus />
         </div>
         
         <div className="settings-group">
