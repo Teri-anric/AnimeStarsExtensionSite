@@ -2,6 +2,7 @@ from typing import Any
 from sqlalchemy import and_, or_, not_, exists, func, select
 from sqlalchemy.sql.elements import ClauseElement
 import logging
+from .exceptions import FilterException
 
 logger = logging.getLogger(__name__)
 
@@ -129,13 +130,13 @@ class ConditionBuilder:
             # Regular relationship filtering (backward compatibility)
             sub_conditions = []
             for sub_field, sub_filters in field_filters.items():
-                if hasattr(related_model, sub_field):
-                    related_attr = getattr(related_model, sub_field)
-                    condition = self._apply_field_operators(related_attr, sub_filters)
-                    if condition is not None:
-                        sub_conditions.append(condition)
-                else:
-                    logger.warning(f"Sub-field {sub_field} not found in {related_model}")
+                if not hasattr(related_model, sub_field):
+                    raise FilterException(f"Sub-field {sub_field} not found in {related_model}")
+
+                related_attr = getattr(related_model, sub_field)
+                condition = self._apply_field_operators(related_attr, sub_filters)
+                if condition is not None:
+                    sub_conditions.append(condition)
             
             if sub_conditions:
                 # Use relationship.any() for regular relationship filtering
@@ -154,13 +155,13 @@ class ConditionBuilder:
         # Build conditions for the related model
         sub_conditions = []
         for field_name, field_filter in filter_conditions.items():
-            if hasattr(related_model, field_name):
-                related_attr = getattr(related_model, field_name)
-                condition = self._apply_field_operators(related_attr, field_filter)
-                if condition is not None:
-                    sub_conditions.append(condition)
-            else:
-                logger.warning(f"Field {field_name} not found in related model {related_model}")
+            if not hasattr(related_model, field_name):
+                raise FilterException(f"Field {field_name} not found in related model {related_model}")
+
+            related_attr = getattr(related_model, field_name)
+            condition = self._apply_field_operators(related_attr, field_filter)
+            if condition is not None:
+                sub_conditions.append(condition)
         
         if sub_conditions:
             # Use relationship.any() with conditions
@@ -179,14 +180,14 @@ class ConditionBuilder:
         # Build conditions for the related model
         sub_conditions = []
         for field_name, field_filter in filter_conditions.items():
-            if hasattr(related_model, field_name):
-                related_attr = getattr(related_model, field_name)
-                condition = self._apply_field_operators(related_attr, field_filter)
-                if condition is not None:
-                    sub_conditions.append(condition)
-            else:
-                logger.warning(f"Field {field_name} not found in related model {related_model}")
-        
+            if not hasattr(related_model, field_name):
+                raise FilterException(f"Field {field_name} not found in related model {related_model}")
+
+            related_attr = getattr(related_model, field_name)
+            condition = self._apply_field_operators(related_attr, field_filter)
+            if condition is not None:
+                sub_conditions.append(condition)
+
         if sub_conditions:
             # For 'all', we need to ensure no related items exist that don't match the condition
             # This is equivalent to: NOT EXISTS(related_items WHERE NOT condition)
@@ -202,7 +203,6 @@ class ConditionBuilder:
         """Handle 'length' operator for array/collection relationships"""
         # For length filtering on relationships, we need to count the related items
         # This is a basic implementation - might need refinement for complex cases
-        from sqlalchemy import func, select
         
         # Get the foreign key for the relationship
         related_model = relationship_attr.property.mapper.class_
@@ -228,12 +228,9 @@ class ConditionBuilder:
                 elif operator == 'lte':
                     return count_subquery <= value
                 else:
-                    logger.warning(f"Unsupported length operator: {operator}")
+                    raise FilterException(f"Unsupported length operator: {operator}")
             except Exception as e:
-                logger.error(f"Error building length condition: {e}")
-                # Fallback to a simpler approach
-                logger.info("Falling back to basic relationship length check")
-                return None
+                raise FilterException(f"Error building length condition: {e}")
         
         return None
     
@@ -247,8 +244,7 @@ class ConditionBuilder:
         
         for operator, value in field_filters.items():
             if operator not in self.operator_map:
-                logger.warning(f"Unknown operator: {operator}")
-                continue
+                raise FilterException(f"Unknown operator: {operator}")
                 
             # Skip array operators as they are handled elsewhere
             if operator in ['any', 'all', 'length']:
@@ -258,8 +254,7 @@ class ConditionBuilder:
                 condition = self.operator_map[operator](column, value)
                 conditions.append(condition)
             except Exception as e:
-                logger.warning(f"Failed to apply operator {operator} with value {value}: {e}")
-                continue
+                raise FilterException(f"Failed to apply operator {operator} with value {value}: {e}")
         
         if conditions:
             return and_(*conditions) if len(conditions) > 1 else conditions[0]

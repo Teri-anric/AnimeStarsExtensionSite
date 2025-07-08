@@ -59,8 +59,12 @@ async def update_cards_by_page(page: int = 1) -> CardPaginationResponse | None:
                 logger.info(f"Updating card {card.id}")
                 await card_repo.update(
                     db_card.id,
+                    name=card.name,
+                    rank=card.rank,
                     author=card.author,
+                    anime_name=card.anime_name,
                     image=url_path(card.image),
+                    anime_link=url_path(card.anime_link),
                     mp4=url_path(card.mp4),
                     webm=url_path(card.webm),
                 )

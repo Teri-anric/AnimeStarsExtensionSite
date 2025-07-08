@@ -6,6 +6,7 @@ import logging
 from .operators import FilterOperators
 from .joins import JoinManager
 from .conditions import ConditionBuilder
+from .exceptions import FilterException
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,7 @@ class FilterService:
             
         except Exception as e:
             logger.error(f"Error applying filters: {e}")
-            return stmt
+            raise FilterException(f"Error applying filters: {e}") from e
     
     def get_supported_operators(self) -> list[str]:
         """Get list of all supported operators"""
