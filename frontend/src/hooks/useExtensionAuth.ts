@@ -26,7 +26,6 @@ export const useExtensionAuth = (): UseExtensionAuthReturn => {
 
   // Check if extension is present via postMessage ping
   const pingExtension = useCallback(() => {
-    console.log('Pinging extension...');
     window.postMessage({
       type: 'EXTENSION_PING',
       timestamp: Date.now()
@@ -85,9 +84,7 @@ export const useExtensionAuth = (): UseExtensionAuthReturn => {
     setError(null);
 
     try {
-      console.log('Requesting token from extension...');
       await requestTokenFromExtension();
-      console.log('Extension token request completed successfully');
       return true;
 
     } catch (err) {
@@ -108,7 +105,6 @@ export const useExtensionAuth = (): UseExtensionAuthReturn => {
       
       const { data } = event;
       if (data.type === 'EXTENSION_PRESENCE') {
-        console.log('Extension presence notification received:', data);
         setExtensionInfo({
           hasExtension: data.hasExtension || false,
           extensionVersion: data.version || 'unknown',
