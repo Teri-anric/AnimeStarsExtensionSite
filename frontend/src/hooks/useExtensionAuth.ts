@@ -59,9 +59,9 @@ export const useExtensionAuth = (): UseExtensionAuthReturn => {
         throw new Error('Extension not detected');
       }
 
-      // Load initial token from backend (from secrets file)
+      // Generate new token from backend (same system as user tokens)
       const response = await fetch('/api/extension/token', {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -69,19 +69,19 @@ export const useExtensionAuth = (): UseExtensionAuthReturn => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to get extension token: ${response.status}`);
+        throw new Error(`Failed to create extension token: ${response.status}`);
       }
 
       const data = await response.json();
       
-      if (!data.token) {
-        throw new Error('No extension token available');
+      if (!data.access_token) {
+        throw new Error('No access token available');
       }
 
       // Send token to extension via postMessage
       window.postMessage({
         type: 'ASS_EXTENSION_TOKEN_UPDATE',
-        token: data.token,
+        token: data.access_token,
         source: 'website_init'
       }, window.location.origin);
 
@@ -90,7 +90,7 @@ export const useExtensionAuth = (): UseExtensionAuthReturn => {
         detail: {
           type: 'token_response',
           success: true,
-          token: data.token,
+          token: data.access_token,
           source: 'website_init',
           timestamp: Date.now()
         }
