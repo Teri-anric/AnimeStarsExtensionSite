@@ -16,6 +16,7 @@ class UserRepository(CRUDRepository[User, UUID]):
     async def get_user_by_username(self, username: str) -> User | None:
         return await self.scalar(select(User).where(func.lower(User.username) == username.lower()))
 
+    @property
     def entry_class(self) -> type[User]:
         return User
 
@@ -35,5 +36,6 @@ class TokenRepository(CRUDRepository[Token, UUID]):
             await self.session.commit()
             await self.session.refresh(db_token) 
 
+    @property
     def entry_class(self) -> type[Token]:
         return Token

@@ -29,8 +29,27 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
     const handleExtensionRequest = (event: CustomEvent) => {
       console.log('Extension token request received:', event.detail);
       
-      if (event.detail && event.detail.type === 'token_request') {
-        setRequestData(event.detail);
+      try {
+        // Safe access to event.detail properties
+        const detail = event.detail;
+        if (detail && (detail.type === 'token_request' || detail.type === 'ASS_EXTENSION_TOKEN_REQUEST')) {
+          setRequestData({
+            type: detail.type || 'token_request',
+            extensionId: detail.extensionId || 'unknown',
+            timestamp: detail.timestamp || Date.now(),
+            origin: detail.origin || 'extension'
+          });
+          setIsVisible(true);
+        }
+      } catch (error) {
+        console.warn('Error accessing event.detail properties:', error);
+        // Fallback: show modal anyway if we got an extension request
+        setRequestData({
+          type: 'token_request',
+          extensionId: 'unknown',
+          timestamp: Date.now(),
+          origin: 'extension'
+        });
         setIsVisible(true);
       }
     };
@@ -39,10 +58,14 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
     const handlePostMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
       
-      if (event.data && event.data.type === 'ASS_EXTENSION_TOKEN_REQUEST') {
-        console.log('Extension token request via postMessage:', event.data);
-        setRequestData(event.data);
-        setIsVisible(true);
+      try {
+        if (event.data && event.data.type === 'ASS_EXTENSION_TOKEN_REQUEST') {
+          console.log('Extension token request via postMessage:', event.data);
+          setRequestData(event.data);
+          setIsVisible(true);
+        }
+      } catch (error) {
+        console.warn('Error accessing postMessage data:', error);
       }
     };
 
@@ -81,8 +104,8 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
 
       // Also send via postMessage for compatibility
       window.postMessage({
-        type: 'ASS_EXTENSION_TOKEN_RESPONSE',
-        ...responseData
+        ...responseData,
+        type: 'ASS_EXTENSION_TOKEN_RESPONSE'
       }, window.location.origin);
 
       console.log('Token shared with extension successfully');
@@ -116,8 +139,8 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
     }));
 
     window.postMessage({
-      type: 'ASS_EXTENSION_TOKEN_RESPONSE',
-      ...responseData
+      ...responseData,
+      type: 'ASS_EXTENSION_TOKEN_RESPONSE'
     }, window.location.origin);
 
     handleClose();
