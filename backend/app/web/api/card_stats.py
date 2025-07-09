@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from datetime import UTC
 
 from app.web.schema.card_stats import (
     CardUsersStatsSchema,
@@ -51,7 +52,7 @@ async def add_card_users_stats(
             card_id=stat.card_id,
             collection=stat.collection,
             count=stat.count,
-            created_at=stat.created_at,
+            created_at=stat.created_at.astimezone(UTC).replace(tzinfo=None),
         )
         for stat in request.stats
     )
