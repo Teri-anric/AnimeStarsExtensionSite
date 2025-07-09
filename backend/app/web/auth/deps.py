@@ -23,7 +23,6 @@ async def get_token_obj(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    # Decode the token
     token_data = await decode_token(token)
     if token_data is None:
         raise credentials_exception
@@ -45,7 +44,7 @@ async def get_current_user(
             detail="User not found",
         )
     user = await user_repo.get(token.user_id)
-    if user is None:
+    if user is None or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found",
@@ -53,18 +52,15 @@ async def get_current_user(
     return user
 
 
-async def get_current_active_user(
-    current_user: User = Depends(get_current_user),
-) -> User:
-    if not current_user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Inactive user",
-        )
-    return current_user
-
+async def get_optional_current_user(
+    token: Token = Depends(get_token_obj),
+    user_repo: UserRepositoryDep = None,
+) -> User | None:
+    if token.user_id is None:
+        return None
+    return await user_repo.get(token.user_id)
 
 
 TokenDep = Annotated[Token, Depends(get_token_obj)]
 UserDep = Annotated[User, Depends(get_current_user)]
-ActiveUserDep = Annotated[User, Depends(get_current_active_user)]
+OptionalUserDep = Annotated[User, Depends(get_optional_current_user)]

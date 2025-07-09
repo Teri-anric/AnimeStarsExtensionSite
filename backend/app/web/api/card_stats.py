@@ -8,7 +8,7 @@ from app.web.schema.card_stats import (
     CardUsersStatsAddResponse,
 )
 from app.web.deps import CardUsersStatsRepositoryDep
-from app.web.deps import ActiveUserDep
+from app.web.auth.deps import UserDep
 from app.database.models.animestars.card_users_stats import CardUsersStats
 
 
@@ -43,7 +43,7 @@ async def get_card_users_stats_by_card_id(
 async def add_card_users_stats(
     request: CardUsersStatsAddRequest,
     repo: CardUsersStatsRepositoryDep,
-    user: ActiveUserDep,
+    user: UserDep,
 ) -> CardUsersStatsAddResponse:
     objs = (
         CardUsersStats(

@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from ..schema.auth import UserCreate, Token, UserResponse
 from ..auth import get_password_hash, verify_password
-from ..auth.deps import TokenDep, TokenRepositoryDep, UserRepositoryDep, ActiveUserDep
+from ..auth.deps import TokenDep, TokenRepositoryDep, UserRepositoryDep, UserDep
 from ..deps import AnimestarsUserRepoDep
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -71,5 +71,5 @@ async def logout(
 
 
 @router.get("/me", response_model=UserResponse)
-async def read_users_me(current_user: ActiveUserDep):
+async def read_users_me(current_user: UserDep):
     return current_user
