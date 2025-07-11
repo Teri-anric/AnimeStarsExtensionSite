@@ -5,6 +5,7 @@ import { CardApi, CardSchema } from '../../client';
 import { useDomain } from '../../context/DomainContext';
 import CardStatsChart from '../../components/CardStatsChart';
 import '../../styles/CardDetail.css';
+import { createAuthenticatedClient } from '../../utils/apiClient';
 
 const CardDetailPage: React.FC = () => {
   const { cardId } = useParams<{ cardId: string }>();
@@ -14,7 +15,6 @@ const CardDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const api = new CardApi();
 
   useEffect(() => {
     if (cardId) {
@@ -28,7 +28,9 @@ const CardDetailPage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.getCardApiCardCardIdGet(parseInt(cardId));
+      const cardApi = createAuthenticatedClient(CardApi);
+
+      const response = await cardApi.getCardApiCardCardIdGet(parseInt(cardId));
       setCard(response.data);
     } catch (err) {
       console.error('Error fetching card:', err);
@@ -46,8 +48,7 @@ const CardDetailPage: React.FC = () => {
   const getAnisiteUrl = (path: string | null, params: object | null = null) => {
     if (!path) return '';
     
-    const baseUrl = 'https://anisite.net';
-    let url = baseUrl + path;
+    let url = currentDomain + path;
     
     if (params) {
       const searchParams = new URLSearchParams();

@@ -28,7 +28,7 @@ async def get_token_obj(
         raise credentials_exception
 
     token = await token_repo.get(token_data.token_id)
-    if token is None:
+    if token is None or not token.is_active:
         raise credentials_exception
 
     return token
@@ -62,5 +62,6 @@ async def get_optional_current_user(
 
 
 TokenDep = Annotated[Token, Depends(get_token_obj)]
-UserDep = Annotated[User, Depends(get_current_user)]
+ProtectedDep = Depends(get_current_user)
+UserDep = Annotated[User, ProtectedDep]
 OptionalUserDep = Annotated[User, Depends(get_optional_current_user)]

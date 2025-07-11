@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from uuid import UUID
 
 from app.web.schema.card import (
@@ -7,8 +7,10 @@ from app.web.schema.card import (
     CardSchema,
 )
 from app.web.deps import CardRepositoryDep
+from app.web.auth.deps import ProtectedDep
 
-router = APIRouter(prefix="/card", tags=["card"])
+
+router = APIRouter(prefix="/card", tags=["card"], dependencies=[ProtectedDep])
 
 
 @router.post("/")

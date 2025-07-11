@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from uuid import UUID
@@ -12,7 +12,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # JWT settings
 SECRET_KEY = settings.auth.secret_key
 ALGORITHM = settings.auth.algorithm
-ACCESS_TOKEN_EXPIRE_MINUTES = settings.auth.access_token_expire_minutes
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -23,13 +22,10 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+def create_access_token(data: dict, expire: datetime | None = None) -> str:
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
+    if expire:
+        to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 

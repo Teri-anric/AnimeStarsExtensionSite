@@ -9,11 +9,11 @@ from app.web.schema.card_stats import (
     CardUsersStatsAddResponse,
 )
 from app.web.deps import CardUsersStatsRepositoryDep
-from app.web.auth.deps import UserDep
+from app.web.auth.deps import UserDep, ProtectedDep
 from app.database.models.animestars.card_users_stats import CardUsersStats
 
 
-router = APIRouter(prefix="/card/stats", tags=["card-stats"])
+router = APIRouter(prefix="/card/stats", tags=["card-stats"], dependencies=[ProtectedDep])
 
 
 @router.get("/last")

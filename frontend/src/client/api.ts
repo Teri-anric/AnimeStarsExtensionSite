@@ -343,6 +343,79 @@ export type CardType = typeof CardType[keyof typeof CardType];
 
 
 /**
+ * 
+ * @export
+ * @interface CardUsersStatsAddRequest
+ */
+export interface CardUsersStatsAddRequest {
+    /**
+     * 
+     * @type {Array<CardUsersStatsAddSchema>}
+     * @memberof CardUsersStatsAddRequest
+     */
+    'stats': Array<CardUsersStatsAddSchema>;
+}
+/**
+ * 
+ * @export
+ * @interface CardUsersStatsAddResponse
+ */
+export interface CardUsersStatsAddResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof CardUsersStatsAddResponse
+     */
+    'status': CardUsersStatsAddResponseStatusEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardUsersStatsAddResponse
+     */
+    'message'?: string | null;
+}
+
+export const CardUsersStatsAddResponseStatusEnum = {
+    Ok: 'ok',
+    Error: 'error'
+} as const;
+
+export type CardUsersStatsAddResponseStatusEnum = typeof CardUsersStatsAddResponseStatusEnum[keyof typeof CardUsersStatsAddResponseStatusEnum];
+
+/**
+ * 
+ * @export
+ * @interface CardUsersStatsAddSchema
+ */
+export interface CardUsersStatsAddSchema {
+    /**
+     * 
+     * @type {number}
+     * @memberof CardUsersStatsAddSchema
+     */
+    'card_id': number;
+    /**
+     * 
+     * @type {CardCollection}
+     * @memberof CardUsersStatsAddSchema
+     */
+    'collection': CardCollection;
+    /**
+     * 
+     * @type {number}
+     * @memberof CardUsersStatsAddSchema
+     */
+    'count': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardUsersStatsAddSchema
+     */
+    'created_at'?: string;
+}
+
+
+/**
  * Filter schema for CardUsersStats model
  * @export
  * @interface CardUsersStatsFilter
@@ -1698,6 +1771,10 @@ export const CardApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -1730,6 +1807,10 @@ export const CardApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
 
 
     
@@ -1856,6 +1937,46 @@ export const CardStatsApiAxiosParamCreator = function (configuration?: Configura
     return {
         /**
          * 
+         * @summary Add Card Users Stats
+         * @param {CardUsersStatsAddRequest} cardUsersStatsAddRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addCardUsersStatsApiCardStatsAddPost: async (cardUsersStatsAddRequest: CardUsersStatsAddRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'cardUsersStatsAddRequest' is not null or undefined
+            assertParamExists('addCardUsersStatsApiCardStatsAddPost', 'cardUsersStatsAddRequest', cardUsersStatsAddRequest)
+            const localVarPath = `/api/card/stats/add`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(cardUsersStatsAddRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get Card Users Stats By Card Id
          * @param {CardUsersStatsQuery} cardUsersStatsQuery 
          * @param {*} [options] Override http request option.
@@ -1875,6 +1996,10 @@ export const CardStatsApiAxiosParamCreator = function (configuration?: Configura
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
 
 
     
@@ -1911,6 +2036,10 @@ export const CardStatsApiAxiosParamCreator = function (configuration?: Configura
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
 
             if (cardId !== undefined) {
                 localVarQueryParameter['card_id'] = cardId;
@@ -1949,6 +2078,10 @@ export const CardStatsApiAxiosParamCreator = function (configuration?: Configura
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
+
 
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
@@ -1973,6 +2106,19 @@ export const CardStatsApiAxiosParamCreator = function (configuration?: Configura
 export const CardStatsApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CardStatsApiAxiosParamCreator(configuration)
     return {
+        /**
+         * 
+         * @summary Add Card Users Stats
+         * @param {CardUsersStatsAddRequest} cardUsersStatsAddRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addCardUsersStatsApiCardStatsAddPost(cardUsersStatsAddRequest: CardUsersStatsAddRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CardUsersStatsAddResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addCardUsersStatsApiCardStatsAddPost(cardUsersStatsAddRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CardStatsApi.addCardUsersStatsApiCardStatsAddPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
         /**
          * 
          * @summary Get Card Users Stats By Card Id
@@ -2024,6 +2170,16 @@ export const CardStatsApiFactory = function (configuration?: Configuration, base
     return {
         /**
          * 
+         * @summary Add Card Users Stats
+         * @param {CardUsersStatsAddRequest} cardUsersStatsAddRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addCardUsersStatsApiCardStatsAddPost(cardUsersStatsAddRequest: CardUsersStatsAddRequest, options?: RawAxiosRequestConfig): AxiosPromise<CardUsersStatsAddResponse> {
+            return localVarFp.addCardUsersStatsApiCardStatsAddPost(cardUsersStatsAddRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get Card Users Stats By Card Id
          * @param {CardUsersStatsQuery} cardUsersStatsQuery 
          * @param {*} [options] Override http request option.
@@ -2062,6 +2218,18 @@ export const CardStatsApiFactory = function (configuration?: Configuration, base
  * @extends {BaseAPI}
  */
 export class CardStatsApi extends BaseAPI {
+    /**
+     * 
+     * @summary Add Card Users Stats
+     * @param {CardUsersStatsAddRequest} cardUsersStatsAddRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CardStatsApi
+     */
+    public addCardUsersStatsApiCardStatsAddPost(cardUsersStatsAddRequest: CardUsersStatsAddRequest, options?: RawAxiosRequestConfig) {
+        return CardStatsApiFp(this.configuration).addCardUsersStatsApiCardStatsAddPost(cardUsersStatsAddRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Get Card Users Stats By Card Id
@@ -2129,6 +2297,10 @@ export const DeckApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
+
             if (animeLink !== undefined) {
                 localVarQueryParameter['anime_link'] = animeLink;
             }
@@ -2165,6 +2337,10 @@ export const DeckApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
 
 
     
@@ -2379,6 +2555,111 @@ export class DefaultApi extends BaseAPI {
      */
     public readRootGet(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).readRootGet(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * ExtensionApi - axios parameter creator
+ * @export
+ */
+export const ExtensionApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Generate a new authentication token for the browser extension.  This endpoint creates a new token using the same system as regular user login, allowing the extension to authenticate API requests on behalf of the user.
+         * @summary Get Extension Token
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getExtensionTokenApiExtensionTokenPost: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/extension/token`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ExtensionApi - functional programming interface
+ * @export
+ */
+export const ExtensionApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ExtensionApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Generate a new authentication token for the browser extension.  This endpoint creates a new token using the same system as regular user login, allowing the extension to authenticate API requests on behalf of the user.
+         * @summary Get Extension Token
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getExtensionTokenApiExtensionTokenPost(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Token>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getExtensionTokenApiExtensionTokenPost(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ExtensionApi.getExtensionTokenApiExtensionTokenPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * ExtensionApi - factory interface
+ * @export
+ */
+export const ExtensionApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ExtensionApiFp(configuration)
+    return {
+        /**
+         * Generate a new authentication token for the browser extension.  This endpoint creates a new token using the same system as regular user login, allowing the extension to authenticate API requests on behalf of the user.
+         * @summary Get Extension Token
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getExtensionTokenApiExtensionTokenPost(options?: RawAxiosRequestConfig): AxiosPromise<Token> {
+            return localVarFp.getExtensionTokenApiExtensionTokenPost(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ExtensionApi - object-oriented interface
+ * @export
+ * @class ExtensionApi
+ * @extends {BaseAPI}
+ */
+export class ExtensionApi extends BaseAPI {
+    /**
+     * Generate a new authentication token for the browser extension.  This endpoint creates a new token using the same system as regular user login, allowing the extension to authenticate API requests on behalf of the user.
+     * @summary Get Extension Token
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ExtensionApi
+     */
+    public getExtensionTokenApiExtensionTokenPost(options?: RawAxiosRequestConfig) {
+        return ExtensionApiFp(this.configuration).getExtensionTokenApiExtensionTokenPost(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

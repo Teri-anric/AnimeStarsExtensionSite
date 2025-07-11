@@ -56,7 +56,7 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    token = await token_repo.create_token(user.id)
+    token = await token_repo.create(user_id=user.id)
     
     return {"access_token": token.get_access_token(), "token_type": "bearer"}
 

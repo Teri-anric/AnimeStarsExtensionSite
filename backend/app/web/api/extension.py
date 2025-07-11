@@ -1,18 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 import logging
 
-from ..auth.deps import get_current_user
+from ..auth.deps import UserDep, ProtectedDep
 from ...database.repos.user import TokenRepository
-from ...database.models.user import User
 from ..schema.auth import Token
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/extension", tags=["extension"])
+router = APIRouter(prefix="/extension", tags=["extension"], dependencies=[ProtectedDep])
 
 
 @router.post("/token", response_model=Token)
 async def get_extension_token(
-    current_user: User = Depends(get_current_user),
+    current_user: UserDep,
     token_repo: TokenRepository = Depends(lambda: TokenRepository())
 ) -> Token:
     """
@@ -22,15 +21,7 @@ async def get_extension_token(
     allowing the extension to authenticate API requests on behalf of the user.
     """
     try:
-        # Verify user is authenticated
-        if not current_user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Authentication required"
-            )
-        
-        # Create a new token for the user (same as login)
-        token = await token_repo.create_token(current_user.id)
+        token = await token_repo.create(user_id=current_user.id, expire_at=None)
         
         logger.info(f"Extension token created for user {current_user.username}")
         
