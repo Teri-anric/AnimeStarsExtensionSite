@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from sqlalchemy import select, func
 from uuid import UUID, uuid4
 from typing import List
@@ -35,7 +35,8 @@ class TokenRepository(CRUDRepository[Token, UUID]):
         """Get all active sessions for a specific user"""
         stmt = select(Token).where(
             Token.user_id == user_id,
-            Token.is_active == True
+            Token.expire_at > datetime.now(UTC),
+            Token.is_active.is_(True),
         ).order_by(Token.created_at.desc())
         result = await self.session.execute(stmt)
         return result.scalars().all()

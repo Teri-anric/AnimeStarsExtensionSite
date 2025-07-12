@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Path
 from fastapi.security import OAuth2PasswordRequestForm
-from typing import List
+from typing import Annotated
 from uuid import UUID
 
 from ..schema.auth import UserCreate, Token, UserResponse, LogoutResponse
@@ -71,14 +71,6 @@ async def logout(
 ):
     """
     Logout the current user.
-    
-    This endpoint deactivates the current session token,
-    effectively logging out the user from this session.
-    
-    **Authentication required**
-    
-    **Returns:**
-    - Success message confirming logout
     """
     await token_repo.deactivate_token(token.id)
     return LogoutResponse(message="Successfully logged out")
@@ -89,7 +81,7 @@ async def read_users_me(current_user: UserDep):
     return current_user
 
 
-@router.get("/sessions", response_model=List[SessionResponse])
+@router.get("/sessions", response_model=list[SessionResponse])
 async def get_user_sessions(
     current_user: UserDep,
     token_repo: TokenRepositoryDep,
@@ -97,14 +89,6 @@ async def get_user_sessions(
 ):
     """
     Get all active sessions for the current user.
-    
-    Returns a list of all active sessions including:
-    - Session ID
-    - Creation timestamp
-    - Expiration timestamp  
-    - Whether it's the current session
-    
-    **Authentication required**
     """
     sessions = await token_repo.get_active_sessions_by_user_id(current_user.id)
     return [
@@ -120,27 +104,12 @@ async def get_user_sessions(
 
 @router.delete("/sessions/{session_id}", response_model=SessionRevokeResponse)
 async def revoke_session(
-    session_id: str = Path(..., description="The ID of the session to revoke"),
-    current_user: UserDep = Depends(),
-    token_repo: TokenRepositoryDep = Depends(),
+    session_id: Annotated[str, Path(..., description="The ID of the session to revoke")],
+    current_user: UserDep,
+    token_repo: TokenRepositoryDep,
 ):
     """
     Revoke a specific session.
-    
-    This endpoint allows users to revoke (deactivate) a specific session.
-    Users can only revoke their own sessions.
-    
-    **Parameters:**
-    - session_id: UUID of the session to revoke
-    
-    **Authentication required**
-    
-    **Returns:**
-    - Success message if session was revoked
-    
-    **Errors:**
-    - 400: Invalid session ID format
-    - 404: Session not found or doesn't belong to user
     """
     
     try:
