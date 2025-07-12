@@ -1,4 +1,4 @@
-from datetime import datetime, UTC, timedelta
+from datetime import datetime, UTC
 from sqlalchemy import select, update, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -62,19 +62,6 @@ class VerificationCodeRepository(BaseRepository):
         ).values(is_active=False)
         await self.execute(stmt)
 
-    async def delete_expired_codes(self) -> None:
-        """Видалити застарілі коди."""
-        stmt = select(VerificationCode).where(
-            VerificationCode.expire_at < datetime.now(UTC).replace(tzinfo=None)
-        )
-        expired_codes = await self.scalars(stmt)
-        
-        if expired_codes:
-            async with self.session as session:
-                for code in expired_codes:
-                    await session.delete(code)
-                await session.commit()
-
     async def get_valid_code(self, username: str, code: str) -> VerificationCode | None:
         """Отримати валідний код верифікації."""
         verification_code = await self.get_by_username_and_code(username, code)
@@ -83,44 +70,3 @@ class VerificationCodeRepository(BaseRepository):
             return verification_code
         
         return None
-
-    async def cleanup_old_codes(self, days_old: int = 7) -> None:
-        """Очистити старі коди (старіше вказаної кількості днів)."""
-        cutoff_date = datetime.now(UTC).replace(tzinfo=None) - timedelta(days=days_old)
-        stmt = select(VerificationCode).where(
-            VerificationCode.created_at < cutoff_date
-        )
-        old_codes = await self.scalars(stmt)
-        
-        if old_codes:
-            async with self.session as session:
-                for code in old_codes:
-                    await session.delete(code)
-                await session.commit()
-
-    async def get_stats(self) -> dict:
-        """Отримати статистику по кодам верифікації."""
-        # Загальна кількість
-        total_stmt = select(VerificationCode)
-        total_codes = await self.scalars(total_stmt)
-        
-        # Активні коди
-        active_stmt = select(VerificationCode).where(VerificationCode.is_active == True)
-        active_codes = await self.scalars(active_stmt)
-        
-        # Використані коди
-        used_stmt = select(VerificationCode).where(VerificationCode.is_used == True)
-        used_codes = await self.scalars(used_stmt)
-        
-        # Застарілі коди
-        expired_stmt = select(VerificationCode).where(
-            VerificationCode.expire_at < datetime.now(UTC).replace(tzinfo=None)
-        )
-        expired_codes = await self.scalars(expired_stmt)
-        
-        return {
-            "total": len(total_codes),
-            "active": len(active_codes),
-            "used": len(used_codes),
-            "expired": len(expired_codes)
-        }

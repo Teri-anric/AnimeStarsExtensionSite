@@ -72,14 +72,3 @@ class VerificationService:
         """Clean up expired verification codes."""
         await self.repo.deactivate_expired_codes()
 
-    async def delete_expired_codes(self):
-        """Delete expired verification codes."""
-        await self.repo.delete_expired_codes()
-
-    async def cleanup_old_codes(self, days_old: int = 7):
-        """Clean up old codes (older than specified days)."""
-        await self.repo.cleanup_old_codes(days_old)
-
-    async def get_stats(self) -> dict:
-        """Get verification codes statistics."""
-        return await self.repo.get_stats()

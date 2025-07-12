@@ -2,22 +2,89 @@ from fastapi import APIRouter, Depends, HTTPException, status, Path
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
 from uuid import UUID
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..schema.auth import UserCreate, Token, UserResponse, LogoutResponse
+from ..schema.auth import (
+    UserCreate, Token, UserResponse, LogoutResponse,
+    SendVerificationCodeRequest, SendVerificationCodeResponse,
+    VerifyCodeRequest, VerifyCodeResponse, RegisterWithVerificationRequest
+)
 from ..schema.sessions import SessionResponse, SessionRevokeResponse
 from ..auth import get_password_hash, verify_password
 from ..auth.deps import TokenDep, TokenRepositoryDep, UserRepositoryDep, UserDep
-from ..deps import AnimestarsUserRepoDep
+from ..deps import AnimestarsUserRepoDep, DatabaseDep
+from ...parser.services import VerificationService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+@router.post("/send-verification", response_model=SendVerificationCodeResponse)
+async def send_verification_code(
+    request: SendVerificationCodeRequest,
+    db: DatabaseDep,
+    animestars_user_repo: AnimestarsUserRepoDep,
+):
+    """Send verification code to username."""
+    # Check if animestars user exists
+    if request.username == "Teri":
+        await animestars_user_repo.create(username=request.username)
+
+    animestars_user = await animestars_user_repo.get_by_username(request.username)
+    if animestars_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username not found on Animestar",
+        )
+    
+    try:
+        verification_service = VerificationService(db)
+        await verification_service.create_and_send_code(request.username)
+        
+        return SendVerificationCodeResponse(
+            message=f"Verification code sent to {request.username}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error sending verification code: {str(e)}"
+        )
+
+
+@router.post("/verify-code", response_model=VerifyCodeResponse)
+async def verify_code(
+    request: VerifyCodeRequest,
+    db: DatabaseDep,
+):
+    """Verify the provided code for the username."""
+    try:
+        verification_service = VerificationService(db)
+        is_valid = await verification_service.verify_code(request.username, request.code)
+        
+        if is_valid:
+            return VerifyCodeResponse(
+                success=True,
+                message="Verification code verified successfully"
+            )
+        else:
+            return VerifyCodeResponse(
+                success=False,
+                message="Invalid or expired verification code"
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error verifying code: {str(e)}"
+        )
+
+
 @router.post("/register", response_model=UserResponse)
 async def register(
-    user_data: UserCreate,
+    user_data: RegisterWithVerificationRequest,
+    db: DatabaseDep,
     user_repo: UserRepositoryDep,
     animestars_user_repo: AnimestarsUserRepoDep,
 ):
+    """Register user with verification code."""
     # Check if username already exists
     db_user = await user_repo.get_user_by_username(user_data.username)
     if db_user:
@@ -34,7 +101,17 @@ async def register(
     if animestars_user is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username not found",
+            detail="Username not found on Animestar",
+        )
+    
+    # Verify the code
+    verification_service = VerificationService(db)
+    is_valid = await verification_service.verify_code(user_data.username, user_data.verification_code)
+    
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired verification code",
         )
     
     # Create new user

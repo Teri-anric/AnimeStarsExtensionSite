@@ -25,7 +25,7 @@ def upgrade() -> None:
     sa.Column('expire_at', sa.DateTime(), nullable=False),
     sa.Column('is_used', sa.Boolean(), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_verification_codes_username'), 'verification_codes', ['username'], unique=False)
