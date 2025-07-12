@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useDomain } from '../../context/DomainContext';
-import ExtensionStatus from '../../components/ExtensionStatus';
 
 const AccountSettings = () => {
   const { username } = useAuth();
@@ -29,13 +28,7 @@ const AccountSettings = () => {
         </div>
       </div>
       
-      <div className="settings-section">
-        <h2>Browser Extension</h2>
-        <div className="setting-description">
-          Connect the Anime Stars browser extension to sync your card statistics and get enhanced features.
-        </div>
-        <ExtensionStatus />
-      </div>
+
       
       <div className="settings-section">
         <h2>Site Settings</h2>

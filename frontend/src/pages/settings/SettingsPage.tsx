@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import AccountSettings from './AccountSettings';
+import ExtensionSettings from './ExtensionSettings';
 import SessionsSettings from './SessionsSettings';
 import '../../styles/SettingsPage.css';
 
@@ -27,13 +28,16 @@ const SettingsPage = () => {
       id: 'account',
       label: 'Account',
       path: '/settings',
-      icon: '👤'
+    },
+    {
+      id: 'extension',
+      label: 'Browser Extension',
+      path: '/settings/extension',
     },
     {
       id: 'sessions',
       label: 'Sessions',
       path: '/settings/sessions',
-      icon: '🔐'
     }
   ];
 
@@ -57,7 +61,6 @@ const SettingsPage = () => {
                   navigate(tab.path);
                 }}
               >
-                <span className="nav-icon">{tab.icon}</span>
                 <span className="nav-label">{tab.label}</span>
               </a>
             ))}
@@ -67,6 +70,7 @@ const SettingsPage = () => {
         <div className="settings-content">
           <Routes>
             <Route path="/" element={<AccountSettings />} />
+            <Route path="/extension" element={<ExtensionSettings />} />
             <Route path="/sessions" element={<SessionsSettings />} />
             <Route path="*" element={<Navigate to="/settings" replace />} />
           </Routes>
