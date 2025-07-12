@@ -29,7 +29,7 @@ class BaseRepository(ABC):
         await session.commit()
 
     async def execute(self, stmt: Select):
-        async with self.session as session:
+        async with self.auto_commit() as session:
             result = await session.execute(stmt)
             return result
 

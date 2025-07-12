@@ -1,15 +1,17 @@
 import { useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import LoginForm from './LoginForm';
 
 const LoginPage = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      const from = location.state?.from || '/';
+      navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate]);
 

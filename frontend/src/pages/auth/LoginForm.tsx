@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
 
 
 const LoginForm = () => {
@@ -9,9 +8,7 @@ const LoginForm = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { login, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,14 +26,6 @@ const LoginForm = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      // Redirect to the page user was trying to access, or default to home
-      const from = location.state?.from || '/';
-      navigate(from, { replace: true });
-    }
-  }, [isAuthenticated, navigate, location.state]);
 
   return (
     <div className="login-form">
