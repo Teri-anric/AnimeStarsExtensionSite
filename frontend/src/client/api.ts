@@ -1057,6 +1057,19 @@ export interface IntegerEntryFilter {
     'not_in'?: Array<number> | null;
 }
 /**
+ * 
+ * @export
+ * @interface LogoutResponse
+ */
+export interface LogoutResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof LogoutResponse
+     */
+    'message': string;
+}
+/**
  * Order by for the pagination
  * @export
  * @interface OrderBy
@@ -1090,6 +1103,50 @@ export interface Property {
  * @interface Property1
  */
 export interface Property1 {
+}
+/**
+ * Response model for a single session
+ * @export
+ * @interface SessionResponse
+ */
+export interface SessionResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionResponse
+     */
+    'created_at': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionResponse
+     */
+    'expire_at': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SessionResponse
+     */
+    'is_current': boolean;
+}
+/**
+ * Response model for session revocation
+ * @export
+ * @interface SessionRevokeResponse
+ */
+export interface SessionRevokeResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionRevokeResponse
+     */
+    'message': string;
 }
 /**
  * 
@@ -1389,6 +1446,40 @@ export interface ValidationErrorLocInner {
 export const AuthApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Get all active sessions for the current user.
+         * @summary Get User Sessions
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserSessionsApiAuthSessionsGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/auth/sessions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Login
          * @param {string} username 
@@ -1457,7 +1548,7 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * 
+         * Logout the current user.
          * @summary Logout
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1560,6 +1651,44 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Revoke a specific session.
+         * @summary Revoke Session
+         * @param {string} sessionId The ID of the session to revoke
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        revokeSessionApiAuthSessionsSessionIdDelete: async (sessionId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sessionId' is not null or undefined
+            assertParamExists('revokeSessionApiAuthSessionsSessionIdDelete', 'sessionId', sessionId)
+            const localVarPath = `/api/auth/sessions/{session_id}`
+                .replace(`{${"session_id"}}`, encodeURIComponent(String(sessionId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication OAuth2PasswordBearer required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1570,6 +1699,18 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
 export const AuthApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AuthApiAxiosParamCreator(configuration)
     return {
+        /**
+         * Get all active sessions for the current user.
+         * @summary Get User Sessions
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserSessionsApiAuthSessionsGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<SessionResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserSessionsApiAuthSessionsGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.getUserSessionsApiAuthSessionsGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
         /**
          * 
          * @summary Login
@@ -1589,12 +1730,12 @@ export const AuthApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
+         * Logout the current user.
          * @summary Logout
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async logoutApiAuthLogoutPost(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async logoutApiAuthLogoutPost(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LogoutResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.logoutApiAuthLogoutPost(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AuthApi.logoutApiAuthLogoutPost']?.[localVarOperationServerIndex]?.url;
@@ -1625,6 +1766,19 @@ export const AuthApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['AuthApi.registerApiAuthRegisterPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * Revoke a specific session.
+         * @summary Revoke Session
+         * @param {string} sessionId The ID of the session to revoke
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async revokeSessionApiAuthSessionsSessionIdDelete(sessionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SessionRevokeResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.revokeSessionApiAuthSessionsSessionIdDelete(sessionId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.revokeSessionApiAuthSessionsSessionIdDelete']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -1635,6 +1789,15 @@ export const AuthApiFp = function(configuration?: Configuration) {
 export const AuthApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AuthApiFp(configuration)
     return {
+        /**
+         * Get all active sessions for the current user.
+         * @summary Get User Sessions
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserSessionsApiAuthSessionsGet(options?: RawAxiosRequestConfig): AxiosPromise<Array<SessionResponse>> {
+            return localVarFp.getUserSessionsApiAuthSessionsGet(options).then((request) => request(axios, basePath));
+        },
         /**
          * 
          * @summary Login
@@ -1651,12 +1814,12 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.loginApiAuthLoginPost(username, password, grantType, scope, clientId, clientSecret, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Logout the current user.
          * @summary Logout
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        logoutApiAuthLogoutPost(options?: RawAxiosRequestConfig): AxiosPromise<any> {
+        logoutApiAuthLogoutPost(options?: RawAxiosRequestConfig): AxiosPromise<LogoutResponse> {
             return localVarFp.logoutApiAuthLogoutPost(options).then((request) => request(axios, basePath));
         },
         /**
@@ -1678,6 +1841,16 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
         registerApiAuthRegisterPost(userCreate: UserCreate, options?: RawAxiosRequestConfig): AxiosPromise<UserResponse> {
             return localVarFp.registerApiAuthRegisterPost(userCreate, options).then((request) => request(axios, basePath));
         },
+        /**
+         * Revoke a specific session.
+         * @summary Revoke Session
+         * @param {string} sessionId The ID of the session to revoke
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        revokeSessionApiAuthSessionsSessionIdDelete(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<SessionRevokeResponse> {
+            return localVarFp.revokeSessionApiAuthSessionsSessionIdDelete(sessionId, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -1688,6 +1861,17 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
  * @extends {BaseAPI}
  */
 export class AuthApi extends BaseAPI {
+    /**
+     * Get all active sessions for the current user.
+     * @summary Get User Sessions
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public getUserSessionsApiAuthSessionsGet(options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).getUserSessionsApiAuthSessionsGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Login
@@ -1706,7 +1890,7 @@ export class AuthApi extends BaseAPI {
     }
 
     /**
-     * 
+     * Logout the current user.
      * @summary Logout
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1737,6 +1921,18 @@ export class AuthApi extends BaseAPI {
      */
     public registerApiAuthRegisterPost(userCreate: UserCreate, options?: RawAxiosRequestConfig) {
         return AuthApiFp(this.configuration).registerApiAuthRegisterPost(userCreate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Revoke a specific session.
+     * @summary Revoke Session
+     * @param {string} sessionId The ID of the session to revoke
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public revokeSessionApiAuthSessionsSessionIdDelete(sessionId: string, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).revokeSessionApiAuthSessionsSessionIdDelete(sessionId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

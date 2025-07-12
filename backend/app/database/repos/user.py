@@ -1,6 +1,7 @@
-from datetime import datetime
-from sqlalchemy import select, func
+from datetime import datetime, UTC
+from sqlalchemy import select, func, update
 from uuid import UUID, uuid4
+from typing import List
 
 from ..models.user import User, Token
 from .crud import CRUDRepository
@@ -24,11 +25,23 @@ class UserRepository(CRUDRepository[User, UUID]):
 
 class TokenRepository(CRUDRepository[Token, UUID]):
     async def deactivate_token(self, token_id: UUID) -> None:
-        db_token = await self.get_token(token_id)
-        if db_token:
-            db_token.is_active = False
-            await self.session.commit()
-            await self.session.refresh(db_token) 
+        await self.execute(
+            update(Token).where(Token.id == token_id).values(is_active=False)
+        )
+
+    async def get_active_sessions_by_user_id(self, user_id: UUID) -> List[Token]:
+        """Get all active sessions for a specific user"""
+        stmt = select(Token).where(
+            Token.user_id == user_id,
+            Token.expire_at > datetime.now(UTC).replace(tzinfo=None),
+            Token.is_active.is_(True),
+        ).order_by(Token.created_at.desc())
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+    async def get_token(self, token_id: UUID) -> Token | None:
+        """Get a specific token by ID"""
+        return await self.get(token_id)
 
     @property
     def entry_class(self) -> type[Token]:

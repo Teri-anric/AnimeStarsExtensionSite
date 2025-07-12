@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import axios from 'axios';
-import { DefaultApi } from '../client';
+import { AuthApi } from '../client';
 import { createAuthenticatedClient } from '../utils/apiClient';
 
 interface AuthContextType {
@@ -75,7 +75,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    // Call logout endpoint first
+    if (token) {
+      try {
+        const apiClient = createAuthenticatedClient(AuthApi);
+        await apiClient.logoutApiAuthLogoutPost();
+        console.log('Logout API call successful');
+      } catch (error) {
+        console.error('Logout API call failed:', error);
+        // Continue with local logout even if API call fails
+      }
+    }
+    
     // Clear token and user info
     localStorage.removeItem('token');
     localStorage.removeItem('username');
@@ -83,21 +95,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setToken(null);
     setIsAuthenticated(false);
     setUsername(null);
-    
-    // Optional: Call logout endpoint
-    if (token) {
-      try {
-        // Create authenticated API client
-        const apiClient = createAuthenticatedClient(DefaultApi);
-        
-        // Call logout endpoint using the client
-        apiClient.readRootGet()
-          .then(() => console.log('Logout successful'))
-          .catch(error => console.error('Logout API call failed:', error));
-      } catch (error) {
-        console.error('Error during logout:', error);
-      }
-    }
   };
 
   const value = {

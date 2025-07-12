@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useDomain } from '../../context/DomainContext';
 import ExtensionStatus from '../../components/ExtensionStatus';
@@ -60,6 +61,21 @@ const AccountSettingsPage = () => {
                 </option>
               ))}
             </select>
+          </div>
+        </div>
+        
+        <div className="settings-group">
+          <h2>Security & Sessions</h2>
+          <div className="setting-description">
+            Manage your account security and active sessions
+          </div>
+          <div className="setting-item">
+            <Link to="/sessions" className="settings-link-button">
+              Manage Active Sessions
+            </Link>
+            <div className="setting-description">
+              View and revoke active sessions from other devices
+            </div>
           </div>
         </div>
       </div>
