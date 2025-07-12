@@ -33,9 +33,6 @@ const Header = () => {
               <Link to="/settings" className="settings-link">
                 Settings
               </Link>
-              <Link to="/sessions" className="sessions-link">
-                Sessions
-              </Link>
               <button className="logout-button" onClick={logout}>
                 Logout
               </button>
