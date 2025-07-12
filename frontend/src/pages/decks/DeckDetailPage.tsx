@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Configuration, DeckApi, DeckDetailSchema, CardSchema } from '../../client';
+import { DeckApi, DeckDetailSchema, CardSchema } from '../../client';
 import '../../styles/DeckDetail.css';
 import Card from '../../components/Card';
 import CardInfoPanel from '../../components/CardInfoPanel';
+import { createAuthenticatedClient } from '../../utils/apiClient';
 
 const DeckDetailPage: React.FC = () => {
   const { anime_link } = useParams<{ anime_link: string }>();
@@ -30,13 +31,7 @@ const DeckDetailPage: React.FC = () => {
     try {
       setLoading(true);
       
-      const token = localStorage.getItem('token');
-      const config = new Configuration({
-        basePath: import.meta.env.VITE_API_URL,
-        accessToken: token || undefined
-      });
-      
-      const deckApi = new DeckApi(config);
+      const deckApi = createAuthenticatedClient(DeckApi);
       const response = await deckApi.getDeckDetailApiDeckDetailGet(decodedAnimeLink);
       
       setDeck(response.data);

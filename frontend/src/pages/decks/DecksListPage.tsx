@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Configuration, DeckApi, DeckSummarySchema, DeckQuery } from '../../client';
+import { DeckApi, DeckSummarySchema, DeckQuery } from '../../client';
 import PaginationPage, { PaginationResponse } from '../../components/PaginationPage';
 import { deckFilterConfig } from '../../config/deckFilterConfig';
 import Card from '../../components/Card';
 import '../../styles/Decks.css';
+import { createAuthenticatedClient } from '../../utils/apiClient';
 
 interface DecksListPageProps {
   onDeckSelect?: (animeLink: string) => void;
@@ -16,13 +17,7 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
 
   // API function for fetching decks
   const fetchDecks = async (query: DeckQuery): Promise<PaginationResponse<DeckSummarySchema>> => {
-    const token = localStorage.getItem('token');
-    const config = new Configuration({
-      basePath: import.meta.env.VITE_API_URL,
-      accessToken: token || undefined
-    });
-    
-    const deckApi = new DeckApi(config);
+    const deckApi = createAuthenticatedClient(DeckApi);
     const response = await deckApi.getDecksApiDeckPost(query);
     
     return {

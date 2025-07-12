@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import select, func
 from uuid import UUID, uuid4
 
@@ -16,18 +17,12 @@ class UserRepository(CRUDRepository[User, UUID]):
     async def get_user_by_username(self, username: str) -> User | None:
         return await self.scalar(select(User).where(func.lower(User.username) == username.lower()))
 
+    @property
     def entry_class(self) -> type[User]:
         return User
 
 
 class TokenRepository(CRUDRepository[Token, UUID]):
-    async def create_token(self, user_id: UUID) -> Token:
-        db_token = Token(id=uuid4(), user_id=user_id)
-        self.session.add(db_token)
-        await self.session.commit()
-        await self.session.refresh(db_token)
-        return db_token
-
     async def deactivate_token(self, token_id: UUID) -> None:
         db_token = await self.get_token(token_id)
         if db_token:
@@ -35,5 +30,6 @@ class TokenRepository(CRUDRepository[Token, UUID]):
             await self.session.commit()
             await self.session.refresh(db_token) 
 
+    @property
     def entry_class(self) -> type[Token]:
         return Token

@@ -7,9 +7,10 @@ from app.web.schema.deck import (
     DeckQuery
 )
 from app.web.deps import DeckRepositoryDep
+from app.web.auth.deps import ProtectedDep
 
 
-router = APIRouter(prefix="/deck", tags=["deck"])
+router = APIRouter(prefix="/deck", tags=["deck"], dependencies=[ProtectedDep])
 
 
 @router.post("/")

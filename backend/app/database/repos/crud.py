@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Iterable
 from abc import ABC, abstractmethod
 
 from sqlalchemy import select, delete, update
@@ -18,6 +18,9 @@ class CRUDRepository(BaseRepository, Generic[T, K], ABC):
 
     async def create(self, **kwargs) -> T:
         return await self.add(self.entry_class(**kwargs))
+    
+    async def create_bulk(self, objs: Iterable[T]) -> None:
+        await self.add_bulk(objs)
 
     async def get(self, id: K) -> T | None:
         return await self.scalar(

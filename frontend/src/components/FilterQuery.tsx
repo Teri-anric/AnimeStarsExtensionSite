@@ -368,6 +368,10 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
     }
   };
 
+  useEffect(() => {
+    handleShortFilterSearch({ preventDefault: () => {} } as React.FormEvent);
+  }, []);
+
   const renderShortFilter = () => (
     <div className="short-filter">
       <form onSubmit={handleShortFilterSearch} className="compact-form">

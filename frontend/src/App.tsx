@@ -13,6 +13,7 @@ import {
 import { DecksListPage, DeckDetailPage } from './pages/decks';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
+import ExtensionTokenModal from './components/ExtensionTokenModal';
 
 function App() {
   return (
@@ -66,6 +67,9 @@ function App() {
               </Routes>
             </main>
           </div>
+          
+          {/* Extension Token Modal - Always available for extension requests */}
+          <ExtensionTokenModal />
         </DomainProvider>
       </AuthProvider>
     </Router>

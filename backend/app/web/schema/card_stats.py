@@ -1,4 +1,5 @@
 from datetime import datetime
+from pydantic import Field
 from .base import BaseSchema
 from typing import Literal
 from ...database.enum import CardCollection
@@ -15,6 +16,18 @@ class CardUsersStatsSchema(BaseSchema):
     updated_at: datetime
 
 
+class CardUsersStatsAddSchema(BaseSchema):
+    card_id: int
+    collection: CardCollection
+    count: int
+    created_at: datetime = Field(default_factory=datetime.now, le=datetime.now())
+
+class CardUsersStatsAddRequest(BaseSchema):
+    stats: list[CardUsersStatsAddSchema]
+
+class CardUsersStatsAddResponse(BaseSchema):
+    status: Literal["ok", "error"]
+    message: str | None = None
 
 CardUsersStatsSort = Literal["id", "card_id", "collection", "count", "created_at", "updated_at"] 
 

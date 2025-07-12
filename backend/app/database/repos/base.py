@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import Select
 from ..connection import get_session_factory
-from typing import Any
+from typing import Any, Iterable
 
 
 class BaseRepository(ABC):
@@ -49,3 +49,8 @@ class BaseRepository(ABC):
             await session.commit()
             await session.refresh(obj)
             return obj
+
+    async def add_bulk(self, objs: Iterable[Any]):
+        async with self.session as session:
+            session.add_all(objs)
+            await session.commit()

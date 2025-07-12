@@ -1,0 +1,262 @@
+/* Extension Status Component Styles */
+.extension-status {
+  background-color: var(--ui-bg-2);
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  padding: 1rem;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.status-icon {
+  font-size: 1.2rem;
+  min-width: 24px;
+  text-align: center;
+}
+
+.status-text {
+  flex: 1;
+}
+
+.status-version {
+  color: #aaa;
+  font-weight: 400;
+  font-size: 0.8rem;
+  background-color: var(--ui-bg);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--main-border-radius);
+  border: 1px solid var(--bdc-3);
+}
+
+/* Status Classes */
+.status-connected {
+  color: #4caf50;
+}
+
+.status-connecting {
+  color: #ff9800;
+}
+
+.status-warning {
+  color: #ff9800;
+}
+
+.status-disconnected {
+  color: #f44336;
+}
+
+/* Status Details */
+.status-details {
+  border-top: 1px solid var(--bdc-3);
+  padding-top: 1rem;
+}
+
+.status-message {
+  padding: 1rem;
+  border-radius: var(--main-border-radius);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.status-message:last-child {
+  margin-bottom: 0;
+}
+
+.status-message.info {
+  background-color: rgba(33, 150, 243, 0.1);
+  border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.status-message.warning {
+  background-color: rgba(255, 152, 0, 0.1);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.status-message.success {
+  background-color: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.status-message.error {
+  background-color: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.status-message p {
+  margin: 0 0 1rem 0;
+  color: #ddd;
+}
+
+.status-message p:last-child {
+  margin-bottom: 0;
+}
+
+/* Connection Info */
+.connection-info h4 {
+  margin: 0 0 0.75rem 0;
+  color: #4caf50;
+  font-size: 1.1rem;
+}
+
+.connection-info p {
+  margin: 0 0 1rem 0;
+  color: #ddd;
+}
+
+.features-active {
+  margin-top: 1rem;
+}
+
+.features-active h5 {
+  margin: 0 0 0.5rem 0;
+  color: var(--accent);
+  font-size: 0.95rem;
+}
+
+.features-active ul {
+  margin: 0;
+  padding: 0 0 0 1rem;
+  list-style: none;
+}
+
+.features-active li {
+  margin-bottom: 0.25rem;
+  color: #ddd;
+  font-size: 0.85rem;
+}
+
+/* Buttons */
+.install-button,
+.connect-button,
+.reconnect-button,
+.retry-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--main-border-radius);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 120px;
+}
+
+.install-button {
+  background-color: var(--accent);
+  color: white;
+}
+
+.install-button:hover:not(:disabled) {
+  background-color: var(--accent-s);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+}
+
+.connect-button {
+  background-color: #ff9800;
+  color: white;
+}
+
+.connect-button:hover:not(:disabled) {
+  background-color: #f57c00;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.reconnect-button {
+  background-color: transparent;
+  color: #aaa;
+  border: 1px solid var(--bdc-3);
+}
+
+.reconnect-button:hover:not(:disabled) {
+  background-color: var(--ui-bg);
+  color: white;
+  border-color: #555;
+}
+
+.retry-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.retry-button:hover:not(:disabled) {
+  background-color: #d32f2f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+.install-button:disabled,
+.connect-button:disabled,
+.reconnect-button:disabled,
+.retry-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Compact version for header or small spaces */
+.extension-status.compact {
+  padding: 0.5rem;
+  background-color: transparent;
+  border: none;
+}
+
+.extension-status.compact .status-indicator {
+  margin-bottom: 0;
+  font-size: 0.8rem;
+}
+
+.extension-status.compact .status-details {
+  display: none;
+}
+
+.extension-status.compact .status-icon {
+  font-size: 1rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .extension-status {
+    padding: 0.75rem;
+  }
+  
+  .status-indicator {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .status-message {
+    padding: 0.75rem;
+  }
+  
+  .install-button,
+  .connect-button,
+  .reconnect-button,
+  .retry-button {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  
+  .features-active ul {
+    padding-left: 0.5rem;
+  }
+}
+
+/* Animation for connecting state */
+.status-connecting .status-icon {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+} 
