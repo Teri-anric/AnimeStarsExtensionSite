@@ -10,3 +10,12 @@ class RateLimitError(AnimestarError):
 
 class LoginError(AnimestarError):
     pass
+
+
+class LoginHashError(AnimestarError):
+    def __init__(self, url: str):
+        self.url = url
+        super().__init__(f"Failed to get login hash for {url}")
+
+class PMError(AnimestarError):
+    pass
