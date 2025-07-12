@@ -1,7 +1,10 @@
 import { Configuration, DefaultApi, HealthApi, CardApi, DeckApi, CardStatsApi } from '../client';
-
+import { setupAuthInterceptor } from './authInterceptor';
 
 const basePath = import.meta.env.VITE_API_URL;
+
+// Setup auth interceptor
+setupAuthInterceptor();
 
 /**
  * Creates an authenticated API client with the stored token

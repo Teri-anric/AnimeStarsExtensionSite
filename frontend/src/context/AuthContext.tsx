@@ -2,6 +2,7 @@ import { createContext, useState, useContext, ReactNode, useEffect } from 'react
 import axios from 'axios';
 import { DefaultApi } from '../client';
 import { createAuthenticatedClient } from '../utils/apiClient';
+import { setupAuthInterceptor, setLogoutFunction, checkTokenValidity } from '../utils/authInterceptor';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -32,18 +33,36 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Initialize auth state from localStorage
+  // Setup auth interceptor on component mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUsername = localStorage.getItem('username');
-    
-    if (storedToken) {
-      setToken(storedToken);
-      setIsAuthenticated(true);
-      setUsername(storedUsername);
-    }
-    
-    setLoading(false);
+    setupAuthInterceptor();
+  }, []);
+
+  // Initialize auth state from localStorage and validate token
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const storedToken = localStorage.getItem('token');
+      const storedUsername = localStorage.getItem('username');
+      
+      if (storedToken) {
+        // Check if token is still valid
+        const isValid = await checkTokenValidity();
+        
+        if (isValid) {
+          setToken(storedToken);
+          setIsAuthenticated(true);
+          setUsername(storedUsername);
+        } else {
+          // Token is invalid, clear storage
+          localStorage.removeItem('token');
+          localStorage.removeItem('username');
+        }
+      }
+      
+      setLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
@@ -99,6 +118,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     }
   };
+
+  // Set logout function for interceptor
+  useEffect(() => {
+    setLogoutFunction(logout);
+  }, []);
 
   const value = {
     isAuthenticated,
