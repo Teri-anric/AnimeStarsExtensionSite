@@ -39,6 +39,13 @@ class ParserSettings(BaseSettings):
     base_url: str | None = None
 
 
+class PMSettings(BaseSettings):
+    cookie_file: str = "cookie.json"
+    login: str = "teri-test"
+    password: str = "testtest"
+    code_expire_hours: int = 1
+
+
 class AuthSettings(BaseSettings):
     secret_key: str = token_hex(32)
     algorithm: str = "HS256"
@@ -50,6 +57,7 @@ class Settings(BaseSettings):
 
     database: DatabaseSettings
     parser: ParserSettings = Field(default_factory=ParserSettings)
+    pm: PMSettings = Field(default_factory=PMSettings)
     auth: AuthSettings = Field(default_factory=AuthSettings)
 
 
