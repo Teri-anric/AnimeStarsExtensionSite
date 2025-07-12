@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, UTC
 from sqlalchemy import Column, String, DateTime, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 
-from .base import Base, UUIDPKMixin, TimestampMixin
+from .base import Base, UUIDPKMixin
 from ...config import settings
 
 
@@ -11,7 +11,7 @@ def default_expire_at():
     return expire_at.replace(tzinfo=None)
 
 
-class VerificationCode(UUIDPKMixin, TimestampMixin, Base):
+class VerificationCode(UUIDPKMixin, Base):
     __tablename__ = "verification_codes"
 
     username = Column(String, nullable=False, index=True)
@@ -19,6 +19,7 @@ class VerificationCode(UUIDPKMixin, TimestampMixin, Base):
     expire_at = Column(DateTime, nullable=False, default=default_expire_at)
     is_used = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     @property
     def is_expired(self) -> bool:

@@ -83,9 +83,61 @@ async def cleanup_expired_codes(
         verification_service = VerificationService(db)
         await verification_service.cleanup_expired_codes()
         
-        return {"message": "Застарілі коди успішно видалено"}
+        return {"message": "Застарілі коди успішно деактивовано"}
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Помилка при очищенні кодів: {str(e)}"
+        )
+
+
+@router.post("/delete-expired", response_model=dict)
+async def delete_expired_codes(
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete expired verification codes."""
+    try:
+        verification_service = VerificationService(db)
+        await verification_service.delete_expired_codes()
+        
+        return {"message": "Застарілі коди успішно видалено"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Помилка при видаленні кодів: {str(e)}"
+        )
+
+
+@router.post("/cleanup-old", response_model=dict)
+async def cleanup_old_codes(
+    days_old: int = 7,
+    db: AsyncSession = Depends(get_db)
+):
+    """Clean up old verification codes."""
+    try:
+        verification_service = VerificationService(db)
+        await verification_service.cleanup_old_codes(days_old)
+        
+        return {"message": f"Коди старіше {days_old} днів успішно видалено"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Помилка при очищенні старих кодів: {str(e)}"
+        )
+
+
+@router.get("/stats", response_model=dict)
+async def get_verification_stats(
+    db: AsyncSession = Depends(get_db)
+):
+    """Get verification codes statistics."""
+    try:
+        verification_service = VerificationService(db)
+        stats = await verification_service.get_stats()
+        
+        return stats
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Помилка при отриманні статистики: {str(e)}"
         )
