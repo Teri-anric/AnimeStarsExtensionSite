@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy import select, func
 from uuid import UUID, uuid4
+from typing import List
 
 from ..models.user import User, Token
 from .crud import CRUDRepository
@@ -28,7 +29,20 @@ class TokenRepository(CRUDRepository[Token, UUID]):
         if db_token:
             db_token.is_active = False
             await self.session.commit()
-            await self.session.refresh(db_token) 
+            await self.session.refresh(db_token)
+
+    async def get_active_sessions_by_user_id(self, user_id: UUID) -> List[Token]:
+        """Get all active sessions for a specific user"""
+        stmt = select(Token).where(
+            Token.user_id == user_id,
+            Token.is_active == True
+        ).order_by(Token.created_at.desc())
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+    async def get_token(self, token_id: UUID) -> Token | None:
+        """Get a specific token by ID"""
+        return await self.get(token_id)
 
     @property
     def entry_class(self) -> type[Token]:

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 
 const LoginForm = () => {
@@ -11,6 +11,7 @@ const LoginForm = () => {
   
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,15 +27,16 @@ const LoginForm = () => {
       setError('An error occurred during login.');
     } finally {
       setLoading(false);
-      navigate('/');
     }
   };
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      // Redirect to the page user was trying to access, or default to home
+      const from = location.state?.from || '/';
+      navigate(from, { replace: true });
     }
-  }, []);
+  }, [isAuthenticated, navigate, location.state]);
 
   return (
     <div className="login-form">
