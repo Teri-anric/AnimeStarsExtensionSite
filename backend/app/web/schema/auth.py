@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
+from typing import List
 
 
 class UserBase(BaseModel):
@@ -32,3 +33,18 @@ class UserResponse(UserBase):
     
     class Config:
         from_attributes = True
+
+
+class LogoutResponse(BaseModel):
+    message: str
+
+
+class AuthError(BaseModel):
+    detail: str
+
+
+class ValidationError(BaseModel):
+    detail: str
+    loc: List[str]
+    msg: str
+    type: str
