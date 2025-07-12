@@ -5,8 +5,9 @@ import httpx
 from http.cookiejar import LWPCookieJar
 from bs4 import BeautifulSoup
 
-from ..exception import AnimestarError
+from ..exception import AnimestarError, LoginHashError
 from ..types import PaginatedBase
+from ..utils import extract_login_hash
 
 from app.config import settings
 
@@ -27,9 +28,21 @@ class AnimestarBaseRepo(AbstractAsyncContextManager):
         self._client: httpx.AsyncClient | None = None
         self.base_url = base_url or settings.parser.base_url or DEFAULT_BASE_URL
         self.proxy = proxy or settings.parser.proxy or DEFAULT_PROXY
+        self.users_hash: dict[str, str] = {}
+
 
     async def index(self) -> httpx.Response:
         return await self.client().get("/")
+
+        
+    async def get_user_hash(self, url: str = None) -> str:
+        url = url or "/"
+        if url not in self.users_hash:
+            if login_hash := extract_login_hash(await self.get_page(url)):
+                self.users_hash[url] = login_hash
+            else:
+                raise LoginHashError(url=url)
+        return self.users_hash[url]
 
 
     async def get_page(self, url: str, **kwargs) -> BeautifulSoup:

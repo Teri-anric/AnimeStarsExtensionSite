@@ -16,7 +16,7 @@ class AnimestarAuthRepo(AnimestarBaseRepo):
         Returns the username of the logged in user.
         Raises LoginError if the login fails.
         """
-        LOGIN_TITLE_SELECTOR = ".login__title"
+        LOGIN_TITLE_SELECTOR = ".lgn__name > span"
         data = from_data(
             {"login_name": username, "login_password": password, "login": "submit"}
         )
@@ -28,5 +28,8 @@ class AnimestarAuthRepo(AnimestarBaseRepo):
             raise RateLimitError(*find_message_info(page))
         if "Ошибка авторизации".encode() not in page:
             soup = BeautifulSoup(page, "html.parser")
-            return soup.select_one(LOGIN_TITLE_SELECTOR).text.strip()
+            elm = soup.select_one(LOGIN_TITLE_SELECTOR)
+            if elm:
+                raise LoginError("Not found login title")
+            return elm.text.strip()
         raise LoginError(*find_message_info(page))
