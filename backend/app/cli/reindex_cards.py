@@ -3,11 +3,13 @@ from app.database.repos.card import CardRepository
 from app.database.repos.animestars_user import AnimestarsUserRepo
 from app.parser.repos.cards import AnimestarCardsRepo
 from app.parser.exception import AnimestarError
+from app.database.repos.health import HealthRepository
 from logging import getLogger, StreamHandler, INFO
 import traceback
 import asyncio
 from urllib.parse import urlparse
 import random
+from datetime import datetime, UTC
 
 logger = getLogger(__name__)
 logger.setLevel(INFO)
@@ -16,6 +18,7 @@ logger.addHandler(StreamHandler())
 card_repo = CardRepository()
 user_repo = AnimestarsUserRepo()
 cards_repo = AnimestarCardsRepo()
+health_repo = HealthRepository()
 
 def url_path(url: str | None) -> str | None:
     if not url:
@@ -93,6 +96,7 @@ async def update_cards_by_page(page: int = 1) -> CardPaginationResponse | None:
 
 async def reindex_cards():
     page = 1
+    start_at = datetime.now(UTC).replace(tzinfo=None)
     while True:
         new_cards = await update_cards_by_page(page)
         if not new_cards:
@@ -102,6 +106,10 @@ async def reindex_cards():
             break
         page += 1
 
+    total_cards_count = await health_repo.get_total_cards_count()
+    await card_repo.delete_by({"updated_at": {"lt": start_at}})
+    total_cards_count_after = await health_repo.get_total_cards_count()
+    logger.info(f"Total cards count: {total_cards_count} -> {total_cards_count_after} (deleted: {total_cards_count - total_cards_count_after})")
 
 if __name__ == "__main__":
     asyncio.run(reindex_cards())
