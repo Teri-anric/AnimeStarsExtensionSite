@@ -5,11 +5,12 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     select,
-    func,
+    func
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import column_property
-from ...enum import CardType
+from sqlalchemy.ext.hybrid import hybrid_property
+from ...enum import CardType, CardCollection
 from ..base import Base, TimestampMixin, UUIDPKMixin
 from .user import AnimestarsUser
 from .card_users_stats import CardUsersStats
@@ -35,8 +36,6 @@ class Card(Base, UUIDPKMixin, TimestampMixin):
     mp4: str = Column(String, nullable=True)
     webm: str = Column(String, nullable=True)
 
-    has_stats = column_property(
-        select(func.count(CardUsersStats.id) > 0).where(
-            CardUsersStats.card_id == card_id
-        )
+    stats_count = column_property(
+        select(func.count(CardUsersStats.id)).where(CardUsersStats.card_id == card_id)
     )

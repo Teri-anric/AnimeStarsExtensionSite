@@ -29,7 +29,7 @@ export const cardFilterConfig: EntityFilterConfig = {
     { value: 'webm', label: 'WebM Path', type: 'string' },
     { value: 'created_at', label: 'Created Date', type: 'datetime' },
     { value: 'updated_at', label: 'Updated Date', type: 'datetime' },
-    { value: 'has_stats', label: 'Has Stats', type: 'boolean' }
+    { value: 'stats_count', label: 'Stats Count', type: 'number' }
   ],
 
   shortFilterFields: [

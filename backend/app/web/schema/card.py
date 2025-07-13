@@ -70,7 +70,7 @@ class CardFilter(BaseFilter):
     created_at: DateTimeEntryFilter | None = None
     updated_at: DateTimeEntryFilter | None = None
 
-    has_stats: BooleanEntryFilter | None = None
+    stats_count: IntegerEntryFilter | None = None
 
 
 class CardQuery(BasePaginationQuery[CardFilter, CardSort | str]):
