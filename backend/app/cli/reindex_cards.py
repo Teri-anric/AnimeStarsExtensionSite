@@ -104,6 +104,7 @@ async def reindex_cards():
             continue
         if new_cards.last_page == page:
             break
+        await asyncio.sleep(60 + random.randint(0, 60))
         page += 1
 
     total_cards_count = await health_repo.get_total_cards_count()
