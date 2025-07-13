@@ -3,7 +3,6 @@ from app.database.repos.card import CardRepository
 from app.database.repos.animestars_user import AnimestarsUserRepo
 from app.parser.repos.cards import AnimestarCardsRepo
 from app.parser.exception import AnimestarError
-from app.database.repos.health import HealthRepository
 from logging import getLogger, StreamHandler, INFO
 import traceback
 import asyncio
@@ -18,7 +17,7 @@ logger.addHandler(StreamHandler())
 card_repo = CardRepository()
 user_repo = AnimestarsUserRepo()
 cards_repo = AnimestarCardsRepo()
-health_repo = HealthRepository()
+
 
 def url_path(url: str | None) -> str | None:
     if not url:
@@ -26,16 +25,17 @@ def url_path(url: str | None) -> str | None:
     parsed_url = urlparse(url)
     return parsed_url.path
 
+
 async def update_cards_by_page(page: int = 1) -> CardPaginationResponse | None:
     try:
         logger.info(f"Getting cards from animestars.org page {page}")
         new_cards = await cards_repo.get_cards(page=page)
         logger.info(f"Retrieved {len(new_cards.cards)} cards")
-        
+
         if not new_cards or not new_cards.cards:
             logger.warning("No cards received from API")
             return None
-            
+
     except AnimestarError as e:
         logger.error(f"AnimestarError: {e}")
         return False
@@ -58,8 +58,6 @@ async def update_cards_by_page(page: int = 1) -> CardPaginationResponse | None:
             # update & create card
             db_card = await card_repo.get_by_card_id(card.id)
             if db_card:
-                logger.info(f"{db_card.id} {db_card}")
-                logger.info(f"Updating card {card.id}")
                 await card_repo.update(
                     db_card.id,
                     name=card.name,
@@ -89,8 +87,10 @@ async def update_cards_by_page(page: int = 1) -> CardPaginationResponse | None:
             logger.error(f"Error processing card {card.id}: {e}")
             logger.error(traceback.format_exc())
             continue
-    
-    logger.info(f"Cards update completed. Successfully processed: {successfully_processed}/{len(new_cards.cards)}")
+
+    logger.info(
+        f"Cards update completed. Successfully processed: {successfully_processed}/{len(new_cards.cards)}"
+    )
     return new_cards
 
 
@@ -104,13 +104,12 @@ async def reindex_cards():
             continue
         if new_cards.last_page == page:
             break
-        await asyncio.sleep(60 + random.randint(0, 60))
+        await asyncio.sleep(5 + random.randint(0, 15))
         page += 1
 
-    total_cards_count = await health_repo.get_total_cards_count()
-    await card_repo.delete_by({"updated_at": {"lt": start_at}})
-    total_cards_count_after = await health_repo.get_total_cards_count()
-    logger.info(f"Total cards count: {total_cards_count} -> {total_cards_count_after} (deleted: {total_cards_count - total_cards_count_after})")
+    deleted_count = await card_repo.delete_by({"updated_at": {"lt": start_at}})
+    logger.info(f"Deleted {deleted_count} cards")
+
 
 if __name__ == "__main__":
     asyncio.run(reindex_cards())
