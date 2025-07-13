@@ -1,25 +1,28 @@
+import { useTranslation } from 'react-i18next';
 import ExtensionStatus from '../../components/ExtensionStatus';
 import '../../styles/settings/ExtensionSettings.css';
 
 const ExtensionSettings = () => {
+  const { t } = useTranslation();
+  
   return (
     <div className="extension-settings-content">
       <div className="settings-section">
-        <h2>Browser Extension</h2>
+        <h2>{t('settings.browserExtension')}</h2>
         <div className="setting-description">
-          Connect the Anime Stars browser extension to sync your card statistics and get enhanced features.
+          {t('settings.extensionDescription')}
         </div>
         <ExtensionStatus />
       </div>
       
       <div className="settings-section">
-        <h3>Installation</h3>
+        <h3>{t('settings.installation')}</h3>
         <div className="installation-steps">
           <div className="step">
             <span className="step-number">1</span>
             <div className="step-content">
-              <h4>Download Extension</h4>
-              <p>Download the Anime Stars browser extension from the Chrome Web Store or GitHub releases.</p>
+              <h4>{t('settings.downloadExtension')}</h4>
+              <p>{t('settings.downloadExtensionDescription')}</p>
               <div className="download-buttons">
                 <a 
                   href="https://chromewebstore.google.com/detail/animestar-extension/ocpbplnohadkjdindnodcmpmjboifjae" 
@@ -28,7 +31,7 @@ const ExtensionSettings = () => {
                   className="download-button chrome-store-button"
                 >
                   <img src="/icons/chrome_web_store.ico" alt="Chrome Web Store" className="button-icon" />
-                  <span>Chrome Web Store</span>
+                  <span>{t('settings.chromeWebStore')}</span>
                 </a>
                 <a 
                   href="https://github.com/Teri-anric/AnimeStarsExtensions/releases/latest" 
@@ -37,7 +40,7 @@ const ExtensionSettings = () => {
                   className="download-button github-button"
                 >
                   <img src="/github-mark/github-mark-white.svg" alt="GitHub" className="button-icon" />
-                  <span>GitHub (Firefox XPI)</span>
+                  <span>{t('settings.githubFirefoxXpi')}</span>
                 </a>
               </div>
             </div>
@@ -45,15 +48,15 @@ const ExtensionSettings = () => {
           <div className="step">
             <span className="step-number">2</span>
             <div className="step-content">
-              <h4>Install Extension</h4>
-              <p>For Chrome: Follow the installation instructions in the Chrome Web Store. For Firefox: Download the XPI file from GitHub and install it manually.</p>
+              <h4>{t('settings.installExtension')}</h4>
+              <p>{t('settings.installExtensionDescription')}</p>
             </div>
           </div>
           <div className="step">
             <span className="step-number">3</span>
             <div className="step-content">
-              <h4>Connect Account</h4>
-              <p>Use the extension token above to connect your account.</p>
+              <h4>{t('settings.connectAccount')}</h4>
+              <p>{t('settings.connectAccountDescription')}</p>
             </div>
           </div>
         </div>

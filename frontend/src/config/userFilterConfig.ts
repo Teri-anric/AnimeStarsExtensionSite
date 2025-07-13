@@ -1,24 +1,24 @@
 import { FieldOption } from '../types/filter';
 
 export const userFieldOptions: FieldOption[] = [
-  { value: 'id', label: 'User ID', type: 'number' },
-  { value: 'username', label: 'Username', type: 'string' },
-  { value: 'email', label: 'Email', type: 'string' },
+  { value: 'id', label: 'filterConfig.userId', type: 'number' },
+  { value: 'username', label: 'filterConfig.username', type: 'string' },
+  { value: 'email', label: 'filterConfig.email', type: 'string' },
   { 
     value: 'is_active', 
-    label: 'Is Active', 
+    label: 'filterConfig.isActive', 
     type: 'boolean'
   },
   { 
     value: 'role', 
-    label: 'Role', 
+    label: 'filterConfig.role', 
     type: 'enum',
     enumOptions: [
-      { value: 'admin', label: 'Administrator' },
-      { value: 'user', label: 'Regular User' },
-      { value: 'moderator', label: 'Moderator' }
+      { value: 'admin', label: 'filterConfig.administrator' },
+      { value: 'user', label: 'filterConfig.regularUser' },
+      { value: 'moderator', label: 'filterConfig.moderator' }
     ]
   },
-  { value: 'created_at', label: 'Registration Date', type: 'datetime' },
-  { value: 'last_login', label: 'Last Login', type: 'datetime' }
+  { value: 'created_at', label: 'filterConfig.registrationDate', type: 'datetime' },
+  { value: 'last_login', label: 'filterConfig.lastLogin', type: 'datetime' }
 ]; 

@@ -1,11 +1,12 @@
 /**
  * Formats a date string into a human-readable "time ago" format
  * @param dateString - The date string to format (can be null/undefined)
- * @param options - Optional configuration for the formatting
+ * @param t - Translation function (optional)
  * @returns A human-readable string like "2h ago", "3d ago", etc.
  */
 export const formatTimeAgo = (
   dateString: string | null | undefined,
+  t?: (key: string) => string
 ): string | undefined => {
   if (!dateString) return undefined;
   if (!dateString.includes('Z')) dateString += 'Z';
@@ -15,7 +16,7 @@ export const formatTimeAgo = (
     const date = new Date(dateString);
     const diffInMs = now.getTime() - date.getTime();
 
-    if (diffInMs < 0) return 'Future date';
+    if (diffInMs < 0) return t ? t('dateTime.futureDate') : 'Future date';
 
     const diffInSeconds = Math.floor(diffInMs / 1000);
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
@@ -26,21 +27,28 @@ export const formatTimeAgo = (
     const diffInYears = Math.floor(diffInDays / 365);
 
     if (diffInSeconds <= 1) {
-      return 'Just now';
+      return t ? t('dateTime.justNow') : 'Just now';
     } else if (diffInSeconds < 60) {
-      return `${diffInSeconds}s ago`;
+      const suffix = t ? t('dateTime.secondsAgo') : 's ago';
+      return `${diffInSeconds}${suffix}`;
     } else if (diffInMinutes < 60) {
-      return `${diffInMinutes}m ago`;
+      const suffix = t ? t('dateTime.minutesAgo') : 'm ago';
+      return `${diffInMinutes}${suffix}`;
     } else if (diffInHours < 24) {
-      return `${diffInHours}h ago`;
+      const suffix = t ? t('dateTime.hoursAgo') : 'h ago';
+      return `${diffInHours}${suffix}`;
     } else if (diffInDays < 7) {
-      return `${diffInDays}d ago`;
+      const suffix = t ? t('dateTime.daysAgo') : 'd ago';
+      return `${diffInDays}${suffix}`;
     } else if (diffInWeeks < 5) {
-      return `${diffInWeeks}w ago`;
+      const suffix = t ? t('dateTime.weeksAgo') : 'w ago';
+      return `${diffInWeeks}${suffix}`;
     } else if (diffInMonths < 12) {
-      return `${diffInMonths}mo ago`;
+      const suffix = t ? t('dateTime.monthsAgo') : 'mo ago';
+      return `${diffInMonths}${suffix}`;
     } else {
-      return `${diffInYears}y ago`;
+      const suffix = t ? t('dateTime.yearsAgo') : 'y ago';
+      return `${diffInYears}${suffix}`;
     }
   } catch {
     return undefined;

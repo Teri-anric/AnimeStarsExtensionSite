@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AuthApi } from '../../client/api';
 import { createAuthenticatedClient } from '../../utils/apiClient';
 import { UsernameStep, VerificationStep, PasswordStep } from './Register';
+import { useTranslation } from 'react-i18next';
 
 interface RegisterFormProps {
   onSuccess: () => void;
@@ -16,10 +17,11 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const { t } = useTranslation();
 
   const handleSendVerificationCode = async () => {
     if (!username.trim()) {
-      setError('Please enter your username');
+      setError(t('auth.pleaseEnterUsername'));
       return;
     }
 
@@ -33,13 +35,13 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         setCurrentStep('verification');
       }
     } catch (err: any) {
-      setError('Failed to send verification code. Please try again.');
+      setError(t('auth.failedToSendVerificationCode'));
     }
   };
 
   const handleVerifyCode = async () => {
     if (!verificationCode.trim()) {
-      setError('Please enter the verification code');
+      setError(t('auth.pleaseEnterVerificationCode'));
       return;
     }
 
@@ -52,10 +54,10 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       if (response.data.success) {
         setCurrentStep('password');
       } else {
-        setError(response.data.message || 'Invalid verification code');
+        setError(response.data.message || t('auth.invalidVerificationCode'));
       }
     } catch (err: any) {
-      setError('Failed to verify code. Please try again.');
+      setError(t('auth.failedToVerifyCode'));
     }
   };
 
@@ -64,7 +66,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     setError('');
     
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.passwordsDoNotMatch'));
       return;
     }
 
@@ -76,7 +78,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         onSuccess();
       }
     } catch (err: any) {
-      setError('Registration failed. Please try again.');
+      setError(t('auth.registrationFailed'));
     }
   };
 

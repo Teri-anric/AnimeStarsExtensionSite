@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import FilterQuery from './FilterQuery';
 import { EntityFilterConfig, GenericFilter } from '../types/filter';
+import { useTranslation } from 'react-i18next';
 import '../styles/PaginationPage.css';
 
 // Generic pagination response interface
@@ -69,6 +70,15 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
   paginationInfoTemplate
 }: PaginationPageProps<T, F, Q>) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation();
+
+  // Function to translate labels
+  const translateLabel = (label: string): string => {
+    if (label.startsWith('filterConfig.') || label.startsWith('cards.') || label.startsWith('decks.') || label.startsWith('ranks.')) {
+      return t(label);
+    }
+    return label;
+  };
   
   // State management
   const [items, setItems] = useState<T[]>([]);
@@ -154,7 +164,7 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
       setLoading(false);
     } catch (err) {
       console.error('Error fetching data:', err);
-      setError(`Failed to fetch ${filterConfig.entityName.toLowerCase()}. Please try again later.`);
+      setError(t('pagination.error', { entityName: filterConfig.entityName.toLowerCase() }));
       setLoading(false);
     }
   };
@@ -241,7 +251,7 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
           disabled={page <= 1}
           className="pagination-button"
         >
-          Previous
+          {t('pagination.previousPage')}
         </button>
         
         <div className="pagination-info">
@@ -251,16 +261,16 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
                 <span 
                   className="pagination-text clickable-page-info" 
                   onClick={handlePageInputToggle}
-                  title="Click to jump to page"
+                  title={t('paginationPage.clickToJumpToPage')}
                 >
                   {paginationInfoTemplate 
                     ? paginationInfoTemplate(page, totalPages, total)
-                    : `Page ${page} of ${totalPages} (${total} total)`
+                    : `${t('pagination.page')} ${page} ${t('pagination.of')} ${totalPages} (${total} ${t('pagination.items')})`
                   }
                 </span>
               ) : (
                 <div className="page-input-container">
-                  <span className="page-input-label">Go to page:</span>
+                  <span className="page-input-label">{t('pagination.goToPage')}:</span>
                   <input
                     type="text"
                     value={pageInputValue}
@@ -285,7 +295,7 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
                     disabled={!pageInputValue || parseInt(pageInputValue) < 1 || parseInt(pageInputValue) > totalPages}
                     className="page-input-submit"
                   >
-                    Go
+                    {t('common.ok')}
                   </button>
                   <button
                     onClick={() => {
@@ -307,7 +317,7 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
           disabled={page >= totalPages}
           className="pagination-button"
         >
-          Next
+          {t('pagination.nextPage')}
         </button>
       </div>
     );
@@ -317,7 +327,7 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
     if (loading) {
       return loadingComponent || (
         <div className="pagination-page-loading">
-          Loading {filterConfig.entityName.toLowerCase()}...
+          {t('paginationPage.loadingEntity', { entityName: filterConfig.entityName.toLowerCase() })}
         </div>
       );
     }
@@ -333,7 +343,7 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
     if (items.length === 0) {
       return emptyComponent || (
         <div className="pagination-page-empty">
-          No {filterConfig.entityName.toLowerCase()} found matching your criteria.
+          {t('paginationPage.noItems')}
         </div>
       );
     }
@@ -345,7 +355,7 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
     <div className={`pagination-page ${className}`}>
       <div className="pagination-page-header">
         <div className="pagination-page-title-section">
-          {title && <h1 className="pagination-page-title">{title}</h1>}
+          {title && <h1 className="pagination-page-title">{translateLabel(title)}</h1>}
           {headerActions && <div className="pagination-page-actions">{headerActions}</div>}
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   GenericFilter, 
   FilterRule, 
@@ -251,8 +252,18 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
   onClose, 
   initialFilter, 
   fieldOptions,
-  title = 'Advanced Filter'
+  title
 }) => {
+  const { t } = useTranslation();
+  const defaultTitle = t('advancedFilter.title');
+
+  // Function to translate labels
+  const translateLabel = (label: string): string => {
+    if (label.startsWith('filterConfig.') || label.startsWith('cards.') || label.startsWith('decks.') || label.startsWith('ranks.')) {
+      return t(label);
+    }
+    return label;
+  };
   const [groups, setGroups] = useState<FilterGroup[]>(() => {
     if (initialFilter) {
       return parseFilterToGroups(initialFilter, fieldOptions);
@@ -567,7 +578,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
     const fieldType = getFieldType(rule.field);
     
     if (rule.operator === 'is_null') {
-      return <span className="null-indicator">No value needed</span>;
+      return <span className="null-indicator">{t('advancedFilter.noValueNeeded')}</span>;
     }
 
     // Array field handling
@@ -578,7 +589,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
             type="number"
             value={rule.value}
             onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
-            placeholder="Number of items"
+            placeholder={t('advancedFilter.numberOfItems')}
             className="filter-input"
             min="0"
           />
@@ -586,7 +597,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
       } else if (rule.operator === 'any' || rule.operator === 'all') {
         const subEntityConfig = getSubEntityConfig(rule.field);
         if (!subEntityConfig) {
-          return <span className="null-indicator">No sub-entity config</span>;
+          return <span className="null-indicator">{t('advancedFilter.noSubEntityConfig')}</span>;
         }
 
         // Get the selected sub-entity field info
@@ -600,7 +611,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
               onChange={(e) => updateRule(groupId, rule.id, 'subEntity', e.target.value)}
               className="filter-input sub-entity-field"
             >
-              <option value="">Select field...</option>
+              <option value="">{t('advancedFilter.selectField')}</option>
               {subEntityConfig.fieldOptions.map(option => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -632,7 +643,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
                   onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
                   className="filter-input sub-entity-value"
                 >
-                  <option value="">Select value...</option>
+                  <option value="">{t('advancedFilter.selectValue')}</option>
                   {selectedSubField.enumOptions?.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -647,7 +658,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
                   placeholder={
                     rule.subEntityOperator === 'in' || rule.subEntityOperator === 'not_in' 
                       ? 'value1,value2,value3'
-                      : 'Enter value...'
+                      : t('advancedFilter.enterValue')
                   }
                   className="filter-input sub-entity-value"
                 />
@@ -656,7 +667,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
           </div>
         );
       }
-      return <span className="null-indicator">Select operator first</span>;
+      return <span className="null-indicator">{t('advancedFilter.selectOperatorFirst')}</span>;
     }
 
     // DateTime operators that don't need input
@@ -671,7 +682,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
           type="number"
           value={rule.value}
           onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
-          placeholder="Number of days..."
+          placeholder={t('advancedFilter.numberOfDays')}
           className="filter-input"
           min="1"
         />
@@ -698,9 +709,9 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
           onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
           className="filter-input"
         >
-          <option value="">Select value...</option>
-          <option value="true">True</option>
-          <option value="false">False</option>
+          <option value="">{t('advancedFilter.selectValue')}</option>
+          <option value="true">{t('advancedFilter.true')}</option>
+          <option value="false">{t('advancedFilter.false')}</option>
         </select>
       );
     }
@@ -714,10 +725,10 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
           onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
           className="filter-input"
         >
-          <option value="">Select value...</option>
+          <option value="">{t('advancedFilter.selectValue')}</option>
           {enumOptions.map(option => (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {translateLabel(option.label)}
             </option>
           ))}
         </select>
@@ -748,7 +759,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
         type={fieldType === 'number' ? 'number' : 'text'}
         value={rule.value}
         onChange={(e) => updateRule(groupId, rule.id, 'value', e.target.value)}
-        placeholder="Enter value..."
+        placeholder={t('advancedFilter.enterValue')}
         className="filter-input"
       />
     );
@@ -757,7 +768,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
   return (
     <div className="advanced-filter">
       <div className="advanced-filter-header">
-        <h3>{title}</h3>
+        <h3>{title || defaultTitle}</h3>
         <button onClick={onClose} className="close-button">×</button>
       </div>
 
@@ -766,7 +777,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
           <div key={group.id} className="filter-group">
             <div className="filter-group-header">
               {groupIndex > 0 && (
-                <div className="group-connector">AND</div>
+                <div className="group-connector">{t('advancedFilter.and')}</div>
               )}
               
               <div className="filter-group-controls">
@@ -775,8 +786,8 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
                   onChange={(e) => updateGroupOperator(group.id, e.target.value as 'and' | 'or')}
                   className="group-operator"
                 >
-                  <option value="and">AND</option>
-                  <option value="or">OR</option>
+                  <option value="and">{t('advancedFilter.and')}</option>
+                  <option value="or">{t('advancedFilter.or')}</option>
                 </select>
                 
                 {groups.length > 1 && (
@@ -800,7 +811,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
                   >
                     {fieldOptions.map(option => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {translateLabel(option.label)}
                       </option>
                     ))}
                   </select>
@@ -823,7 +834,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
                     onClick={() => removeRule(group.id, rule.id)}
                     className="remove-rule-button"
                   >
-                    Remove
+                    {t('advancedFilter.remove')}
                   </button>
                 </div>
               ))}
@@ -832,7 +843,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
                 onClick={() => addRule(group.id)}
                 className="add-rule-button-small"
               >
-                Add Rule to Group
+                {t('advancedFilter.addRuleToGroup')}
               </button>
             </div>
           </div>
@@ -842,16 +853,16 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
       <div className="filter-actions">
         <div className="filter-group-actions">
           <button onClick={addGroup} className="add-group-button">
-            Add Group
+            {t('advancedFilter.addGroup')}
           </button>
         </div>
         
         <div className="filter-buttons">
           <button onClick={clearFilter} className="clear-button">
-            Clear
+            {t('advancedFilter.clear')}
           </button>
           <button onClick={applyFilter} className="apply-button">
-            Apply Filter
+            {t('advancedFilter.applyFilter')}
           </button>
         </div>
       </div>

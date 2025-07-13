@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiClipboard, FiExternalLink } from 'react-icons/fi';
 import { CardApi, CardSchema } from '../../client';
 import { useDomain } from '../../context/DomainContext';
+import { useTranslation } from 'react-i18next';
 import { formatTimeAgo, formatDateTime } from '../../utils/dateUtils';
 import CardStatsChart from '../../components/CardStatsChart';
 import '../../styles/CardDetail.css';
@@ -12,6 +13,7 @@ const CardDetailPage: React.FC = () => {
   const { cardId } = useParams<{ cardId: string }>();
   const navigate = useNavigate();
   const { currentDomain } = useDomain();
+  const { t } = useTranslation();
   const [card, setCard] = useState<CardSchema | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +37,7 @@ const CardDetailPage: React.FC = () => {
       setCard(response.data);
     } catch (err) {
       console.error('Error fetching card:', err);
-      setError('Failed to load card data. Please try again.');
+      setError(t('cardDetail.failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -78,7 +80,7 @@ const CardDetailPage: React.FC = () => {
   if (loading) {
     return (
       <div className="card-detail-container">
-        <div className="loading">Loading card details...</div>
+        <div className="loading">{t('cardDetail.loadingDetails')}</div>
       </div>
     );
   }
@@ -89,7 +91,7 @@ const CardDetailPage: React.FC = () => {
         <div className="card-detail-error">
           <p>{error}</p>
           <button onClick={() => navigate(-1)} className="back-button">
-            <FiArrowLeft /> Back
+            <FiArrowLeft /> {t('common.back')}
           </button>
         </div>
       </div>
@@ -99,12 +101,12 @@ const CardDetailPage: React.FC = () => {
   if (!card) {
     return (
       <div className="card-detail-container">
-        <div className="card-detail-error">
-          <p>Card not found.</p>
-          <button onClick={() => navigate(-1)} className="back-button">
-            <FiArrowLeft /> Back
-          </button>
-        </div>
+              <div className="card-detail-error">
+        <p>{t('cardDetail.cardNotFound')}</p>
+        <button onClick={() => navigate(-1)} className="back-button">
+          <FiArrowLeft /> {t('common.back')}
+        </button>
+      </div>
       </div>
     );
   }
@@ -113,9 +115,9 @@ const CardDetailPage: React.FC = () => {
     <div className="card-detail-container">
       <div className="card-detail-header">
         <button onClick={() => navigate(-1)} className="back-button">
-          <FiArrowLeft /> Back
+          <FiArrowLeft /> {t('common.back')}
         </button>
-        <h1>Card Details</h1>
+        <h1>{t('cardDetail.cardDetails')}</h1>
       </div>
 
       <div className="card-detail-content">
@@ -138,7 +140,7 @@ const CardDetailPage: React.FC = () => {
                 className="card-detail-video"
               >
                 <source src={getCardMediaUrl(card.mp4)} type="video/mp4" />
-                Your browser does not support the video tag.
+                {t('cards.videoNotSupported')}
               </video>
             )}
             {card.webm && !card.mp4 && (
@@ -151,7 +153,7 @@ const CardDetailPage: React.FC = () => {
                 className="card-detail-video"
               >
                 <source src={getCardMediaUrl(card.webm)} type="video/webm" />
-                Your browser does not support the video tag.
+                {t('cards.videoNotSupported')}
               </video>
             )}
           </div>
@@ -161,14 +163,14 @@ const CardDetailPage: React.FC = () => {
           <div className="card-detail-main-info">
             <div className="card-info-grid">
               <div className="info-row">
-                <strong>Card Name:</strong>
+                <strong>{t('cardDetail.cardName')}:</strong>
                 <div className="value-with-actions">
                   <span>{card.name}</span>
                   <div className="action-buttons">
                     <div 
                       onClick={() => copyToClipboard(card.name)}
                       className="copy-button"
-                      title="Copy Card Name"
+                      title={t('cardDetail.copyCardName')}
                     >
                       <FiClipboard />
                     </div>
@@ -177,14 +179,14 @@ const CardDetailPage: React.FC = () => {
               </div>
 
               <div className="info-row">
-                <strong>Card ID:</strong>
+                <strong>{t('cardDetail.cardId')}:</strong>
                 <div className="value-with-actions">
                   <span>{card.card_id}</span>
                   <div className="action-buttons">
                     <div 
                       onClick={() => copyToClipboard(card.card_id.toString())}
                       className="copy-button"
-                      title="Copy Card ID"
+                      title={t('cardDetail.copyCardId')}
                     >
                       <FiClipboard />
                     </div>
@@ -193,7 +195,7 @@ const CardDetailPage: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="external-link"
-                      title="View on Anisite"
+                      title={t('cardDetail.viewOnAnisite')}
                     >
                       <FiExternalLink />
                     </a>
@@ -202,14 +204,14 @@ const CardDetailPage: React.FC = () => {
               </div>
 
               <div className="info-row">
-                <strong>External ID:</strong>
+                <strong>{t('cardDetail.externalId')}:</strong>
                 <div className="value-with-actions">
                   <span>{card.id}</span>
                   <div className="action-buttons">
                     <div 
                       onClick={() => copyToClipboard(card.id)}
                       className="copy-button"
-                      title="Copy External ID"
+                      title={t('cardDetail.copyExternalId')}
                     >
                       <FiClipboard />
                     </div>
@@ -219,14 +221,14 @@ const CardDetailPage: React.FC = () => {
 
               {card.author && (
                 <div className="info-row">
-                  <strong>Author:</strong>
+                  <strong>{t('cardDetail.author')}:</strong>
                   <div className="value-with-actions">
                     <span>{card.author}</span>
                     <div className="action-buttons">
                       <div 
                         onClick={() => copyToClipboard(card.author || '')}
                         className="copy-button"
-                        title="Copy Author"
+                        title={t('cardDetail.copyAuthor')}
                       >
                         <FiClipboard />
                       </div>
@@ -235,7 +237,7 @@ const CardDetailPage: React.FC = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="external-link"
-                        title="View Author's Cards"
+                        title={t('cardDetail.viewAuthorsCards')}
                       >
                         <FiExternalLink />
                       </a>
@@ -246,14 +248,14 @@ const CardDetailPage: React.FC = () => {
 
               {card.anime_name && (
                 <div className="info-row">
-                  <strong>Anime:</strong>
+                  <strong>{t('cardDetail.anime')}:</strong>
                   <div className="value-with-actions">
                     <span>{card.anime_name}</span>
                     <div className="action-buttons">
                       <div 
                         onClick={() => copyToClipboard(card.anime_name || '')}
                         className="copy-button"
-                        title="Copy Anime Name"
+                        title={t('cardDetail.copyAnimeName')}
                       >
                         <FiClipboard />
                       </div>
@@ -263,7 +265,7 @@ const CardDetailPage: React.FC = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="external-link"
-                          title="View Anime"
+                          title={t('cardDetail.viewAnime')}
                         >
                           <FiExternalLink />
                         </a>
@@ -275,14 +277,14 @@ const CardDetailPage: React.FC = () => {
 
               {card.anime_link && (
                 <div className="info-row">
-                  <strong>Anime Link:</strong>
+                  <strong>{t('cardDetail.animeLink')}:</strong>
                   <div className="value-with-actions">
                     <span>{card.anime_link}</span>
                     <div className="action-buttons">
                       <div 
                         onClick={() => copyToClipboard(card.anime_link || '')}
                         className="copy-button"
-                        title="Copy Anime Link"
+                        title={t('cardDetail.copyAnimeLink')}
                       >
                         <FiClipboard />
                       </div>
@@ -293,13 +295,13 @@ const CardDetailPage: React.FC = () => {
 
               {card.created_at && (
                 <div className="info-row">
-                  <strong>Created:</strong>
+                  <strong>{t('cardDetail.created')}:</strong>
                   <div className="value-with-actions">
                     <span>
                       {formatDateTime(card.created_at)}
-                      {formatTimeAgo(card.created_at) && (
+                      {formatTimeAgo(card.created_at, t) && (
                         <span style={{ color: 'var(--tt-2)', fontSize: '13px', marginLeft: '8px' }}>
-                          ({formatTimeAgo(card.created_at)})
+                          ({formatTimeAgo(card.created_at, t)})
                         </span>
                       )}
                     </span>
@@ -309,13 +311,13 @@ const CardDetailPage: React.FC = () => {
 
               {card.updated_at && (
                 <div className="info-row">
-                  <strong>Updated:</strong>
+                  <strong>{t('cardDetail.updated')}:</strong>
                   <div className="value-with-actions">
                     <span>
                       {formatDateTime(card.updated_at)}
-                      {formatTimeAgo(card.updated_at) && (
+                      {formatTimeAgo(card.updated_at, t ) && (
                         <span style={{ color: 'var(--tt-2)', fontSize: '13px', marginLeft: '8px' }}>
-                          ({formatTimeAgo(card.updated_at)})
+                          ({formatTimeAgo(card.updated_at, t)})
                         </span>
                       )}
                     </span>
@@ -328,7 +330,7 @@ const CardDetailPage: React.FC = () => {
       </div>
 
       <div className="card-stats-section">
-        <h3>Card Statistics</h3>
+        <h3>{t('cardDetail.cardStatistics')}</h3>
         <CardStatsChart cardId={parseInt(cardId!)} />
       </div>
     </div>

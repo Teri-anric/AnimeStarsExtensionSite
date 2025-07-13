@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createAuthenticatedClient } from "../../utils/apiClient";
 import { HealthApi } from "../../client";
+import { useTranslation } from 'react-i18next';
 import { formatTime, formatCurrentTime } from "../../utils/dateUtils";
 import { formatNumber } from "../../utils/formatUtils";
 
@@ -37,6 +38,7 @@ const fetchGif = async (reaction: string) => {
 };
 
 const RandomAnimeGifPage = () => {
+    const { t } = useTranslation();
     const [gif, setGif] = useState<string>('');
     const [currentReaction, setCurrentReaction] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(true);
@@ -82,7 +84,7 @@ const RandomAnimeGifPage = () => {
             } catch (error) {
                 console.error('Health check failed:', error);
                 setHealthInfo({
-                    status: 'Error connecting to backend',
+                    status: t('randomGif.errorConnectingBackend'),
                     ping: 0,
                     uptime_formatted: 'N/A',
                     database_stats: {
@@ -129,7 +131,7 @@ const RandomAnimeGifPage = () => {
     };
 
     if (loading && !gif) {
-        return <div className="loading-container">Loading...</div>;
+        return <div className="loading-container">{t('randomGif.loading')}</div>;
     }
 
     return (
@@ -137,13 +139,13 @@ const RandomAnimeGifPage = () => {
             <div className="gif-main-content">
                 <div className="gif-controls">
                     <button onClick={fetchNewGif} disabled={loading} className="btn btn-primary refresh-btn">
-                        {loading ? 'Loading...' : 'New GIF'}
+                        {loading ? t('randomGif.loadingGif') : t('randomGif.newGif')}
                     </button>
                     <button 
                         onClick={() => setShowHistory(!showHistory)} 
                         className="btn btn-secondary history-btn"
                     >
-                        {showHistory ? 'Hide History' : 'Show History'} ({gifHistory.length})
+                        {showHistory ? t('randomGif.hideHistory') : t('randomGif.showHistory')} ({gifHistory.length})
                     </button>
                 </div>
 
@@ -152,16 +154,16 @@ const RandomAnimeGifPage = () => {
                         <div className="gif-container">
                             <img src={gif} alt="Random Anime Gif" className="anime-gif" />
                             <div className="gif-info">
-                                <span className="reaction-tag">Reaction: {currentReaction}</span>
+                                <span className="reaction-tag">{t('randomGif.reaction')}: {currentReaction}</span>
                             </div>
                         </div>
                     )}
-                    {!gif && !loading && <div className="error-message">Failed to load GIF</div>}
+                    {!gif && !loading && <div className="error-message">{t('randomGif.failedToLoadGif')}</div>}
                 </div>
 
                 {showHistory && (
                     <div className="gif-history">
-                        <h3>GIF History</h3>
+                        <h3>{t('randomGif.gifHistory')}</h3>
                         <div className="history-grid">
                             {gifHistory.map((item) => (
                                 <div key={item.id} className="history-item" onClick={() => loadFromHistory(item)}>
@@ -178,50 +180,50 @@ const RandomAnimeGifPage = () => {
             </div>
 
             <div className="status-panel">
-                <h3>System Status</h3>
+                <h3>{t('randomGif.systemStatus')}</h3>
                 {healthInfo && (
                     <div className="status-info">
                         <div className="status-item">
-                            <span className="status-label">Status:</span>
+                            <span className="status-label">{t('randomGif.status')}:</span>
                             <span className={`status-value ${healthInfo.status === 'healthy' ? 'status-healthy' : 'status-error'}`}>
                                 {healthInfo.status}
                             </span>
                         </div>
 
                         <div className="status-item">
-                            <span className="status-label">Response Time:</span>
+                            <span className="status-label">{t('randomGif.responseTime')}:</span>
                             <span className="status-value">{healthInfo.ping} ms</span>
                         </div>
 
                         <div className="status-item">
-                            <span className="status-label">Uptime:</span>
+                            <span className="status-label">{t('randomGif.uptime')}:</span>
                             <span className="status-value">{healthInfo.uptime_formatted}</span>
                         </div>
 
                         {healthInfo.database_stats && (
                             <div className="status-section">
-                                <h4>Database Stats</h4>
+                                <h4>{t('randomGif.databaseStats')}</h4>
                                 <div className="status-item">
-                                    <span className="status-label">Total Cards:</span>
+                                    <span className="status-label">{t('randomGif.totalCards')}:</span>
                                     <span className="status-value">{formatNumber(healthInfo.database_stats.total_cards)}</span>
                                 </div>
                                 <div className="status-item">
-                                    <span className="status-label">Total Users:</span>
+                                    <span className="status-label">{t('randomGif.totalUsers')}:</span>
                                     <span className="status-value">{formatNumber(healthInfo.database_stats.total_users)}</span>
                                 </div>
                                 <div className="status-item">
-                                    <span className="status-label">Cards with Stats:</span>
+                                    <span className="status-label">{t('randomGif.cardsWithStats')}:</span>
                                     <span className="status-value">{formatNumber(healthInfo.database_stats.cards_with_stats)}</span>
                                 </div>
                                 <div className="status-item">
-                                    <span className="status-label">Stats Today:</span>
+                                    <span className="status-label">{t('randomGif.statsToday')}:</span>
                                     <span className="status-value">{formatNumber(healthInfo.database_stats.cards_stats_today)}</span>
                                 </div>
                             </div>
                         )}
 
                         <div className="status-item timestamp">
-                            <span className="status-label">Last Updated:</span>
+                            <span className="status-label">{t('randomGif.lastUpdated')}:</span>
                             <span className="status-value">
                                 {formatCurrentTime()}
                             </span>

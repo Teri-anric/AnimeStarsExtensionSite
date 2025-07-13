@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface VerificationStepProps {
   username: string;
   verificationCode: string;
@@ -15,22 +17,24 @@ const VerificationStep = ({
   onVerifyCode, 
   onBackToUsername 
 }: VerificationStepProps) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="register-step">
-      <h2>Step 2: Enter Verification Code</h2>
-      <p>We've sent a verification code to your Animestar account via private message.</p>
-      <p><strong>Username:</strong> {username}</p>
+      <h2>{t('registration.step2Title')}</h2>
+      <p>{t('registration.step2Description')}</p>
+      <p><strong>{t('auth.username')}:</strong> {username}</p>
       
       {error && <div className="error-message">{error}</div>}
       
       <div className="form-group">
-        <label htmlFor="verification-code">Verification Code</label>
+        <label htmlFor="verification-code">{t('verificationStep.verificationCode')}</label>
         <input
           type="text"
           id="verification-code"
           value={verificationCode}
           onChange={(e) => onVerificationCodeChange(e.target.value)}
-          placeholder="Enter 6-digit code"
+          placeholder={t('registration.enterVerificationCode')}
           maxLength={6}
           required
         />
@@ -42,7 +46,7 @@ const VerificationStep = ({
           onClick={onBackToUsername}
           className="secondary-button"
         >
-          Back
+          {t('common.back')}
         </button>
         <button 
           type="button" 
@@ -50,7 +54,7 @@ const VerificationStep = ({
           disabled={!verificationCode.trim()} 
           className="submit-button"
         >
-          Verify Code
+          {t('registration.verifyCode')}
         </button>
       </div>
     </div>

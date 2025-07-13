@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface UsernameStepProps {
   username: string;
   error: string;
@@ -6,20 +8,22 @@ interface UsernameStepProps {
 }
 
 const UsernameStep = ({ username, error, onUsernameChange, onSendVerificationCode }: UsernameStepProps) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="register-step">
-      <h2>Step 1: Enter Your Username</h2>
-      <p>Enter your username from the Animestars website to start registration. Please note that usernames are case-sensitive.</p>
+      <h2>{t('registration.step1Title')}</h2>
+      <p>{t('registration.step1Description')}</p>
       {error && <div className="error-message">{error}</div>}
       
       <div className="form-group">
-        <label htmlFor="reg-username">Username</label>
+        <label htmlFor="reg-username">{t('auth.username')}</label>
         <input
           type="text"
           id="reg-username"
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
-          placeholder="Enter your Animestar username"
+          placeholder={t('registration.enterUsername')}
           required
         />
       </div>
@@ -30,7 +34,7 @@ const UsernameStep = ({ username, error, onUsernameChange, onSendVerificationCod
         disabled={!username.trim()} 
         className="submit-button"
       >
-        Send Verification Code
+        {t('registration.sendVerificationCode')}
       </button>
     </div>
   );
