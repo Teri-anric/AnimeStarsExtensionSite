@@ -15,7 +15,7 @@ class HealthRepository(BaseRepository):
 
     async def get_total_cards_with_stats_count(self) -> int:
         return await self.scalar(
-            select(func.count(CardUsersStats.id)).group_by(CardUsersStats.card_id)
+            select(func.count(Card.id)).where(Card.has_stats.is_(True))
         )
 
     async def get_total_cards_stats_count(self) -> int:
