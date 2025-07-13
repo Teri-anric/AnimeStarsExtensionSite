@@ -3,36 +3,37 @@ import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-
 import AccountSettings from './AccountSettings';
 import ExtensionSettings from './ExtensionSettings';
 import SessionsSettings from './SessionsSettings';
+import { useTranslation } from 'react-i18next';
 import '../../styles/settings/index.css';
-
-
-const SETTINGS_TABS = [
-  {
-    id: 'account',
-    label: 'Account',
-    path: '/settings',
-  },
-  {
-    id: 'extension',
-    label: 'Browser Extension',
-    path: '/settings/extension',
-  },
-  {
-    id: 'sessions',
-    label: 'Sessions',
-    path: '/settings/sessions',
-  }
-];
 
 
 const SettingsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(() => {
     const path = location.pathname;
     const tab = SETTINGS_TABS.find(tab => path === tab.path);
     return tab?.id || 'account';
   });
+  
+  const SETTINGS_TABS = [
+    {
+      id: 'account',
+      label: t('navigation.account'),
+      path: '/settings',
+    },
+    {
+      id: 'extension',
+      label: t('navigation.extension'),
+      path: '/settings/extension',
+    },
+    {
+      id: 'sessions',
+      label: t('navigation.sessions'),
+      path: '/settings/sessions',
+    }
+  ];
 
   useEffect(() => {
     const path = location.pathname;
@@ -43,7 +44,7 @@ const SettingsPage = () => {
   return (
     <div className="settings-page">
       <div className="settings-header">
-        <h1>Settings</h1>
+        <h1>{t('settings.title')}</h1>
       </div>
       
       <div className="settings-layout">

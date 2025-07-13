@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 
 const LoginForm = () => {
@@ -9,6 +10,7 @@ const LoginForm = () => {
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,10 +20,10 @@ const LoginForm = () => {
     try {
       const success = await login(username, password);
       if (!success) {
-        setError('Login failed. Please check your credentials.');
+        setError(t('auth.loginFailed'));
       }
     } catch (err) {
-      setError('An error occurred during login.');
+      setError(t('auth.loginError'));
     } finally {
       setLoading(false);
     }
@@ -29,12 +31,12 @@ const LoginForm = () => {
 
   return (
     <div className="login-form">
-      <h2>Login</h2>
+      <h2>{t('auth.login')}</h2>
       {error && <div className="error-message">{error}</div>}
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">{t('auth.username')}</label>
           <input
             type="text"
             id="username"
@@ -45,7 +47,7 @@ const LoginForm = () => {
         </div>
         
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">{t('auth.password')}</label>
           <input
             type="password"
             id="password"
@@ -56,7 +58,7 @@ const LoginForm = () => {
         </div>
         
         <button type="submit" disabled={loading} className="submit-button">
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? t('auth.loggingIn') : t('auth.login')}
         </button>
       </form>
     </div>

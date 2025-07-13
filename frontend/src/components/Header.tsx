@@ -1,9 +1,12 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 import '../styles/Header.css';
 
 const Header = () => {
   const { isAuthenticated, username, logout } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <header className="app-header">
@@ -14,33 +17,34 @@ const Header = () => {
       {isAuthenticated && (
         <nav className="main-nav">
           <NavLink to="/cards" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
-            Cards
+            {t('navigation.cards')}
           </NavLink>
           <NavLink to="/decks" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
-            Decks
+            {t('navigation.decks')}
           </NavLink>
           <NavLink to="/random-gif" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
-            Random GIF
+            {t('navigation.randomGif')}
           </NavLink>
         </nav>
       )}
       
       <nav className="user-nav">
+        <LanguageSwitcher />
         {isAuthenticated ? (
           <div className="user-menu">
-            <span className="username">Welcome, {username}</span>
+            <span className="username">{t('auth.welcomeUser', { username })}</span>
             <div className="user-actions">
               <Link to="/settings" className="settings-link">
-                Settings
+                {t('common.settings')}
               </Link>
               <button className="logout-button" onClick={logout}>
-                Logout
+                {t('auth.logout')}
               </button>
             </div>
           </div>
         ) : (
           <Link to="/login" className="login-button">
-            Login
+            {t('auth.login')}
           </Link>
         )}
       </nav>

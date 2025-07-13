@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import '../styles/components/ExtensionTokenModal.css';
 
 interface TokenRequestData {
@@ -23,6 +24,7 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
   const [isVisible, setIsVisible] = useState(forcedVisible || false);
   const [requestData, setRequestData] = useState<TokenRequestData | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Listen for extension token requests
@@ -162,15 +164,15 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
       <div className="extension-token-modal-overlay">
         <div className="extension-token-modal">
           <div className="modal-header">
-            <h3>Extension Access Request</h3>
+            <h3>{t('extension.accessRequest')}</h3>
             <button className="close-button" onClick={handleClose}>×</button>
           </div>
           <div className="modal-content">
             <div className="extension-icon">🔌</div>
-            <p>The Anime Stars Extension is requesting access, but you need to log in first.</p>
+            <p>{t('extension.needLoginFirst')}</p>
             <div className="modal-actions">
-              <button className="deny-button" onClick={() => handleDeny('User not logged in')}>
-                Close
+              <button className="deny-button" onClick={() => handleDeny(t('extension.userNotLoggedIn'))}>
+                {t('common.close')}
               </button>
             </div>
           </div>
@@ -183,7 +185,7 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
     <div className="extension-token-modal-overlay">
       <div className="extension-token-modal">
         <div className="modal-header">
-          <h3>Connect Browser Extension</h3>
+          <h3>{t('extension.title')}</h3>
           <button className="close-button" onClick={handleClose}>×</button>
         </div>
         
@@ -191,55 +193,53 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
           <div className="extension-icon">🔌</div>
           
           <div className="request-info">
-            <h4>Extension Access Request</h4>
+            <h4>{t('extension.accessRequest')}</h4>
             <p>
-              The <strong>Anime Stars Extension</strong> is requesting access to your account 
-              to provide enhanced features like card statistics and data synchronization.
+              {t('extension.requestDescription')}
             </p>
             
             {requestData && (
               <div className="request-details">
-                <small>Request from: {requestData.extensionId}</small>
+                <small>{t('extension.requestFrom', { extensionId: requestData.extensionId })}</small>
               </div>
             )}
           </div>
 
           <div className="features-list">
-            <h5>This will allow the extension to:</h5>
+            <h5>{t('extension.featuresTitle')}</h5>
             <ul>
-              <li>✅ Fetch card statistics from the API</li>
-              <li>✅ Synchronize card data</li>
-              <li>✅ Access your saved preferences</li>
-              <li>❌ Modify your account data</li>
-              <li>❌ Access sensitive information</li>
+              <li>✅ {t('extension.featureFetchStats')}</li>
+              <li>✅ {t('extension.featureSyncData')}</li>
+              <li>✅ {t('extension.featureAccessPreferences')}</li>
+              <li>❌ {t('extension.featureNoModifyData')}</li>
+              <li>❌ {t('extension.featureNoSensitiveInfo')}</li>
             </ul>
           </div>
 
           <div className="user-info">
-            <p>Sharing access for: <strong>{username}</strong></p>
+            <p>{t('extension.sharingFor', { username })}</p>
           </div>
 
           <div className="modal-actions">
             <button 
               className="deny-button" 
-              onClick={() => handleDeny('User denied access')}
+              onClick={() => handleDeny(t('extension.userDeniedAccess'))}
               disabled={isProcessing}
             >
-              Deny Access
+              {t('extension.denyAccess')}
             </button>
             <button 
               className="approve-button" 
               onClick={handleApprove}
               disabled={isProcessing}
             >
-              {isProcessing ? 'Connecting...' : 'Allow Access'}
+              {isProcessing ? t('extension.connecting') : t('extension.allowAccess')}
             </button>
           </div>
 
           <div className="security-note">
             <small>
-              🔒 Your token will only be shared with the verified Anime Stars Extension. 
-              You can revoke access anytime by logging out.
+              🔒 {t('extension.securityNote')}
             </small>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { CardSchema, CardType } from '../client';
 import { useDomain } from '../context/DomainContext';
+import { useTranslation } from 'react-i18next';
 
 interface CardProps {
   card: CardSchema;
@@ -18,6 +19,7 @@ const Card: React.FC<CardProps> = ({
   canOpenFullPage = true
 }) => {
   const { currentDomain } = useDomain();
+  const { t } = useTranslation();
 
   const getCardMediaUrl = (path: string | null) => {
     if (!path) return '';
@@ -60,7 +62,7 @@ const Card: React.FC<CardProps> = ({
           <div className="card-video">
             <video autoPlay loop muted playsInline>
               <source src={getCardMediaUrl(card.mp4)} type="video/mp4" />
-              Your browser does not support the video tag.
+              {t('cards.videoNotSupported')}
             </video>
           </div>
         )}

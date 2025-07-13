@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface PasswordStepProps {
   username: string;
   password: string;
@@ -19,36 +21,38 @@ const PasswordStep = ({
   onSubmit, 
   onBackToVerification 
 }: PasswordStepProps) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="register-step">
-      <h2>Step 3: Create Password</h2>
-      <p>Create a password for your account.</p>
-      <p><strong>Username:</strong> {username}</p>
+      <h2>{t('registration.step3Title')}</h2>
+      <p>{t('registration.step3Description')}</p>
+      <p><strong>{t('auth.username')}:</strong> {username}</p>
       
       {error && <div className="error-message">{error}</div>}
       
       <form onSubmit={onSubmit}>
         <input name="username" value={username} style={{ display: 'none' }} />
         <div className="form-group">
-          <label htmlFor="reg-password">Password</label>
+          <label htmlFor="reg-password">{t('auth.password')}</label>
           <input
             type="password"
             id="reg-password"
             value={password}
             onChange={(e) => onPasswordChange(e.target.value)}
-            placeholder="Enter your password"
+            placeholder={t('registration.enterPassword')}
             required
           />
         </div>
         
         <div className="form-group">
-          <label htmlFor="confirm-password">Confirm Password</label>
+          <label htmlFor="confirm-password">{t('auth.confirmPassword')}</label>
           <input
             type="password"
             id="confirm-password"
             value={confirmPassword}
             onChange={(e) => onConfirmPasswordChange(e.target.value)}
-            placeholder="Confirm your password"
+            placeholder={t('registration.confirmPassword')}
             required
           />
         </div>
@@ -59,13 +63,13 @@ const PasswordStep = ({
             onClick={onBackToVerification}
             className="secondary-button"
           >
-            Back
+            {t('common.back')}
           </button>
           <button 
             type="submit" 
             className="submit-button"
           >
-            Create Account
+            {t('registration.createAccount')}
           </button>
         </div>
       </form>

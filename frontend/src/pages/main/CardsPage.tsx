@@ -6,10 +6,12 @@ import PaginationPage, { PaginationResponse } from '../../components/PaginationP
 import { cardFilterConfig } from '../../config/cardFilterConfig';
 import Card from '../../components/Card';
 import CardInfoPanel from '../../components/CardInfoPanel';
+import { useTranslation } from 'react-i18next';
 import '../../styles/Cards.css';
 
 const CardsPage = () => {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   
   // Card info panel state
   const [selectedCard, setSelectedCard] = useState<CardSchema | null>(null);
@@ -56,7 +58,7 @@ const CardsPage = () => {
 
   // Custom loading component
   const loadingComponent = (
-    <div className="loading">Loading cards...</div>
+    <div className="loading">{t('cards.loadingCards')}</div>
   );
 
   // Custom error component
@@ -66,11 +68,11 @@ const CardsPage = () => {
 
   // Custom empty component
   const emptyComponent = (
-    <div className="no-cards">No cards found matching your criteria.</div>
+    <div className="no-cards">{t('cards.noCardsFound')}</div>
   );
 
   if (!isAuthenticated) {
-    return <div className="auth-message">Please log in to view cards.</div>;
+    return <div className="auth-message">{t('auth.pleaseLogIn')}</div>;
   }
 
   return (
@@ -79,7 +81,7 @@ const CardsPage = () => {
         fetchData={fetchCards}
         filterConfig={cardFilterConfig as any}
         renderItems={renderCards}
-        title="Anime Cards"
+        title={t('cards.title')}
         perPage={63}
         loadingComponent={loadingComponent}
         errorComponent={errorComponent}
