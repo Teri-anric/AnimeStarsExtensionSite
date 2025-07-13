@@ -1,72 +1,24 @@
-from datetime import datetime, UTC
-from sqlalchemy import select, update, and_
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from ..models import VerificationCode
-from .base import BaseRepository
+from .crud import CRUDRepository
+
+from sqlalchemy import select, and_
 
 
-class VerificationCodeRepository(BaseRepository):
-    def __init__(self, session: AsyncSession | None = None):
-        if session:
-            self.__session = session
+class VerificationCodeRepository(CRUDRepository):
+    @property
+    def entry_class(self) -> type[VerificationCode]:
+        return VerificationCode
 
-    async def create(self, username: str, code: str, expire_at: datetime) -> VerificationCode:
-        """Створити новий код верифікації."""
-        verification_code = VerificationCode(
-            username=username,
-            code=code,
-            expire_at=expire_at,
-        )
-        return await self.add(verification_code)
-
-    async def get_by_username_and_code(self, username: str, code: str) -> VerificationCode | None:
-        """Отримати код верифікації за username та code."""
-        stmt = select(VerificationCode).where(
+    async def verify_code(self, username: str, code: str) -> bool:
+        code = await self.scalar(select(VerificationCode).where(
             and_(
                 VerificationCode.username == username,
                 VerificationCode.code == code,
-                VerificationCode.is_active == True
             )
-        )
-        return await self.scalar(stmt)
+        ))
 
-    async def get_active_by_username(self, username: str) -> list[VerificationCode]:
-        """Отримати всі активні коди для користувача."""
-        stmt = select(VerificationCode).where(
-            and_(
-                VerificationCode.username == username,
-                VerificationCode.is_active == True
-            )
-        )
-        return await self.scalars(stmt)
-
-    async def deactivate_by_username(self, username: str) -> None:
-        """Деактивувати всі коди для користувача."""
-        stmt = update(VerificationCode).where(
-            VerificationCode.username == username
-        ).values(is_active=False)
-        await self.execute(stmt)
-
-    async def mark_as_used(self, verification_code_id: str) -> None:
-        """Позначити код як використаний."""
-        stmt = update(VerificationCode).where(
-            VerificationCode.id == verification_code_id
-        ).values(is_used=True)
-        await self.execute(stmt)
-
-    async def deactivate_expired_codes(self) -> None:
-        """Деактивувати застарілі коди."""
-        stmt = update(VerificationCode).where(
-            VerificationCode.expire_at < datetime.now(UTC).replace(tzinfo=None)
-        ).values(is_active=False)
-        await self.execute(stmt)
-
-    async def get_valid_code(self, username: str, code: str) -> VerificationCode | None:
-        """Отримати валідний код верифікації."""
-        verification_code = await self.get_by_username_and_code(username, code)
+        if not code:
+            return False
         
-        if verification_code and verification_code.is_valid:
-            return verification_code
-        
-        return None
+        await self.update(code.id, is_used=True)
+        return True
