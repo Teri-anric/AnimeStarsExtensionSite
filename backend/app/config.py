@@ -39,10 +39,17 @@ class ParserSettings(BaseSettings):
     base_url: str | None = None
 
 
+class PMSettings(BaseSettings):
+    cookie_file: str | None = None
+    login: str | None = None
+    password: str | None = None
+
+
 class AuthSettings(BaseSettings):
     secret_key: str = token_hex(32)
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
+    code_expire_minutes: int = 60  # 1 hour
 
 
 class Settings(BaseSettings):
@@ -50,6 +57,7 @@ class Settings(BaseSettings):
 
     database: DatabaseSettings
     parser: ParserSettings = Field(default_factory=ParserSettings)
+    pm: PMSettings = Field(default_factory=PMSettings)
     auth: AuthSettings = Field(default_factory=AuthSettings)
 
 

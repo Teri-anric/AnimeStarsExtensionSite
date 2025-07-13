@@ -1105,6 +1105,57 @@ export interface Property {
 export interface Property1 {
 }
 /**
+ * 
+ * @export
+ * @interface RegisterWithVerificationRequest
+ */
+export interface RegisterWithVerificationRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterWithVerificationRequest
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterWithVerificationRequest
+     */
+    'password': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterWithVerificationRequest
+     */
+    'verification_code': string;
+}
+/**
+ * 
+ * @export
+ * @interface SendVerificationCodeRequest
+ */
+export interface SendVerificationCodeRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof SendVerificationCodeRequest
+     */
+    'username': string;
+}
+/**
+ * 
+ * @export
+ * @interface SendVerificationCodeResponse
+ */
+export interface SendVerificationCodeResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof SendVerificationCodeResponse
+     */
+    'message': string;
+}
+/**
  * Response model for a single session
  * @export
  * @interface SessionResponse
@@ -1359,25 +1410,6 @@ export interface UUIDEntryFilter {
 /**
  * 
  * @export
- * @interface UserCreate
- */
-export interface UserCreate {
-    /**
-     * 
-     * @type {string}
-     * @memberof UserCreate
-     */
-    'username': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserCreate
-     */
-    'password': string;
-}
-/**
- * 
- * @export
  * @interface UserResponse
  */
 export interface UserResponse {
@@ -1437,6 +1469,44 @@ export interface ValidationError {
  * @interface ValidationErrorLocInner
  */
 export interface ValidationErrorLocInner {
+}
+/**
+ * 
+ * @export
+ * @interface VerifyCodeRequest
+ */
+export interface VerifyCodeRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof VerifyCodeRequest
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VerifyCodeRequest
+     */
+    'code': string;
+}
+/**
+ * 
+ * @export
+ * @interface VerifyCodeResponse
+ */
+export interface VerifyCodeResponse {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof VerifyCodeResponse
+     */
+    'success': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof VerifyCodeResponse
+     */
+    'message': string;
 }
 
 /**
@@ -1616,15 +1686,15 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * 
+         * Register user with verification code.
          * @summary Register
-         * @param {UserCreate} userCreate 
+         * @param {RegisterWithVerificationRequest} registerWithVerificationRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        registerApiAuthRegisterPost: async (userCreate: UserCreate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'userCreate' is not null or undefined
-            assertParamExists('registerApiAuthRegisterPost', 'userCreate', userCreate)
+        registerApiAuthRegisterPost: async (registerWithVerificationRequest: RegisterWithVerificationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'registerWithVerificationRequest' is not null or undefined
+            assertParamExists('registerApiAuthRegisterPost', 'registerWithVerificationRequest', registerWithVerificationRequest)
             const localVarPath = `/api/auth/register`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1644,7 +1714,7 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(userCreate, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(registerWithVerificationRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1683,6 +1753,78 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Send verification code to username.
+         * @summary Send Verification Code
+         * @param {SendVerificationCodeRequest} sendVerificationCodeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendVerificationCodeApiAuthSendVerificationPost: async (sendVerificationCodeRequest: SendVerificationCodeRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sendVerificationCodeRequest' is not null or undefined
+            assertParamExists('sendVerificationCodeApiAuthSendVerificationPost', 'sendVerificationCodeRequest', sendVerificationCodeRequest)
+            const localVarPath = `/api/auth/send-verification`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(sendVerificationCodeRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Verify the provided code for the username.
+         * @summary Verify Code
+         * @param {VerifyCodeRequest} verifyCodeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyCodeApiAuthVerifyCodePost: async (verifyCodeRequest: VerifyCodeRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'verifyCodeRequest' is not null or undefined
+            assertParamExists('verifyCodeApiAuthVerifyCodePost', 'verifyCodeRequest', verifyCodeRequest)
+            const localVarPath = `/api/auth/verify-code`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(verifyCodeRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1754,14 +1896,14 @@ export const AuthApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
+         * Register user with verification code.
          * @summary Register
-         * @param {UserCreate} userCreate 
+         * @param {RegisterWithVerificationRequest} registerWithVerificationRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async registerApiAuthRegisterPost(userCreate: UserCreate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.registerApiAuthRegisterPost(userCreate, options);
+        async registerApiAuthRegisterPost(registerWithVerificationRequest: RegisterWithVerificationRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.registerApiAuthRegisterPost(registerWithVerificationRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AuthApi.registerApiAuthRegisterPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -1777,6 +1919,32 @@ export const AuthApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.revokeSessionApiAuthSessionsSessionIdDelete(sessionId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AuthApi.revokeSessionApiAuthSessionsSessionIdDelete']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Send verification code to username.
+         * @summary Send Verification Code
+         * @param {SendVerificationCodeRequest} sendVerificationCodeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sendVerificationCodeApiAuthSendVerificationPost(sendVerificationCodeRequest: SendVerificationCodeRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SendVerificationCodeResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sendVerificationCodeApiAuthSendVerificationPost(sendVerificationCodeRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.sendVerificationCodeApiAuthSendVerificationPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Verify the provided code for the username.
+         * @summary Verify Code
+         * @param {VerifyCodeRequest} verifyCodeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async verifyCodeApiAuthVerifyCodePost(verifyCodeRequest: VerifyCodeRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VerifyCodeResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.verifyCodeApiAuthVerifyCodePost(verifyCodeRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.verifyCodeApiAuthVerifyCodePost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -1832,14 +2000,14 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.readUsersMeApiAuthMeGet(options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Register user with verification code.
          * @summary Register
-         * @param {UserCreate} userCreate 
+         * @param {RegisterWithVerificationRequest} registerWithVerificationRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        registerApiAuthRegisterPost(userCreate: UserCreate, options?: RawAxiosRequestConfig): AxiosPromise<UserResponse> {
-            return localVarFp.registerApiAuthRegisterPost(userCreate, options).then((request) => request(axios, basePath));
+        registerApiAuthRegisterPost(registerWithVerificationRequest: RegisterWithVerificationRequest, options?: RawAxiosRequestConfig): AxiosPromise<UserResponse> {
+            return localVarFp.registerApiAuthRegisterPost(registerWithVerificationRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Revoke a specific session.
@@ -1850,6 +2018,26 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
          */
         revokeSessionApiAuthSessionsSessionIdDelete(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<SessionRevokeResponse> {
             return localVarFp.revokeSessionApiAuthSessionsSessionIdDelete(sessionId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Send verification code to username.
+         * @summary Send Verification Code
+         * @param {SendVerificationCodeRequest} sendVerificationCodeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendVerificationCodeApiAuthSendVerificationPost(sendVerificationCodeRequest: SendVerificationCodeRequest, options?: RawAxiosRequestConfig): AxiosPromise<SendVerificationCodeResponse> {
+            return localVarFp.sendVerificationCodeApiAuthSendVerificationPost(sendVerificationCodeRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Verify the provided code for the username.
+         * @summary Verify Code
+         * @param {VerifyCodeRequest} verifyCodeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyCodeApiAuthVerifyCodePost(verifyCodeRequest: VerifyCodeRequest, options?: RawAxiosRequestConfig): AxiosPromise<VerifyCodeResponse> {
+            return localVarFp.verifyCodeApiAuthVerifyCodePost(verifyCodeRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1912,15 +2100,15 @@ export class AuthApi extends BaseAPI {
     }
 
     /**
-     * 
+     * Register user with verification code.
      * @summary Register
-     * @param {UserCreate} userCreate 
+     * @param {RegisterWithVerificationRequest} registerWithVerificationRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApi
      */
-    public registerApiAuthRegisterPost(userCreate: UserCreate, options?: RawAxiosRequestConfig) {
-        return AuthApiFp(this.configuration).registerApiAuthRegisterPost(userCreate, options).then((request) => request(this.axios, this.basePath));
+    public registerApiAuthRegisterPost(registerWithVerificationRequest: RegisterWithVerificationRequest, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).registerApiAuthRegisterPost(registerWithVerificationRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1933,6 +2121,30 @@ export class AuthApi extends BaseAPI {
      */
     public revokeSessionApiAuthSessionsSessionIdDelete(sessionId: string, options?: RawAxiosRequestConfig) {
         return AuthApiFp(this.configuration).revokeSessionApiAuthSessionsSessionIdDelete(sessionId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Send verification code to username.
+     * @summary Send Verification Code
+     * @param {SendVerificationCodeRequest} sendVerificationCodeRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public sendVerificationCodeApiAuthSendVerificationPost(sendVerificationCodeRequest: SendVerificationCodeRequest, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).sendVerificationCodeApiAuthSendVerificationPost(sendVerificationCodeRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Verify the provided code for the username.
+     * @summary Verify Code
+     * @param {VerifyCodeRequest} verifyCodeRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public verifyCodeApiAuthVerifyCodePost(verifyCodeRequest: VerifyCodeRequest, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).verifyCodeApiAuthVerifyCodePost(verifyCodeRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -8,10 +8,6 @@ class UserBase(BaseModel):
     username: str
 
 
-class UserCreate(UserBase):
-    password: str
-
-
 class UserLogin(UserBase):
     password: str
 
@@ -48,3 +44,27 @@ class ValidationError(BaseModel):
     loc: List[str]
     msg: str
     type: str
+
+
+class SendVerificationCodeRequest(BaseModel):
+    username: str
+
+
+class SendVerificationCodeResponse(BaseModel):
+    message: str
+
+
+class VerifyCodeRequest(BaseModel):
+    username: str
+    code: str
+
+
+class VerifyCodeResponse(BaseModel):
+    success: bool
+    message: str
+
+
+class RegisterWithVerificationRequest(BaseModel):
+    username: str
+    password: str
+    verification_code: str

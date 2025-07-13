@@ -24,6 +24,25 @@
   margin-bottom: 1rem;
 }
 
+.register-step {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.register-step h2 {
+  margin-bottom: 0.5rem;
+  color: white !important;
+}
+
+.register-step p {
+  margin-bottom: 1rem;
+  color: #ccc !important;
+  line-height: 1.4;
+}
+
+.register-step p strong {
+  color: var(--accent) !important;
+}
+
 .form-group {
   margin-bottom: 1rem;
   text-align: left;
@@ -44,6 +63,23 @@
   font-size: 1rem;
   background-color: var(--ui-bg-2);
   color: white !important;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.2);
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.button-group .submit-button,
+.button-group .secondary-button {
+  flex: 1;
 }
 
 .submit-button {
@@ -67,6 +103,29 @@
   opacity: 0.5;
   cursor: not-allowed;
   color: #aaa !important;
+}
+
+.secondary-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: transparent;
+  color: #ccc !important;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondary-button:hover {
+  background-color: var(--ui-bg-2);
+  border-color: var(--accent);
+  color: white !important;
+}
+
+.secondary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .error-message {
@@ -110,4 +169,15 @@
 
 .login-button:hover {
   background-color: var(--accent-s);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 } 

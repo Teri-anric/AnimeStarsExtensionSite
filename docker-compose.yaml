@@ -6,6 +6,7 @@ x-backend-app: &backend-app
   volumes:
     - ./backend/app:/app
     - ./backend/migration:/migration
+    - ./cookies:/cookies:rw
   env_file:
     - .env
   environment:

@@ -3,21 +3,67 @@ from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
 from uuid import UUID
 
-from ..schema.auth import UserCreate, Token, UserResponse, LogoutResponse
+from ..schema.auth import (
+    Token, UserResponse, LogoutResponse,
+    SendVerificationCodeRequest, SendVerificationCodeResponse,
+    VerifyCodeRequest, VerifyCodeResponse, RegisterWithVerificationRequest
+)
 from ..schema.sessions import SessionResponse, SessionRevokeResponse
 from ..auth import get_password_hash, verify_password
 from ..auth.deps import TokenDep, TokenRepositoryDep, UserRepositoryDep, UserDep
-from ..deps import AnimestarsUserRepoDep
+from ..deps import AnimestarsUserRepoDep, VerificationServiceDep
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+@router.post("/send-verification", response_model=SendVerificationCodeResponse)
+async def send_verification_code(
+    request: SendVerificationCodeRequest,
+    animestars_user_repo: AnimestarsUserRepoDep,
+    verification_service: VerificationServiceDep,
+):
+    """Send verification code to username."""
+    animestars_user = await animestars_user_repo.get_by_username(request.username)
+    if animestars_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username not found on Animestar",
+        )
+    
+    await verification_service.create_and_send_code(request.username)
+    
+    return SendVerificationCodeResponse(
+        message=f"Verification code sent to {request.username}"
+    )
+
+
+@router.post("/verify-code", response_model=VerifyCodeResponse)
+async def verify_code(
+    request: VerifyCodeRequest,
+    verification_service: VerificationServiceDep,
+):
+    """Verify the provided code for the username."""
+    is_valid = await verification_service.verify_code(request.username, request.code)
+    
+    if is_valid:
+        return VerifyCodeResponse(
+            success=True,
+            message="Verification code verified successfully"
+        )
+    else:
+        return VerifyCodeResponse(
+            success=False,
+            message="Invalid or expired verification code"
+        )
+
 @router.post("/register", response_model=UserResponse)
 async def register(
-    user_data: UserCreate,
+    user_data: RegisterWithVerificationRequest,
+    verification_service: VerificationServiceDep,
     user_repo: UserRepositoryDep,
     animestars_user_repo: AnimestarsUserRepoDep,
 ):
+    """Register user with verification code."""
     # Check if username already exists
     db_user = await user_repo.get_user_by_username(user_data.username)
     if db_user:
@@ -25,16 +71,21 @@ async def register(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered",
         )
-    
-    # Check if animestars user exists
-    if user_data.username == "Teri":
-        await animestars_user_repo.create(username=user_data.username)
-
+  
     animestars_user = await animestars_user_repo.get_by_username(user_data.username)
     if animestars_user is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username not found",
+            detail="Username not found on Animestar",
+        )
+    
+    # Verify the code
+    is_valid = await verification_service.mark_code_as_used(user_data.username, user_data.verification_code)
+    
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired verification code",
         )
     
     # Create new user
