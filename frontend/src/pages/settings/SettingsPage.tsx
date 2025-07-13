@@ -3,43 +3,42 @@ import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-
 import AccountSettings from './AccountSettings';
 import ExtensionSettings from './ExtensionSettings';
 import SessionsSettings from './SessionsSettings';
-import '../../styles/SettingsPage.css';
+import '../../styles/settings/index.css';
+
+
+const SETTINGS_TABS = [
+  {
+    id: 'account',
+    label: 'Account',
+    path: '/settings',
+  },
+  {
+    id: 'extension',
+    label: 'Browser Extension',
+    path: '/settings/extension',
+  },
+  {
+    id: 'sessions',
+    label: 'Sessions',
+    path: '/settings/sessions',
+  }
+];
+
 
 const SettingsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(() => {
     const path = location.pathname;
-    if (path.includes('/sessions')) return 'sessions';
-    return 'account';
+    const tab = SETTINGS_TABS.find(tab => path === tab.path);
+    return tab?.id || 'account';
   });
 
   useEffect(() => {
     const path = location.pathname;
-    if (path.includes('/sessions')) {
-      setActiveTab('sessions');
-    } else {
-      setActiveTab('account');
-    }
+    const tab = SETTINGS_TABS.find(tab => path === tab.path);
+    setActiveTab(tab?.id || 'account');
   }, [location.pathname]);
-
-  const tabs = [
-    {
-      id: 'account',
-      label: 'Account',
-      path: '/settings',
-    },
-    {
-      id: 'extension',
-      label: 'Browser Extension',
-      path: '/settings/extension',
-    },
-    {
-      id: 'sessions',
-      label: 'Sessions',
-      path: '/settings/sessions',
-    }
-  ];
 
   return (
     <div className="settings-page">
@@ -50,7 +49,7 @@ const SettingsPage = () => {
       <div className="settings-layout">
         <div className="settings-sidebar">
           <nav className="settings-nav">
-            {tabs.map((tab) => (
+            {SETTINGS_TABS.map((tab) => (
               <a
                 key={tab.id}
                 href={tab.path}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import '../../styles/settings/SessionsSettings.css';
 
 interface Session {
   id: string;
