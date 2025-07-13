@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiClipboard, FiExternalLink } from 'react-icons/fi';
 import { CardApi, CardSchema } from '../../client';
 import { useDomain } from '../../context/DomainContext';
+import { formatTimeAgo, formatDateTime } from '../../utils/dateUtils';
 import CardStatsChart from '../../components/CardStatsChart';
 import '../../styles/CardDetail.css';
 import { createAuthenticatedClient } from '../../utils/apiClient';
@@ -63,54 +64,6 @@ const CardDetailPage: React.FC = () => {
     }
     
     return url;
-  };
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Unknown';
-    
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch {
-      return 'Invalid date';
-    }
-  };
-
-  const getTimeAgo = (dateString: string | null) => {
-    if (!dateString) return '';
-    
-    try {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-      
-      if (diffInSeconds < 60) {
-        return `${diffInSeconds}s ago`;
-      } else if (diffInSeconds < 3600) {
-        const minutes = Math.floor(diffInSeconds / 60);
-        return `${minutes}m ago`;
-      } else if (diffInSeconds < 86400) {
-        const hours = Math.floor(diffInSeconds / 3600);
-        return `${hours}h ago`;
-      } else if (diffInSeconds < 2592000) {
-        const days = Math.floor(diffInSeconds / 86400);
-        return `${days}d ago`;
-      } else if (diffInSeconds < 31536000) {
-        const months = Math.floor(diffInSeconds / 2592000);
-        return `${months}mo ago`;
-      } else {
-        const years = Math.floor(diffInSeconds / 31536000);
-        return `${years}y ago`;
-      }
-    } catch {
-      return '';
-    }
   };
 
   const copyToClipboard = async (text: string) => {
@@ -343,10 +296,10 @@ const CardDetailPage: React.FC = () => {
                   <strong>Created:</strong>
                   <div className="value-with-actions">
                     <span>
-                      {formatDate(card.created_at)}
-                      {getTimeAgo(card.created_at) && (
+                      {formatDateTime(card.created_at)}
+                      {formatTimeAgo(card.created_at) && (
                         <span style={{ color: 'var(--tt-2)', fontSize: '13px', marginLeft: '8px' }}>
-                          ({getTimeAgo(card.created_at)})
+                          ({formatTimeAgo(card.created_at)})
                         </span>
                       )}
                     </span>
@@ -359,10 +312,10 @@ const CardDetailPage: React.FC = () => {
                   <strong>Updated:</strong>
                   <div className="value-with-actions">
                     <span>
-                      {formatDate(card.updated_at)}
-                      {getTimeAgo(card.updated_at) && (
+                      {formatDateTime(card.updated_at)}
+                      {formatTimeAgo(card.updated_at) && (
                         <span style={{ color: 'var(--tt-2)', fontSize: '13px', marginLeft: '8px' }}>
-                          ({getTimeAgo(card.updated_at)})
+                          ({formatTimeAgo(card.updated_at)})
                         </span>
                       )}
                     </span>

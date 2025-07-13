@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatTimeAgo, formatDateTime } from '../../utils/dateUtils';
 import '../../styles/settings/SessionsSettings.css';
 
 interface Session {
@@ -18,7 +19,7 @@ const SessionsSettings = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No authentication token');
@@ -77,9 +78,6 @@ const SessionsSettings = () => {
     fetchSessions();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
 
   if (!apiAvailable && !loading) {
     return (
@@ -87,18 +85,18 @@ const SessionsSettings = () => {
         <div className="settings-section">
           <h2>Session Management</h2>
           <div className="setting-description">
-            Manage your active sessions across different devices and browsers. 
+            Manage your active sessions across different devices and browsers.
             You can view all your current sessions and revoke access from devices you no longer use.
           </div>
         </div>
-        
+
         <div className="feature-coming-soon">
           <div className="feature-icon">🚧</div>
           <h3>Feature Coming Soon</h3>
           <p className="feature-description">
             The session management feature is currently being developed and will be available soon.
           </p>
-          
+
           <div className="feature-benefits">
             <h4>What you'll be able to do:</h4>
             <ul>
@@ -109,7 +107,7 @@ const SessionsSettings = () => {
               <li>Monitor your account security</li>
             </ul>
           </div>
-          
+
           <div className="feature-status">
             <div className="status-item">
               <span className="status-label">Backend API:</span>
@@ -125,10 +123,10 @@ const SessionsSettings = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="settings-actions">
-          <button 
-            onClick={fetchSessions} 
+          <button
+            onClick={fetchSessions}
             className="button button-secondary"
           >
             Check API Status
@@ -153,11 +151,11 @@ const SessionsSettings = () => {
       <div className="settings-section">
         <h2>Session Management</h2>
         <div className="setting-description">
-          Manage your active sessions across different devices and browsers. 
+          Manage your active sessions across different devices and browsers.
           You can view all your current sessions and revoke access from devices you no longer use.
         </div>
       </div>
-      
+
       {error && (
         <div className="error-message">
           {error}
@@ -183,8 +181,8 @@ const SessionsSettings = () => {
                   )}
                 </div>
                 <div className="session-details">
-                  <p><strong>Created:</strong> {formatDate(session.created_at)}</p>
-                  <p><strong>Expires:</strong> {formatDate(session.expire_at)}</p>
+                  <p><strong>Created:</strong> {formatTimeAgo(session.created_at)}</p>
+                  <p><strong>Expires:</strong> {formatDateTime(session.expire_at)}</p>
                 </div>
               </div>
               {!session.is_current && (

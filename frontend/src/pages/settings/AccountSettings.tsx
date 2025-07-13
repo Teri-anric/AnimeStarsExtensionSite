@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDomain } from '../../context/DomainContext';
 import { createAuthenticatedClient } from '../../utils/apiClient';
 import { AuthApi, UserResponse } from '../../client';
+import { formatTimeAgo } from '../../utils/dateUtils';
 import '../../styles/settings/AccountSettings.css';
 
 const AccountSettings = () => {
@@ -41,36 +42,7 @@ const AccountSettings = () => {
     }, 3000);
   };
 
-  const formatTimeAgo = (dateString: string) => {
-    try {
-      const now = new Date();
-      const date = new Date(dateString);
-      const diffInMs = now.getTime() - date.getTime();
-      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-      const diffInDays = Math.floor(diffInHours / 24);
-      const diffInWeeks = Math.floor(diffInDays / 7);
-      const diffInMonths = Math.floor(diffInDays / 30);
-      const diffInYears = Math.floor(diffInDays / 365);
 
-      if (diffInMs < 0) return 'Future date';
-      if (diffInHours < 1) {
-        const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-        return diffInMinutes <= 0 ? 'Just now' : `${diffInMinutes}m ago`;
-      } else if (diffInHours < 24) {
-        return `${diffInHours}h ago`;
-      } else if (diffInDays < 7) {
-        return `${diffInDays}d ago`;
-      } else if (diffInWeeks < 4) {
-        return `${diffInWeeks}w ago`;
-      } else if (diffInMonths < 12) {
-        return `${diffInMonths}mo ago`;
-      } else {
-        return `${diffInYears}y ago`;
-      }
-    } catch {
-      return 'Unknown';
-    }
-  };
 
   if (loading) {
     return (
