@@ -12,18 +12,18 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
+  background: var(--ui-bg-accent);
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
   cursor: pointer;
   font-size: 14px;
-  color: #495057;
+  color: white !important;
   transition: all 0.2s ease;
 }
 
 .language-button:hover {
-  background: #e9ecef;
-  border-color: #adb5bd;
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .current-flag {
@@ -32,11 +32,13 @@
 
 .current-language {
   font-weight: 500;
+  color: white !important;
 }
 
 .dropdown-arrow {
   font-size: 10px;
   transition: transform 0.2s ease;
+  color: white !important;
 }
 
 .language-dropdown:hover .dropdown-arrow {
@@ -47,10 +49,10 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: var(--ui-bg);
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   min-width: 150px;
   z-index: 1000;
   opacity: 0;
@@ -75,17 +77,17 @@
   border: none;
   cursor: pointer;
   font-size: 14px;
-  color: #495057;
+  color: white !important;
   transition: background-color 0.2s ease;
 }
 
 .language-option:hover {
-  background: #f8f9fa;
+  background: var(--ui-bg-accent);
 }
 
 .language-option.active {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: var(--accent);
+  color: white !important;
   font-weight: 500;
 }
 
@@ -96,6 +98,7 @@
 .language-option .name {
   flex: 1;
   text-align: left;
+  color: white !important;
 }
 
 /* Responsive design */

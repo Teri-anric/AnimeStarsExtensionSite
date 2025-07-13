@@ -7,6 +7,25 @@ import { useTranslation } from 'react-i18next';
 import '../../styles/settings/index.css';
 
 
+const SETTINGS_TABS = [
+  {
+    id: 'account',
+    label: 'navigation.account',
+    path: '/settings',
+  },
+  {
+    id: 'extension',
+    label: 'navigation.extension',
+    path: '/settings/extension',
+  },
+  {
+    id: 'sessions',
+    label: 'navigation.sessions',
+    path: '/settings/sessions',
+  }
+];
+
+
 const SettingsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -17,23 +36,6 @@ const SettingsPage = () => {
     return tab?.id || 'account';
   });
   
-  const SETTINGS_TABS = [
-    {
-      id: 'account',
-      label: t('navigation.account'),
-      path: '/settings',
-    },
-    {
-      id: 'extension',
-      label: t('navigation.extension'),
-      path: '/settings/extension',
-    },
-    {
-      id: 'sessions',
-      label: t('navigation.sessions'),
-      path: '/settings/sessions',
-    }
-  ];
 
   useEffect(() => {
     const path = location.pathname;
@@ -61,7 +63,7 @@ const SettingsPage = () => {
                   navigate(tab.path);
                 }}
               >
-                <span className="nav-label">{tab.label}</span>
+                <span className="nav-label">{t(tab.label)}</span>
               </a>
             ))}
           </nav>

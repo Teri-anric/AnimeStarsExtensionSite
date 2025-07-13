@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FiClock } from 'react-icons/fi';
 import { CardUsersStatsSchema, CardStatsApi, CardCollection } from '../client';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { createAuthenticatedClient } from '../utils/apiClient';
 import { formatTimeAgo } from '../utils/dateUtils';
 import '../styles/CardStatsDisplay.css';
@@ -16,6 +17,7 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isAuthenticated && cardId) {
@@ -33,7 +35,7 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
       setStatsData(response.data || []);
     } catch (err) {
       console.error('Error fetching last card stats:', err);
-      setError('Failed to load card statistics');
+      setError(t('cardStatsDisplay.failedToLoadStats'));
     } finally {
       setLoading(false);
     }
@@ -42,13 +44,13 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
   const getCollectionDisplayName = (collection: CardCollection): string => {
     switch (collection) {
       case CardCollection.Trade:
-        return 'Trade';
+        return t('cardStatsDisplay.trade');
       case CardCollection.Need:
-        return 'Need';
+        return t('cardStatsDisplay.need');
       case CardCollection.Owned:
-        return 'Owned';
+        return t('cardStatsDisplay.owned');
       case CardCollection.UnlockedOwned:
-        return 'Unlocked Owned';
+        return t('cardStatsDisplay.unlockedOwned');
       default:
         return collection;
     }
@@ -86,10 +88,10 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
     return (
       <div className={`card-stats-display ${className}`}>
         <div className="card-stats-header">
-          <h3>📊 Card Statistics</h3>
+          <h3>{t('cardStatsDisplay.cardStatistics')}</h3>
         </div>
         <div className="stats-empty">
-          Please log in to view statistics
+          {t('cardStatsDisplay.pleaseLogIn')}
         </div>
       </div>
     );
@@ -99,9 +101,9 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
     return (
       <div className={`card-stats-display ${className}`}>
         <div className="card-stats-header">
-          <h3>📊 Card Statistics</h3>
+          <h3>{t('cardStatsDisplay.cardStatistics')}</h3>
         </div>
-        <div className="stats-loading">Loading statistics...</div>
+        <div className="stats-loading">{t('cardStatsDisplay.loadingStatistics')}</div>
       </div>
     );
   }
@@ -110,7 +112,7 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
     return (
       <div className={`card-stats-display ${className}`}>
         <div className="card-stats-header">
-          <h3>📊 Card Statistics</h3>
+          <h3>{t('cardStatsDisplay.cardStatistics')}</h3>
         </div>
         <div className="stats-error">{error}</div>
       </div>
@@ -121,9 +123,9 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
     return (
       <div className={`card-stats-display ${className}`}>
         <div className="card-stats-header">
-          <h3>📊 Card Statistics</h3>
+          <h3>{t('cardStatsDisplay.cardStatistics')}</h3>
         </div>
-        <div className="stats-empty">No statistics available</div>
+        <div className="stats-empty">{t('cardStatsDisplay.noStatisticsAvailable')}</div>
       </div>
     );
   }
@@ -131,10 +133,10 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
   return (
     <div className={`card-stats-display ${className}`}>
       <div className="card-stats-header">
-        <h3>📊 Card Statistics</h3>
+        <h3>{t('cardStatsDisplay.cardStatistics')}</h3>
         <div className="freshness-indicator">
           <FiClock size={14} />
-          <span>Last updated</span>
+          <span>{t('cardStatsDisplay.lastUpdated')}</span>
         </div>
       </div>
       

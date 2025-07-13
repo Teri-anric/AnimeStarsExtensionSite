@@ -28,7 +28,7 @@ const VerificationStep = ({
       {error && <div className="error-message">{error}</div>}
       
       <div className="form-group">
-        <label htmlFor="verification-code">Verification Code</label>
+        <label htmlFor="verification-code">{t('verificationStep.verificationCode')}</label>
         <input
           type="text"
           id="verification-code"

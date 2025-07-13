@@ -4,6 +4,7 @@ import { createAuthenticatedClient } from '../../utils/apiClient';
 import { AuthApi, UserResponse } from '../../client';
 import { formatTimeAgo } from '../../utils/dateUtils';
 import '../../styles/settings/AccountSettings.css';
+import LanguageSwitcher from '../../components/LanguageSwitcher';
 
 const AccountSettings = () => {
   const { currentDomain, setCurrentDomain, availableDomains } = useDomain();
@@ -84,6 +85,8 @@ const AccountSettings = () => {
               <label>Account Created</label>
               <div className="setting-value">{formatTimeAgo(userInfo.created_at)}</div>
             </div>
+            <LanguageSwitcher />
+
           </>
         )}
       </div>

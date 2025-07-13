@@ -11,7 +11,7 @@ const Header = () => {
   return (
     <header className="app-header">
       <div className="header-logo">
-        <Link to="/">Anime Stars</Link>
+        <Link to="/">{t('header.logo')}</Link>
       </div>
       
       {isAuthenticated && (
@@ -29,7 +29,6 @@ const Header = () => {
       )}
       
       <nav className="user-nav">
-        <LanguageSwitcher />
         {isAuthenticated ? (
           <div className="user-menu">
             <span className="username">{t('auth.welcomeUser', { username })}</span>
@@ -43,9 +42,12 @@ const Header = () => {
             </div>
           </div>
         ) : (
-          <Link to="/login" className="login-button">
-            {t('auth.login')}
-          </Link>
+          <div className="user-menu">
+            <LanguageSwitcher />
+            <Link to="/login" className="login-button">
+              {t('auth.login')}
+            </Link>
+          </div>
         )}
       </nav>
     </header>

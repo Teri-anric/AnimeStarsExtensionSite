@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { DeckApi, DeckSummarySchema, DeckQuery } from '../../client';
+import { useTranslation } from 'react-i18next';
 import PaginationPage, { PaginationResponse } from '../../components/PaginationPage';
 import { deckFilterConfig } from '../../config/deckFilterConfig';
 import Card from '../../components/Card';
@@ -14,6 +15,7 @@ interface DecksListPageProps {
 const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // API function for fetching decks
   const fetchDecks = async (query: DeckQuery): Promise<PaginationResponse<DeckSummarySchema>> => {
@@ -38,11 +40,14 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
           <div className="deck-header-section">
             <div className="deck-info">
               <h2 className="deck-title">
-                {deck.anime_name || 'Unknown Anime'}
+                {deck.anime_name || t('decks.unknownAnime')}
               </h2>
               <div className="deck-meta">
                 <span className="deck-card-count">
-                  {deck.card_count} card{deck.card_count !== 1 ? 's' : ''}
+                  {deck.card_count === 1 
+                    ? t('decks.cardCount', { count: deck.card_count })
+                    : t('decks.cardCountPlural', { count: deck.card_count })
+                  }
                 </span>
                 <span className="deck-link">
                   {deck.anime_link}
@@ -59,7 +64,7 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
                 ))}
               </div>
             ) : (
-              <div className="no-preview-cards">No preview cards available</div>
+              <div className="no-preview-cards">{t('decks.noPreviewCards')}</div>
             )}
           </div>
         </div>
@@ -79,7 +84,7 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
 
   // Custom loading component
   const loadingComponent = (
-    <div className="loading">Loading decks...</div>
+    <div className="loading">{t('decks.loadingDecks')}</div>
   );
 
   // Custom error component
@@ -89,18 +94,18 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
 
   // Custom empty component
   const emptyComponent = (
-    <div className="no-decks">No decks found matching your criteria.</div>
+    <div className="no-decks">{t('decks.noDecksFound')}</div>
   );
 
   // Custom header description
   const headerDescription = (
     <p className="decks-description">
-      Browse cards organized by anime series. Each deck contains all cards from a specific anime.
+      {t('decks.description')}
     </p>
   );
 
   if (!isAuthenticated) {
-    return <div className="auth-message">Please log in to view decks.</div>;
+    return <div className="auth-message">{t('decks.pleaseLogIn')}</div>;
   }
 
   return (
@@ -109,7 +114,7 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
         fetchData={fetchDecks}
         filterConfig={deckFilterConfig as any}
         renderItems={renderDecks}
-        title="Anime Decks"
+        title={t('decks.title')}
         perPage={20}
         loadingComponent={loadingComponent}
         errorComponent={errorComponent}
@@ -117,7 +122,7 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
         headerActions={headerDescription}
         className="decks-pagination-page"
         paginationInfoTemplate={(current, total, itemsCount) => 
-          `Page ${current} of ${total} (${itemsCount} total decks)`
+          t('decks.pageInfo', { current, total, itemsCount })
         }
       />
     </div>

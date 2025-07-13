@@ -5,56 +5,56 @@ export const cardFilterConfig: EntityFilterConfig = {
   entityName: 'Cards',
   
   fieldOptions: [
-    { value: 'name', label: 'Card Name', type: 'string' },
-    { value: 'card_id', label: 'Card ID', type: 'number' },
+    { value: 'name', label: 'filterConfig.cardName', type: 'string' },
+    { value: 'card_id', label: 'filterConfig.cardId', type: 'number' },
     { 
       value: 'rank', 
-      label: 'Rank', 
+      label: 'filterConfig.rank', 
       type: 'enum',
       enumOptions: [
-        { value: 'ass', label: 'ASS' },
-        { value: 's', label: 'S' },
-        { value: 'a', label: 'A' },
-        { value: 'b', label: 'B' },
-        { value: 'c', label: 'C' },
-        { value: 'd', label: 'D' },
-        { value: 'e', label: 'E' }
+        { value: 'ass', label: 'ranks.ass' },
+        { value: 's', label: 'ranks.s' },
+        { value: 'a', label: 'ranks.a' },
+        { value: 'b', label: 'ranks.b' },
+        { value: 'c', label: 'ranks.c' },
+        { value: 'd', label: 'ranks.d' },
+        { value: 'e', label: 'ranks.e' }
       ]
     },
-    { value: 'anime_name', label: 'Anime Name', type: 'string' },
-    { value: 'anime_link', label: 'Anime Link', type: 'string' },
-    { value: 'author', label: 'Author', type: 'string' },
-    { value: 'image', label: 'Image Path', type: 'string' },
-    { value: 'mp4', label: 'MP4 Path', type: 'string' },
-    { value: 'webm', label: 'WebM Path', type: 'string' },
-    { value: 'created_at', label: 'Created Date', type: 'datetime' },
-    { value: 'updated_at', label: 'Updated Date', type: 'datetime' },
-    { value: 'stats_count', label: 'Stats Count', type: 'number' }
+    { value: 'anime_name', label: 'filterConfig.animeName', type: 'string' },
+    { value: 'anime_link', label: 'filterConfig.animeLink', type: 'string' },
+    { value: 'author', label: 'filterConfig.author', type: 'string' },
+    { value: 'image', label: 'filterConfig.imagePath', type: 'string' },
+    { value: 'mp4', label: 'filterConfig.mp4Path', type: 'string' },
+    { value: 'webm', label: 'filterConfig.webmPath', type: 'string' },
+    { value: 'created_at', label: 'filterConfig.createdDate', type: 'datetime' },
+    { value: 'updated_at', label: 'filterConfig.updatedDate', type: 'datetime' },
+    { value: 'stats_count', label: 'filterConfig.statsCount', type: 'number' }
   ],
 
   shortFilterFields: [
     {
       key: 'name',
       type: 'text',
-      placeholder: 'Card name or ID'
+      placeholder: 'filterConfig.cardNameOrId'
     },
     {
       key: 'anime_name',
       type: 'text',
-      placeholder: 'Anime name'
+      placeholder: 'filterConfig.animeNamePlaceholder'
     },
     {
       key: 'rank',
       type: 'select',
-      placeholder: 'All Ranks',
+      placeholder: 'filterConfig.allRanks',
       options: [
-        { value: 'ass', label: 'ASS' },
-        { value: 's', label: 'S' },
-        { value: 'a', label: 'A' },
-        { value: 'b', label: 'B' },
-        { value: 'c', label: 'C' },
-        { value: 'd', label: 'D' },
-        { value: 'e', label: 'E' }
+        { value: 'ass', label: 'ranks.ass' },
+        { value: 's', label: 'ranks.s' },
+        { value: 'a', label: 'ranks.a' },
+        { value: 'b', label: 'ranks.b' },
+        { value: 'c', label: 'ranks.c' },
+        { value: 'd', label: 'ranks.d' },
+        { value: 'e', label: 'ranks.e' }
       ]
     }
   ],
@@ -127,18 +127,18 @@ export const cardFilterConfig: EntityFilterConfig = {
   },
 
   sortOptions: [
-    { value: "card_id asc", label: 'Card ID (Ascending)' },
-    { value: "card_id desc", label: 'Card ID (Descending)' },
-    { value: "name asc", label: 'Name (A-Z)' },
-    { value: "name desc", label: 'Name (Z-A)' },
-    { value: "rank asc", label: 'Rank (Low to High)' },
-    { value: "rank desc", label: 'Rank (High to Low)' },
-    { value: "anime_name asc", label: 'Anime Name (A-Z)' },
-    { value: "anime_name desc", label: 'Anime Name (Z-A)' },
-    { value: 'created_at desc', label: 'Newest First' },
-    { value: 'created_at asc', label: 'Oldest First' },
-    { value: 'updated_at desc', label: 'Recently Updated' },
-    { value: 'updated_at asc', label: 'Least Recently Updated' },
+    { value: "card_id asc", label: 'filterConfig.cardIdAscending' },
+    { value: "card_id desc", label: 'filterConfig.cardIdDescending' },
+    { value: "name asc", label: 'filterConfig.nameAZ' },
+    { value: "name desc", label: 'filterConfig.nameZA' },
+    { value: "rank asc", label: 'filterConfig.rankLowToHigh' },
+    { value: "rank desc", label: 'filterConfig.rankHighToLow' },
+    { value: "anime_name asc", label: 'filterConfig.animeNameAZ' },
+    { value: "anime_name desc", label: 'filterConfig.animeNameZA' },
+    { value: 'created_at desc', label: 'filterConfig.newestFirst' },
+    { value: 'created_at asc', label: 'filterConfig.oldestFirst' },
+    { value: 'updated_at desc', label: 'filterConfig.recentlyUpdated' },
+    { value: 'updated_at asc', label: 'filterConfig.leastRecentlyUpdated' },
   ],
 
   defaults: {
@@ -147,7 +147,7 @@ export const cardFilterConfig: EntityFilterConfig = {
   },
 
   ui: {
-    title: 'Cards',
+    title: 'cards.title',
     showModeToggle: true,
     className: 'cards-filter'
   }

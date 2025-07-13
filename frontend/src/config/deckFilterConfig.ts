@@ -4,38 +4,38 @@ export const deckFilterConfig: EntityFilterConfig = {
   entityName: 'Anime Decks',
   
   fieldOptions: [
-    { value: 'anime_name', label: 'Anime Name', type: 'string' },
-    { value: 'anime_link', label: 'Anime Link', type: 'string' },
-    { value: 'card_count', label: 'Number of Cards', type: 'number' },
+    { value: 'anime_name', label: 'filterConfig.animeName', type: 'string' },
+    { value: 'anime_link', label: 'filterConfig.animeLink', type: 'string' },
+    { value: 'card_count', label: 'filterConfig.numberOfCards', type: 'number' },
     { 
       value: 'cards', 
-      label: 'Cards', 
+      label: 'filterConfig.cards', 
       type: 'array',
       subEntityConfig: {
         entityName: 'Cards',
         supportedOperators: ['any', 'all', 'length'],
         fieldOptions: [
-          { value: 'name', label: 'Card Name', type: 'string' },
-          { value: 'card_id', label: 'Card ID', type: 'number' },
+          { value: 'name', label: 'filterConfig.cardName', type: 'string' },
+          { value: 'card_id', label: 'filterConfig.cardId', type: 'number' },
           { 
             value: 'rank', 
-            label: 'Rank', 
+            label: 'filterConfig.rank', 
             type: 'enum',
             enumOptions: [
-              { value: 'ass', label: 'ASS' },
-              { value: 's', label: 'S' },
-              { value: 'a', label: 'A' },
-              { value: 'b', label: 'B' },
-              { value: 'c', label: 'C' },
-              { value: 'd', label: 'D' },
-              { value: 'e', label: 'E' }
+              { value: 'ass', label: 'ranks.ass' },
+              { value: 's', label: 'ranks.s' },
+              { value: 'a', label: 'ranks.a' },
+              { value: 'b', label: 'ranks.b' },
+              { value: 'c', label: 'ranks.c' },
+              { value: 'd', label: 'ranks.d' },
+              { value: 'e', label: 'ranks.e' }
             ]
           },
-          { value: 'anime_name', label: 'Card Anime Name', type: 'string' },
-          { value: 'anime_link', label: 'Card Anime Link', type: 'string' },
-          { value: 'author', label: 'Card Author', type: 'string' },
-          { value: 'created_at', label: 'Card Created Date', type: 'datetime' },
-          { value: 'updated_at', label: 'Card Updated Date', type: 'datetime' }
+          { value: 'anime_name', label: 'filterConfig.cardAnimeName', type: 'string' },
+          { value: 'anime_link', label: 'filterConfig.cardAnimeLink', type: 'string' },
+          { value: 'author', label: 'filterConfig.cardAuthor', type: 'string' },
+          { value: 'created_at', label: 'filterConfig.cardCreatedDate', type: 'datetime' },
+          { value: 'updated_at', label: 'filterConfig.cardUpdatedDate', type: 'datetime' }
         ]
       }
     }
@@ -45,7 +45,7 @@ export const deckFilterConfig: EntityFilterConfig = {
     {
       key: 'query',
       type: 'text',
-      placeholder: 'Anime name or link'
+      placeholder: 'filterConfig.animeNameOrLink'
     }
   ],
 
@@ -73,10 +73,10 @@ export const deckFilterConfig: EntityFilterConfig = {
   },
 
   sortOptions: [
-    { value: 'anime_name asc', label: 'Anime Name (A-Z)' },
-    { value: 'anime_name desc', label: 'Anime Name (Z-A)' },
-    { value: 'card_count desc', label: 'Most Cards' },
-    { value: 'card_count asc', label: 'Least Cards' },
+    { value: 'anime_name asc', label: 'filterConfig.animeNameAZ' },
+    { value: 'anime_name desc', label: 'filterConfig.animeNameZA' },
+    { value: 'card_count desc', label: 'filterConfig.mostCards' },
+    { value: 'card_count asc', label: 'filterConfig.leastCards' },
   ],
 
   defaults: {
@@ -85,7 +85,7 @@ export const deckFilterConfig: EntityFilterConfig = {
   },
 
   ui: {
-    title: 'Anime Decks',
+    title: 'decks.title',
     showModeToggle: true,
     className: 'decks-filter'
   }

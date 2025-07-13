@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 import '../styles/LanguageSwitcher.css';
 
 const LanguageSwitcher: React.FC = () => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'uk', name: 'Українська', flag: '🇺🇦' },
-    { code: 'ru', name: 'Русский', flag: '🇷🇺' }
+    { code: 'en', name: t('languageSwitcher.english'), flag: '🇺🇸' },
+    { code: 'uk', name: t('languageSwitcher.ukrainian'), flag: '🇺🇦' },
+    { code: 'ru', name: t('languageSwitcher.russian'), flag: '🇷🇺' }
   ];
 
   const handleLanguageChange = (languageCode: string) => {
@@ -23,7 +23,7 @@ const LanguageSwitcher: React.FC = () => {
             {languages.find(lang => lang.code === i18n.language)?.flag || '🌐'}
           </span>
           <span className="current-language">
-            {languages.find(lang => lang.code === i18n.language)?.name || 'Language'}
+            {languages.find(lang => lang.code === i18n.language)?.name || t('languageSwitcher.language')}
           </span>
           <span className="dropdown-arrow">▼</span>
         </button>

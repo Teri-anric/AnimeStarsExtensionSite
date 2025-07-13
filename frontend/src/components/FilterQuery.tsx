@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { GenericFilter, EntityFilterConfig } from '../types/filter';
 import AdvancedFilter from './AdvancedFilter';
 import '../styles/FilterQuery.css';
@@ -54,6 +55,15 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
   className = ''
 }: FilterQueryProps<T>) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation();
+
+  // Function to translate labels
+  const translateLabel = (label: string): string => {
+    if (label.startsWith('filterConfig.') || label.startsWith('cards.') || label.startsWith('decks.') || label.startsWith('ranks.')) {
+      return t(label);
+    }
+    return label;
+  };
 
   // Extract configuration from either config object or individual props
   const entityConfig = config || {
@@ -383,7 +393,7 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
                   type="text"
                   value={shortFilterValues[field.key] || ''}
                   onChange={(e) => handleShortFilterChange(field.key, e.target.value)}
-                  placeholder={field.placeholder}
+                  placeholder={translateLabel(field.placeholder || '')}
                   className="compact-input"
                   ref={(el) => { inputRefs.current[field.key] = el; }}
                 />
@@ -393,10 +403,10 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
                   onChange={(e) => handleShortFilterChange(field.key, e.target.value)}
                   className="compact-select"
                 >
-                  <option value="">{field.placeholder || 'All'}</option>
+                  <option value="">{translateLabel(field.placeholder || t('filterQuery.all'))}</option>
                   {field.options?.map(option => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {translateLabel(option.label)}
                     </option>
                   ))}
                 </select>
@@ -405,7 +415,7 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
           ))}
           
           <button type="submit" className="search-button">
-            Search
+            {t('filterQuery.search')}
           </button>
         </div>
       </form>
@@ -426,7 +436,7 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
     return (
       <div className="sort-options">
         <label className="sort-label">
-          Sort by:
+          {t('filterQuery.sortBy')}
           <select
             value={sortValue}
             onChange={(e) => handleSortChange(e.target.value)}
@@ -434,7 +444,7 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
           >
             {entityConfig.sortOptions.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {translateLabel(option.label)}
               </option>
             ))}
           </select>
@@ -451,7 +461,7 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
             onClick={handleModeToggle}
             className={`filter-mode-button ${filterMode === 'short' ? 'active' : ''}`}
           >
-            {filterMode === 'short' ? 'Switch to Advanced Filter' : 'Switch to Short Filter'}
+            {filterMode === 'short' ? t('filterQuery.switchToAdvancedFilter') : t('filterQuery.switchToShortFilter')}
           </button>
         </div>
       )}
@@ -466,7 +476,7 @@ const FilterQuery = <T extends GenericFilter = GenericFilter>({
               onClose={handleAdvancedFilterClose}
               initialFilter={filter}
               fieldOptions={entityConfig.fieldOptions}
-              title={`Advanced ${(entityConfig as any).ui?.title || entityConfig.entityName || title || 'Filter'}`}
+              title={`Advanced ${translateLabel((entityConfig as any).ui?.title || entityConfig.entityName || title || 'Filter')}`}
             />
           )}
         </div>

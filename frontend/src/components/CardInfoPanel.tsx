@@ -3,6 +3,7 @@ import { FiExternalLink, FiMaximize2, FiClipboard, FiLayers } from 'react-icons/
 import { useNavigate } from 'react-router-dom';
 import { CardSchema } from '../client';
 import { useDomain } from '../context/DomainContext';
+import { useTranslation } from 'react-i18next';
 import { formatTimeAgo } from '../utils/dateUtils';
 import CardStatsDisplay from './CardStatsDisplay';
 import '../styles/CardInfoPanel.css';
@@ -24,6 +25,7 @@ const CardInfoRow = ({
   externalLink?: string,
   addComponent?: React.ReactNode,
 }) => {
+  const { t } = useTranslation();
   const copyValueToClipboard = () => {
     navigator.clipboard.writeText(value);
   };
@@ -36,7 +38,7 @@ const CardInfoRow = ({
         <div 
           onClick={copyValueToClipboard}
           className="action-button-arrow"
-          title="Copy to clipboard"
+          title={t('cardInfoPanel.copyToClipboard')}
         >
           <FiClipboard />
         </div>
@@ -47,7 +49,7 @@ const CardInfoRow = ({
             target="_blank" 
             rel="noopener noreferrer"
             className="action-button-arrow external-link-red"
-            title="Open in Anisite"
+            title={t('cardInfoPanel.openInAnisite')}
           >
             <FiExternalLink />
           </a>
@@ -60,6 +62,7 @@ const CardInfoRow = ({
 const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) => {
   const { currentDomain } = useDomain();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const getCardMediaUrl = (path: string | null) => {
     if (!path) return '';
@@ -95,12 +98,12 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
       {/* Panel */}
       <div className={`card-info-panel ${isOpen ? 'open' : ''}`}>
         <div className="card-info-header">
-          <h2>Card Details</h2>
+          <h2>{t('cardInfoPanel.cardDetails')}</h2>
           <div className="header-buttons">
             <button 
               className="full-page-button" 
               onClick={() => navigate(`/card/${card.card_id}`)}
-              title="Open full page"
+              title={t('cardInfoPanel.openFullPage')}
             >
               <FiMaximize2 />
             </button>
@@ -130,43 +133,43 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
                 controls
               >
                 <source src={getCardMediaUrl(card.mp4)} type="video/mp4" />
-                Your browser does not support the video tag.
+                {t('cards.videoNotSupported')}
               </video>
             )}
           </div>
 
           {/* Info Section */}
           <div className="card-info-details">
-            <CardInfoRow label="ID" value={card.card_id} externalLink={getAnisiteUrl('/cards/users/', { id: card.card_id })}/>
+            <CardInfoRow label={t('cardInfoPanel.id')} value={card.card_id} externalLink={getAnisiteUrl('/cards/users/', { id: card.card_id })}/>
 
-            <CardInfoRow label="External ID" value={card.id} />
+            <CardInfoRow label={t('cardInfoPanel.externalId')} value={card.id} />
 
             <CardInfoRow 
-              label="Author" 
+              label={t('cardInfoPanel.author')} 
               value={card.author}
               externalLink={getAnisiteUrl('/user/cards/', { name: card.author })}
             />
             
-            <CardInfoRow label="Name" value={card.name} />
+            <CardInfoRow label={t('cardInfoPanel.name')} value={card.name} />
             
-            <CardInfoRow label="Rank" value={card.rank.toUpperCase()} />
+            <CardInfoRow label={t('cardInfoPanel.rank')} value={card.rank.toUpperCase()} />
             
             {card.anime_name && (
               <CardInfoRow 
-                label="Anime" 
+                label={t('cardInfoPanel.anime')} 
                 value={card.anime_name}
                 externalLink={card.anime_link ? getAnisiteUrl(card.anime_link) : undefined}
               />
             )}
             
             {card.anime_link && (
-              <CardInfoRow label="Anime Link" value={card.anime_link} addComponent={
+              <CardInfoRow label={t('cardInfoPanel.animeLink')} value={card.anime_link} addComponent={
                 <a
                   href={`/deck/${encodeURIComponent(card.anime_link)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="action-button-arrow deck-button"
-                  title="View deck"
+                  title={t('cardInfoPanel.viewDeck')}
                 >
                   <FiLayers />
                 </a>
@@ -174,11 +177,11 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
             )}
             
             {card.created_at && (
-              <CardInfoRow label="Created" value={formatTimeAgo(card.created_at)} />
+              <CardInfoRow label={t('cardInfoPanel.created')} value={formatTimeAgo(card.created_at)} />
             )}
             
             {card.updated_at && (
-              <CardInfoRow label="Updated" value={formatTimeAgo(card.updated_at)} />
+              <CardInfoRow label={t('cardInfoPanel.updated')} value={formatTimeAgo(card.updated_at)} />
             )}
 
             {/* Card Statistics Display */}
@@ -190,4 +193,4 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
   );
 };
 
-export default CardInfoPanel; 
+export default CardInfoPanel;
