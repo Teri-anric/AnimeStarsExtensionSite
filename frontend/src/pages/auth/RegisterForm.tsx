@@ -1,101 +1,135 @@
 import { useState } from 'react';
-import { AuthApiFactory, UserCreate } from '../../client/api';
+import { AuthApi, SendVerificationCodeRequest, VerifyCodeRequest, RegisterWithVerificationRequest } from '../../client/api';
+import { createAuthenticatedClient } from '../../utils/apiClient';
+import { UsernameStep, VerificationStep, PasswordStep } from './Register';
 
 interface RegisterFormProps {
   onSuccess: () => void;
 }
 
+type RegistrationStep = 'username' | 'verification' | 'password';
+
 const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
+  const [currentStep, setCurrentStep] = useState<RegistrationStep>('username');
   const [username, setUsername] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendVerificationCode = async () => {
+    if (!username.trim()) {
+      setError('Please enter your username');
+      return;
+    }
+
+    setError('');
+
+    try {
+      const authApi = createAuthenticatedClient(AuthApi);
+      const response = await authApi.sendVerificationCodeApiAuthSendVerificationPost( { username: username.trim() });
+      
+      if (response.status === 200) {
+        setVerificationSent(true);
+        setCurrentStep('verification');
+      }
+    } catch (err: any) {
+      setError('Failed to send verification code. Please try again.');
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    if (!verificationCode.trim()) {
+      setError('Please enter the verification code');
+      return;
+    }
+
+    setError('');
+
+    try {
+      const authApi = createAuthenticatedClient(AuthApi);
+      const response = await authApi.verifyCodeApiAuthVerifyCodePost( { username: username.trim(), code: verificationCode.trim() });
+      
+      if (response.data.success) {
+        setCurrentStep('password');
+      } else {
+        setError(response.data.message || 'Invalid verification code');
+      }
+    } catch (err: any) {
+      setError('Failed to verify code. Please try again.');
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
-    // Validate passwords match
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-    
-    // Validate password length
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-    
-    setLoading(true);
-    
+
     try {
-      const authApi = AuthApiFactory();
-      const userCreate: UserCreate = {
-        username,
-        password
-      };
-      
-      const response = await authApi.registerApiAuthRegisterPost(userCreate);
+      const authApi = createAuthenticatedClient(AuthApi);
+      const response = await authApi.registerApiAuthRegisterPost( { username: username.trim(), password, verification_code: verificationCode.trim() });
       
       if (response.status === 200) {
         onSuccess();
       }
     } catch (err: any) {
-      if (err.response?.data?.detail) {
-        setError(err.response.data.detail);
-      } else {
-        setError('Registration failed. Please try again.');
-      }
-    } finally {
-      setLoading(false);
+      setError('Registration failed. Please try again.');
     }
+  };
+
+  const handleBackToUsername = () => {
+    setCurrentStep('username');
+    setVerificationCode('');
+    setVerificationSent(false);
+    setError('');
+  };
+
+  const handleBackToVerification = () => {
+    setCurrentStep('verification');
+    setPassword('');
+    setConfirmPassword('');
+    setError('');
   };
 
   return (
     <div className="register-form">
-      <h2>Register</h2>
-      {error && <div className="error-message">{error}</div>}
+      {currentStep === 'username' && (
+        <UsernameStep
+          username={username}
+          error={error}
+          onUsernameChange={setUsername}
+          onSendVerificationCode={handleSendVerificationCode}
+        />
+      )}
       
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="reg-username">Username</label>
-          <input
-            type="text"
-            id="reg-username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="reg-password">Password</label>
-          <input
-            type="password"
-            id="reg-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="confirm-password">Confirm Password</label>
-          <input
-            type="password"
-            id="confirm-password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-        </div>
-        
-        <button type="submit" disabled={loading} className="submit-button">
-          {loading ? 'Registering...' : 'Register'}
-        </button>
-      </form>
+      {currentStep === 'verification' && (
+        <VerificationStep
+          username={username}
+          verificationCode={verificationCode}
+          error={error}
+          onVerificationCodeChange={setVerificationCode}
+          onVerifyCode={handleVerifyCode}
+          onBackToUsername={handleBackToUsername}
+        />
+      )}
+      
+      {currentStep === 'password' && (
+        <PasswordStep
+          username={username}
+          password={password}
+          confirmPassword={confirmPassword}
+          error={error}
+          onPasswordChange={setPassword}
+          onConfirmPasswordChange={setConfirmPassword}
+          onSubmit={handleRegister}
+          onBackToVerification={handleBackToVerification}
+        />
+      )}
     </div>
   );
 };

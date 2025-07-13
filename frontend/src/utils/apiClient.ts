@@ -18,16 +18,3 @@ export const createAuthenticatedClient = <T extends DefaultApi | HealthApi | Car
   
   return new ApiClass(config);
 };
-
-/**
- * Creates a basic API client without authentication
- */
-export const createClient = <T extends DefaultApi | HealthApi | CardApi | DeckApi | CardStatsApi | AuthApi>(
-  ApiClass: new (config: Configuration) => T
-): T => {
-  const config = new Configuration({
-    basePath
-  });
-  
-  return new ApiClass(config);
-}; 

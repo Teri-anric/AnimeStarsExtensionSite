@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, UTC
-from sqlalchemy import Column, String, Boolean, ForeignKey, func
+from sqlalchemy import Column, String, Boolean, ForeignKey, func, text
 from sqlalchemy.orm import column_property
 from .base import Base, UUIDPKMixin, TimestampMixin
 
@@ -18,10 +18,13 @@ class VerificationCode(UUIDPKMixin, TimestampMixin, Base):
     code = Column(String, nullable=False)
     is_used = Column(Boolean, default=False)
 
-    @column_property
-    @classmethod
-    def is_valid(cls):
+    @property
+    def is_valid(self):
         return (
-            cls.created_at
-            + timedelta(minutes=settings.auth.code_expire_minutes)
-        ) > func.now()
+            self.created_at + timedelta(minutes=settings.auth.code_expire_minutes)
+        ) > datetime.now(UTC).replace(tzinfo=None)
+
+    is_valid_sql = column_property(
+        (func.now() - timedelta(minutes=settings.auth.code_expire_minutes))
+        < text("created_at")
+    )

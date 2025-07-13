@@ -30,17 +30,11 @@ async def send_verification_code(
             detail="Username not found on Animestar",
         )
     
-    try:
-        await verification_service.create_and_send_code(request.username)
-        
-        return SendVerificationCodeResponse(
-            message=f"Verification code sent to {request.username}"
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error sending verification code: {str(e)}"
-        )
+    await verification_service.create_and_send_code(request.username)
+    
+    return SendVerificationCodeResponse(
+        message=f"Verification code sent to {request.username}"
+    )
 
 
 @router.post("/verify-code", response_model=VerifyCodeResponse)
@@ -49,25 +43,18 @@ async def verify_code(
     verification_service: VerificationServiceDep,
 ):
     """Verify the provided code for the username."""
-    try:
-        is_valid = await verification_service.verify_code(request.username, request.code)
-        
-        if is_valid:
-            return VerifyCodeResponse(
-                success=True,
-                message="Verification code verified successfully"
-            )
-        else:
-            return VerifyCodeResponse(
-                success=False,
-                message="Invalid or expired verification code"
-            )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error verifying code: {str(e)}"
+    is_valid = await verification_service.verify_code(request.username, request.code)
+    
+    if is_valid:
+        return VerifyCodeResponse(
+            success=True,
+            message="Verification code verified successfully"
         )
-
+    else:
+        return VerifyCodeResponse(
+            success=False,
+            message="Invalid or expired verification code"
+        )
 
 @router.post("/register", response_model=UserResponse)
 async def register(
