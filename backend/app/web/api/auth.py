@@ -2,18 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException, status, Path
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
 from uuid import UUID
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..schema.auth import (
-    UserCreate, Token, UserResponse, LogoutResponse,
+    Token, UserResponse, LogoutResponse,
     SendVerificationCodeRequest, SendVerificationCodeResponse,
     VerifyCodeRequest, VerifyCodeResponse, RegisterWithVerificationRequest
 )
 from ..schema.sessions import SessionResponse, SessionRevokeResponse
 from ..auth import get_password_hash, verify_password
 from ..auth.deps import TokenDep, TokenRepositoryDep, UserRepositoryDep, UserDep
-from ..deps import AnimestarsUserRepoDep, DatabaseDep
-from ...parser.services import VerificationService
+from ..deps import AnimestarsUserRepoDep, VerificationServiceDep
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -21,14 +19,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/send-verification", response_model=SendVerificationCodeResponse)
 async def send_verification_code(
     request: SendVerificationCodeRequest,
-    db: DatabaseDep,
     animestars_user_repo: AnimestarsUserRepoDep,
+    verification_service: VerificationServiceDep,
 ):
     """Send verification code to username."""
-    # Check if animestars user exists
-    if request.username == "Teri":
-        await animestars_user_repo.create(username=request.username)
-
     animestars_user = await animestars_user_repo.get_by_username(request.username)
     if animestars_user is None:
         raise HTTPException(
@@ -37,7 +31,6 @@ async def send_verification_code(
         )
     
     try:
-        verification_service = VerificationService(db)
         await verification_service.create_and_send_code(request.username)
         
         return SendVerificationCodeResponse(
@@ -53,11 +46,10 @@ async def send_verification_code(
 @router.post("/verify-code", response_model=VerifyCodeResponse)
 async def verify_code(
     request: VerifyCodeRequest,
-    db: DatabaseDep,
+    verification_service: VerificationServiceDep,
 ):
     """Verify the provided code for the username."""
     try:
-        verification_service = VerificationService(db)
         is_valid = await verification_service.verify_code(request.username, request.code)
         
         if is_valid:
@@ -80,7 +72,7 @@ async def verify_code(
 @router.post("/register", response_model=UserResponse)
 async def register(
     user_data: RegisterWithVerificationRequest,
-    db: DatabaseDep,
+    verification_service: VerificationServiceDep,
     user_repo: UserRepositoryDep,
     animestars_user_repo: AnimestarsUserRepoDep,
 ):
@@ -92,11 +84,7 @@ async def register(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered",
         )
-    
-    # Check if animestars user exists
-    if user_data.username == "Teri":
-        await animestars_user_repo.create(username=user_data.username)
-
+  
     animestars_user = await animestars_user_repo.get_by_username(user_data.username)
     if animestars_user is None:
         raise HTTPException(
@@ -105,8 +93,7 @@ async def register(
         )
     
     # Verify the code
-    verification_service = VerificationService(db)
-    is_valid = await verification_service.verify_code(user_data.username, user_data.verification_code)
+    is_valid = await verification_service.mark_code_as_used(user_data.username, user_data.verification_code)
     
     if not is_valid:
         raise HTTPException(

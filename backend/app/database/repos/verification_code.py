@@ -19,6 +19,9 @@ class VerificationCodeRepository(CRUDRepository):
 
         if not code:
             return False
-        
-        await self.update(code.id, is_used=True)
-        return True
+
+        return code.is_valid
+
+    async def mark_code_as_used(self, username: str, code: str) -> bool:
+        count = await self.update(code.id, is_used=True)
+        return count > 0

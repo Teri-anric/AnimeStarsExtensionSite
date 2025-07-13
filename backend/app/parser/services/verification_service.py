@@ -37,7 +37,7 @@ class VerificationService:
         # Send PM with the code
         message = (
             f"Your code: {code}\n"
-            f"It code expired {settings.pm.code_expire_hours} hours."
+            f"It code expired {settings.auth.code_expire_minutes} minutes."
         )
         await self._send_pm_message(username, message)
 
@@ -47,5 +47,17 @@ class VerificationService:
         """Verify the provided code for the username."""
         # Get valid verification code
         return await self.verification_code_repo.verify_code(
+            username=username, code=code
+        )
+
+    async def mark_code_as_used(self, username: str, code: str) -> bool:
+        """Mark the code as used."""
+        is_valid = await self.verification_code_repo.verify_code(
+            username=username, code=code
+        )
+        if not is_valid:
+            return False
+    
+        return await self.verification_code_repo.mark_code_as_used(
             username=username, code=code
         )
