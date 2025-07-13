@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatTimeAgo, formatDateTime } from '../../utils/dateUtils';
 import '../../styles/settings/SessionsSettings.css';
 
@@ -10,6 +11,7 @@ interface Session {
 }
 
 const SessionsSettings = () => {
+  const { t } = useTranslation();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +44,7 @@ const SessionsSettings = () => {
     } catch (err) {
       console.error('Failed to fetch sessions:', err);
       setApiAvailable(false);
-      setError('API not available yet');
+      setError(t('settings.apiNotAvailable'));
     } finally {
       setLoading(false);
     }
@@ -70,7 +72,7 @@ const SessionsSettings = () => {
       }
     } catch (err) {
       console.error('Failed to revoke session:', err);
-      setError('Failed to revoke session');
+      setError(t('settings.failedToRevokeSession'));
     }
   };
 
@@ -83,43 +85,42 @@ const SessionsSettings = () => {
     return (
       <div className="sessions-content">
         <div className="settings-section">
-          <h2>Session Management</h2>
+          <h2>{t('settings.sessionManagement')}</h2>
           <div className="setting-description">
-            Manage your active sessions across different devices and browsers.
-            You can view all your current sessions and revoke access from devices you no longer use.
+            {t('settings.sessionManagementDescription')}
           </div>
         </div>
 
         <div className="feature-coming-soon">
           <div className="feature-icon">🚧</div>
-          <h3>Feature Coming Soon</h3>
+          <h3>{t('settings.featureComingSoon')}</h3>
           <p className="feature-description">
-            The session management feature is currently being developed and will be available soon.
+            {t('settings.featureDescription')}
           </p>
 
           <div className="feature-benefits">
-            <h4>What you'll be able to do:</h4>
+            <h4>{t('settings.whatYouWillBeAbleToDo')}</h4>
             <ul>
-              <li>View all your active sessions across devices</li>
-              <li>See when each session was created and expires</li>
-              <li>Identify which device and browser each session belongs to</li>
-              <li>Revoke sessions from devices you no longer use</li>
-              <li>Monitor your account security</li>
+              <li>{t('settings.viewAllSessions')}</li>
+              <li>{t('settings.seeSessionInfo')}</li>
+              <li>{t('settings.identifyDevices')}</li>
+              <li>{t('settings.revokeSessions')}</li>
+              <li>{t('settings.monitorSecurity')}</li>
             </ul>
           </div>
 
           <div className="feature-status">
             <div className="status-item">
-              <span className="status-label">Backend API:</span>
-              <span className="status-value ready">Ready</span>
+              <span className="status-label">{t('settings.backendApi')}</span>
+              <span className="status-value ready">{t('settings.ready')}</span>
             </div>
             <div className="status-item">
-              <span className="status-label">Frontend UI:</span>
-              <span className="status-value ready">Ready</span>
+              <span className="status-label">{t('settings.frontendUi')}</span>
+              <span className="status-value ready">{t('settings.ready')}</span>
             </div>
             <div className="status-item">
-              <span className="status-label">Deployment:</span>
-              <span className="status-value pending">Pending</span>
+              <span className="status-label">{t('settings.deployment')}</span>
+              <span className="status-value pending">{t('settings.pending')}</span>
             </div>
           </div>
         </div>
@@ -129,7 +130,7 @@ const SessionsSettings = () => {
             onClick={fetchSessions}
             className="button button-secondary"
           >
-            Check API Status
+            {t('settings.checkApiStatus')}
           </button>
         </div>
       </div>
@@ -140,7 +141,7 @@ const SessionsSettings = () => {
     return (
       <div className="sessions-content">
         <div className="loading">
-          Loading sessions...
+          {t('settings.loadingSessions')}
         </div>
       </div>
     );
@@ -149,10 +150,9 @@ const SessionsSettings = () => {
   return (
     <div className="sessions-content">
       <div className="settings-section">
-        <h2>Session Management</h2>
+        <h2>{t('settings.sessionManagement')}</h2>
         <div className="setting-description">
-          Manage your active sessions across different devices and browsers.
-          You can view all your current sessions and revoke access from devices you no longer use.
+          {t('settings.sessionManagementDescription')}
         </div>
       </div>
 
@@ -160,14 +160,14 @@ const SessionsSettings = () => {
         <div className="error-message">
           {error}
           <button onClick={fetchSessions} className="button button-secondary">
-            Retry
+            {t('settings.retry')}
           </button>
         </div>
       )}
 
       {sessions.length === 0 ? (
         <div className="no-sessions">
-          <p>No active sessions found.</p>
+          <p>{t('settings.noActiveSessions')}</p>
         </div>
       ) : (
         <div className="sessions-list">
@@ -175,14 +175,14 @@ const SessionsSettings = () => {
             <div key={session.id} className={`session-item ${session.is_current ? 'current-session' : ''}`}>
               <div className="session-info">
                 <div className="session-header">
-                  <span className="session-id">Session ID: {session.id.slice(0, 8)}...</span>
+                  <span className="session-id">{t('settings.sessionId')} {session.id.slice(0, 8)}...</span>
                   {session.is_current && (
-                    <span className="current-badge">Current Session</span>
+                    <span className="current-badge">{t('settings.currentSession')}</span>
                   )}
                 </div>
                 <div className="session-details">
-                  <p><strong>Created:</strong> {formatTimeAgo(session.created_at)}</p>
-                  <p><strong>Expires:</strong> {formatDateTime(session.expire_at)}</p>
+                  <p><strong>{t('settings.created')}</strong> {formatTimeAgo(session.created_at, t)}</p>
+                  <p><strong>{t('settings.expires')}</strong> {formatDateTime(session.expire_at)}</p>
                 </div>
               </div>
               {!session.is_current && (
@@ -190,7 +190,7 @@ const SessionsSettings = () => {
                   onClick={() => revokeSession(session.id)}
                   className="button button-danger"
                 >
-                  Revoke
+                  {t('settings.revoke')}
                 </button>
               )}
             </div>
@@ -200,7 +200,7 @@ const SessionsSettings = () => {
 
       <div className="settings-actions">
         <button onClick={fetchSessions} className="button button-secondary">
-          Refresh Sessions
+          {t('settings.refreshSessions')}
         </button>
       </div>
     </div>

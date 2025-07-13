@@ -153,7 +153,7 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
               style={{ color: getFreshnessColor(stat.updated_at) }}
             >
               <FiClock size={12} />
-              <span>{formatTimeAgo(stat.updated_at)}</span>
+              <span>{formatTimeAgo(stat.updated_at, t)}</span>
             </div>
           </div>
         ))}

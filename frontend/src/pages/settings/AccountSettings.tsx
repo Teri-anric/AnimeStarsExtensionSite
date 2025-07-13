@@ -3,10 +3,12 @@ import { useDomain } from '../../context/DomainContext';
 import { createAuthenticatedClient } from '../../utils/apiClient';
 import { AuthApi, UserResponse } from '../../client';
 import { formatTimeAgo } from '../../utils/dateUtils';
+import { useTranslation } from 'react-i18next';
 import '../../styles/settings/AccountSettings.css';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 
 const AccountSettings = () => {
+  const { t } = useTranslation();
   const { currentDomain, setCurrentDomain, availableDomains } = useDomain();
   const [successMessage, setSuccessMessage] = useState('');
   const [userInfo, setUserInfo] = useState<UserResponse | null>(null);
@@ -23,7 +25,7 @@ const AccountSettings = () => {
         setUserInfo(response.data);
       } catch (err) {
         console.error('Failed to fetch user info:', err);
-        setError('Failed to load user information');
+        setError(t('settings.failedToLoadUserInfo'));
       } finally {
         setLoading(false);
       }
@@ -35,7 +37,7 @@ const AccountSettings = () => {
   const handleDomainChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newDomain = e.target.value;
     setCurrentDomain(newDomain);
-    setSuccessMessage('Domain settings updated successfully');
+    setSuccessMessage(t('settings.domainSettingsUpdated'));
     
     // Clear success message after 3 seconds
     setTimeout(() => {
@@ -49,9 +51,9 @@ const AccountSettings = () => {
     return (
       <div className="account-settings-content">
         <div className="settings-section">
-          <h2>User Information</h2>
+          <h2>{t('settings.userInformation')}</h2>
           <div className="setting-item">
-            <div className="loading">Loading user information...</div>
+            <div className="loading">{t('settings.loadingUserInfo')}</div>
           </div>
         </div>
       </div>
@@ -62,7 +64,7 @@ const AccountSettings = () => {
     return (
       <div className="account-settings-content">
         <div className="settings-section">
-          <h2>User Information</h2>
+          <h2>{t('settings.userInformation')}</h2>
           <div className="setting-item">
             <div className="error-message">{error}</div>
           </div>
@@ -74,16 +76,16 @@ const AccountSettings = () => {
   return (
     <div className="account-settings-content">
       <div className="settings-section">
-        <h2>User Information</h2>
+        <h2>{t('settings.userInformation')}</h2>
         {userInfo && (
           <>
             <div className="setting-item">
-              <label>Username</label>
+              <label>{t('common.username')}</label>
               <div className="setting-value">{userInfo.username}</div>
             </div>
             <div className="setting-item">
-              <label>Account Created</label>
-              <div className="setting-value">{formatTimeAgo(userInfo.created_at)}</div>
+              <label>{t('settings.accountCreated')}</label>
+              <div className="setting-value">{formatTimeAgo(userInfo.created_at, t)}</div>
             </div>
             <LanguageSwitcher />
 
@@ -92,12 +94,12 @@ const AccountSettings = () => {
       </div>
       
       <div className="settings-section">
-        <h2>Site Settings</h2>
+        <h2>{t('settings.siteSettings')}</h2>
         
         <div className="setting-item">
-          <label htmlFor="domain-setting">Card Domain</label>
+          <label htmlFor="domain-setting">{t('settings.cardDomain')}</label>
           <div className="setting-description">
-            Select the domain used to display card images and media
+            {t('settings.cardDomainDescription')}
           </div>
           <select 
             id="domain-setting" 

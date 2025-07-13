@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useExtensionAuth } from '../hooks/useExtensionAuth';
 import '../styles/components/ExtensionStatus.css';
 
@@ -11,6 +12,7 @@ const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
   showDetails = true, 
   className = '' 
 }) => {
+  const { t } = useTranslation();
   const { 
     extensionInfo, 
     initializeExtensionToken, 
@@ -26,10 +28,10 @@ const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
   };
 
   const getStatusText = () => {
-    if (isInitializing) return 'Connecting...';
-    if (extensionInfo.hasExtension && extensionInfo.isConnected) return 'Connected';
-    if (extensionInfo.hasExtension && !extensionInfo.isConnected) return 'Detected (Not Connected)';
-    return 'Not Detected';
+    if (isInitializing) return t('extensionStatus.connecting');
+    if (extensionInfo.hasExtension && extensionInfo.isConnected) return t('extensionStatus.connected');
+    if (extensionInfo.hasExtension && !extensionInfo.isConnected) return t('extensionStatus.detectedNotConnected');
+    return t('extensionStatus.notDetected');
   };
 
   const getStatusClass = () => {
@@ -56,7 +58,7 @@ const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
     <div className={`extension-status ${className}`}>
       <div className={`status-indicator ${getStatusClass()}`}>
         <span className="status-icon">{getStatusIcon()}</span>
-        <span className="status-text">Extension: {getStatusText()}</span>
+        <span className="status-text">{t('extensionStatus.extension')} {getStatusText()}</span>
         {extensionInfo.extensionVersion && (
           <span className="status-version">v{extensionInfo.extensionVersion}</span>
         )}
@@ -67,14 +69,13 @@ const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
           {!extensionInfo.hasExtension && (
             <div className="status-message info">
               <p>
-                📥 Install the Anime Stars Browser Extension to sync your card statistics 
-                and get enhanced features while browsing anime card sites.
+                {t('extensionStatus.installMessage')}
               </p>
               <button 
                 className="install-button"
                 onClick={handleInstallExtension}
               >
-                Install Extension
+                {t('extensionStatus.installExtension')}
               </button>
             </div>
           )}
@@ -82,14 +83,14 @@ const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
           {extensionInfo.hasExtension && !extensionInfo.isConnected && (
             <div className="status-message warning">
               <p>
-                🔌 Extension detected but not connected. Click to establish connection.
+                {t('extensionStatus.detectedNotConnectedMessage')}
               </p>
               <button 
                 className="connect-button"
                 onClick={handleRetryConnection}
                 disabled={isInitializing}
               >
-                {isInitializing ? 'Connecting...' : 'Connect Extension'}
+                {isInitializing ? t('extensionStatus.connecting') : t('extensionStatus.connectExtension')}
               </button>
             </div>
           )}
@@ -97,18 +98,18 @@ const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
           {extensionInfo.hasExtension && extensionInfo.isConnected && (
             <div className="status-message success">
               <div className="connection-info">
-                <h4>🎉 Extension Connected Successfully!</h4>
+                <h4>{t('extensionStatus.connectedSuccessfully')}</h4>
                 <p>
-                  Your browser extension is connected and ready to sync card statistics.
+                  {t('extensionStatus.connectedMessage')}
                 </p>
                 
                 <div className="features-active">
-                  <h5>Active Features:</h5>
+                  <h5>{t('extensionStatus.activeFeatures')}</h5>
                   <ul>
-                    <li>✅ Card statistics synchronization</li>
-                    <li>✅ Real-time data updates</li>
-                    <li>✅ Cross-platform card tracking</li>
-                    <li>✅ Enhanced browsing experience</li>
+                    <li>{t('extensionStatus.cardStatsSync')}</li>
+                    <li>{t('extensionStatus.realTimeUpdates')}</li>
+                    <li>{t('extensionStatus.crossPlatformTracking')}</li>
+                    <li>{t('extensionStatus.enhancedBrowsing')}</li>
                   </ul>
                 </div>
               </div>
@@ -118,20 +119,20 @@ const ExtensionStatus: React.FC<ExtensionStatusProps> = ({
                 onClick={handleRetryConnection}
                 disabled={isInitializing}
               >
-                Refresh Connection
+                {t('extensionStatus.refreshConnection')}
               </button>
             </div>
           )}
 
           {error && (
             <div className="status-message error">
-              <p>❌ Connection Error: {error}</p>
+              <p>{t('extensionStatus.connectionError')} {error}</p>
               <button 
                 className="retry-button"
                 onClick={handleRetryConnection}
                 disabled={isInitializing}
               >
-                Retry
+                {t('extensionStatus.retryConnection')}
               </button>
             </div>
           )}

@@ -177,11 +177,11 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
             )}
             
             {card.created_at && (
-              <CardInfoRow label={t('cardInfoPanel.created')} value={formatTimeAgo(card.created_at)} />
+              <CardInfoRow label={t('cardInfoPanel.created')} value={formatTimeAgo(card.created_at, t)} />
             )}
             
             {card.updated_at && (
-              <CardInfoRow label={t('cardInfoPanel.updated')} value={formatTimeAgo(card.updated_at)} />
+              <CardInfoRow label={t('cardInfoPanel.updated')} value={formatTimeAgo(card.updated_at, t)} />
             )}
 
             {/* Card Statistics Display */}

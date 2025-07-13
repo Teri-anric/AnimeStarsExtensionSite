@@ -299,9 +299,9 @@ const CardDetailPage: React.FC = () => {
                   <div className="value-with-actions">
                     <span>
                       {formatDateTime(card.created_at)}
-                      {formatTimeAgo(card.created_at) && (
+                      {formatTimeAgo(card.created_at, t) && (
                         <span style={{ color: 'var(--tt-2)', fontSize: '13px', marginLeft: '8px' }}>
-                          ({formatTimeAgo(card.created_at)})
+                          ({formatTimeAgo(card.created_at, t)})
                         </span>
                       )}
                     </span>
@@ -315,9 +315,9 @@ const CardDetailPage: React.FC = () => {
                   <div className="value-with-actions">
                     <span>
                       {formatDateTime(card.updated_at)}
-                      {formatTimeAgo(card.updated_at) && (
+                      {formatTimeAgo(card.updated_at, t ) && (
                         <span style={{ color: 'var(--tt-2)', fontSize: '13px', marginLeft: '8px' }}>
-                          ({formatTimeAgo(card.updated_at)})
+                          ({formatTimeAgo(card.updated_at, t)})
                         </span>
                       )}
                     </span>
