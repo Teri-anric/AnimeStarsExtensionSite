@@ -1,6 +1,5 @@
 .decks-container {
   padding: 20px;
-  margin: 0 auto;
   color: white !important;
   width: 100%;
   background: var(--bg);
@@ -25,7 +24,6 @@
   font-size: 1.1rem;
   margin-bottom: 0;
   max-width: 600px;
-  margin: 0 auto;
 }
 
 .decks-controls {

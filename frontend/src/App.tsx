@@ -8,8 +8,7 @@ import {
   CardsPage, 
   CardDetailPage,
   RandomAnimeGifPage, 
-  AccountSettingsPage,
-  SessionsPage
+  SettingsPage
 } from './pages';
 import { DecksListPage, DeckDetailPage } from './pages/decks';
 import Header from './components/Header';
@@ -53,14 +52,9 @@ function App() {
                       <DeckDetailPage />
                     </ProtectedRoute>
                   } />
-                  <Route path="/settings" element={
+                  <Route path="/settings/*" element={
                     <ProtectedRoute>
-                      <AccountSettingsPage />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/sessions" element={
-                    <ProtectedRoute>
-                      <SessionsPage />
+                      <SettingsPage />
                     </ProtectedRoute>
                   } />
                   <Route path="/" element=

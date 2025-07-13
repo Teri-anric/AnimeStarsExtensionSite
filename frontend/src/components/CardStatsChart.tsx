@@ -20,6 +20,7 @@ import {
 } from '../client';
 import { createAuthenticatedClient } from '../utils/apiClient';
 import { useAuth } from '../context/AuthContext';
+import { formatChartDate } from '../utils/dateUtils';
 import 'chartjs-adapter-date-fns';
 
 ChartJS.register(
@@ -180,13 +181,7 @@ const CardStatsChart: React.FC<CardStatsChartProps> = ({ cardId, className = '' 
         callbacks: {
           title: (context: any[]) => {
             if (context[0]?.parsed?.x) {
-              return new Date(context[0].parsed.x).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              });
+              return formatChartDate(context[0].parsed.x);
             }
             return '';
           },

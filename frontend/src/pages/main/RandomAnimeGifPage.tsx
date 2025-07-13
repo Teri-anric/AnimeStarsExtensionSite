@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { createAuthenticatedClient } from "../../utils/apiClient";
 import { HealthApi } from "../../client";
+import { formatTime, formatCurrentTime } from "../../utils/dateUtils";
+import { formatNumber } from "../../utils/formatUtils";
 
 interface GifHistoryItem {
     id: string;
@@ -166,7 +168,7 @@ const RandomAnimeGifPage = () => {
                                     <img src={item.url} alt={item.reaction} />
                                     <span className="history-reaction">{item.reaction}</span>
                                     <span className="history-time">
-                                        {new Date(item.timestamp).toLocaleTimeString()}
+                                        {formatTime(item.timestamp)}
                                     </span>
                                 </div>
                             ))}
@@ -201,19 +203,19 @@ const RandomAnimeGifPage = () => {
                                 <h4>Database Stats</h4>
                                 <div className="status-item">
                                     <span className="status-label">Total Cards:</span>
-                                    <span className="status-value">{(healthInfo.database_stats.total_cards ?? 0).toLocaleString()}</span>
+                                    <span className="status-value">{formatNumber(healthInfo.database_stats.total_cards)}</span>
                                 </div>
                                 <div className="status-item">
                                     <span className="status-label">Total Users:</span>
-                                    <span className="status-value">{(healthInfo.database_stats.total_users ?? 0).toLocaleString()}</span>
+                                    <span className="status-value">{formatNumber(healthInfo.database_stats.total_users)}</span>
                                 </div>
                                 <div className="status-item">
                                     <span className="status-label">Cards with Stats:</span>
-                                    <span className="status-value">{(healthInfo.database_stats.cards_with_stats ?? 0).toLocaleString()}</span>
+                                    <span className="status-value">{formatNumber(healthInfo.database_stats.cards_with_stats)}</span>
                                 </div>
                                 <div className="status-item">
                                     <span className="status-label">Stats Today:</span>
-                                    <span className="status-value">{(healthInfo.database_stats.cards_stats_today ?? 0).toLocaleString()}</span>
+                                    <span className="status-value">{formatNumber(healthInfo.database_stats.cards_stats_today)}</span>
                                 </div>
                             </div>
                         )}
@@ -221,7 +223,7 @@ const RandomAnimeGifPage = () => {
                         <div className="status-item timestamp">
                             <span className="status-label">Last Updated:</span>
                             <span className="status-value">
-                                {new Date().toLocaleTimeString()}
+                                {formatCurrentTime()}
                             </span>
                         </div>
                     </div>

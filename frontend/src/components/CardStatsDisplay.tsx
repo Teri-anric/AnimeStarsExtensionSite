@@ -3,6 +3,7 @@ import { FiClock } from 'react-icons/fi';
 import { CardUsersStatsSchema, CardStatsApi, CardCollection } from '../client';
 import { useAuth } from '../context/AuthContext';
 import { createAuthenticatedClient } from '../utils/apiClient';
+import { formatTimeAgo } from '../utils/dateUtils';
 import '../styles/CardStatsDisplay.css';
 
 interface CardStatsDisplayProps {
@@ -68,32 +69,7 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
     }
   };
 
-  const formatTimeAgo = (dateString: string): string => {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diffInMs = now.getTime() - date.getTime();
-    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-    const diffInDays = Math.floor(diffInHours / 24);
-    const diffInWeeks = Math.floor(diffInDays / 7);
-    const diffInMonths = Math.floor(diffInDays / 30);
 
-    if (diffInMs < 0) return 'Future';
-    if (diffInHours < 1) {
-      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-      return diffInMinutes <= 0 ? 'Just now' : `${diffInMinutes}m ago`;
-    } else if (diffInHours < 24) {
-      return `${diffInHours}h ago`;
-    } else if (diffInDays < 7) {
-      return `${diffInDays}d ago`;
-    } else if (diffInWeeks < 4) {
-      return `${diffInWeeks}w ago`;
-    } else if (diffInMonths < 12) {
-      return `${diffInMonths}mo ago`;
-    } else {
-      const diffInYears = Math.floor(diffInDays / 365);
-      return `${diffInYears}y ago`;
-    }
-  };
 
   const getFreshnessColor = (dateString: string): string => {
     const now = new Date();

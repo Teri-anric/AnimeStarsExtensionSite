@@ -3,6 +3,7 @@ import { FiExternalLink, FiMaximize2, FiClipboard, FiLayers } from 'react-icons/
 import { useNavigate } from 'react-router-dom';
 import { CardSchema } from '../client';
 import { useDomain } from '../context/DomainContext';
+import { formatTimeAgo } from '../utils/dateUtils';
 import CardStatsDisplay from './CardStatsDisplay';
 import '../styles/CardInfoPanel.css';
 
@@ -78,37 +79,7 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
     return url.toString();
   };
 
-  const formatTimeAgo = (dateString: string | null) => {
-    if (!dateString) return 'Unknown';
-    try {
-      const now = new Date();
-      const date = new Date(dateString);
-      const diffInMs = now.getTime() - date.getTime();
-      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-      const diffInDays = Math.floor(diffInHours / 24);
-      const diffInWeeks = Math.floor(diffInDays / 7);
-      const diffInMonths = Math.floor(diffInDays / 30);
-      const diffInYears = Math.floor(diffInDays / 365);
 
-      if (diffInMs < 0) return 'Future date';
-      if (diffInHours < 1) {
-        const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-        return diffInMinutes <= 0 ? 'Just now' : `${diffInMinutes}m ago`;
-      } else if (diffInHours < 24) {
-        return `${diffInHours}h ago`;
-      } else if (diffInDays < 7) {
-        return `${diffInDays}d ago`;
-      } else if (diffInWeeks < 4) {
-        return `${diffInWeeks}w ago`;
-      } else if (diffInMonths < 12) {
-        return `${diffInMonths}mo ago`;
-      } else {
-        return `${diffInYears}y ago`;
-      }
-    } catch {
-      return 'Unknown';
-    }
-  };
 
 
   if (!card) return null;

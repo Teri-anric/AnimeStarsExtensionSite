@@ -1,0 +1,256 @@
+/* Settings Page Layout */
+.settings-page {
+  width: 70%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.settings-header {
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--bdc-3);
+  padding-bottom: 20px;
+}
+
+.settings-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--tt);
+}
+
+.settings-layout {
+  display: flex;
+  gap: 40px;
+  min-height: 600px;
+}
+
+/* Sidebar Navigation */
+.settings-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: var(--tt-2);
+  border-radius: var(--main-border-radius);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.settings-nav-item:hover {
+  background-color: var(--ui-bg-accent);
+  color: var(--tt);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.settings-nav-item.active {
+  background-color: var(--accent);
+  color: var(--ui-text-color-on-accent);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(158, 41, 79, 0.3);
+}
+
+.nav-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.nav-label {
+  font-weight: 500;
+}
+
+/* Content Area */
+.settings-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Settings Sections */
+.settings-section {
+  margin-bottom: 40px;
+}
+
+.settings-section h2 {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--tt);
+  border-bottom: 1px solid var(--bdc-3);
+  padding-bottom: 8px;
+}
+
+.settings-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tt);
+}
+
+.settings-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tt);
+}
+
+/* Setting Items */
+.setting-item {
+  margin-bottom: 24px;
+}
+
+.setting-item label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--tt);
+  font-size: 14px;
+}
+
+.setting-value {
+  padding: 8px 12px;
+  background-color: var(--ui-bg-accent);
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  font-size: 14px;
+  color: var(--tt);
+  min-height: 20px;
+}
+
+.setting-description {
+  margin-bottom: 12px;
+  color: var(--tt-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.setting-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 8px 12px;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  font-size: 14px;
+  background-color: var(--ui-bg);
+  color: var(--tt);
+  transition: border-color 0.2s ease;
+}
+
+.setting-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(158, 41, 79, 0.1);
+}
+
+/* Buttons */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: none;
+  font-family: inherit;
+}
+
+.button-secondary {
+  color: var(--tt);
+  background-color: var(--ui-bg-accent);
+  border-color: var(--bdc-3);
+}
+
+.button-secondary:hover {
+  background-color: var(--accent);
+  color: var(--ui-text-color-on-accent);
+  transform: translateY(-1px);
+}
+
+.button-danger {
+  color: var(--ui-text-color-on-accent);
+  background-color: var(--accent-red);
+  border-color: var(--accent-red);
+}
+
+.button-danger:hover {
+  background-color: #d32f2f;
+  border-color: #d32f2f;
+  transform: translateY(-1px);
+}
+
+/* Messages */
+.success-message {
+  padding: 12px 16px;
+  background-color: rgba(76, 175, 80, 0.1);
+  border: 1px solid var(--accent-green);
+  border-radius: var(--main-border-radius);
+  color: var(--accent-green);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  padding: 12px 16px;
+  background-color: rgba(244, 67, 54, 0.1);
+  border: 1px solid var(--accent-red);
+  border-radius: var(--main-border-radius);
+  color: var(--accent-red);
+  font-size: 14px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Actions */
+.settings-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .settings-layout {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .settings-sidebar {
+    width: 100%;
+  }
+  
+  .settings-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  
+  .settings-nav-item {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  
+  .settings-actions {
+    flex-direction: column;
+  }
+}

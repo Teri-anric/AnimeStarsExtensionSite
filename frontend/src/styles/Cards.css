@@ -1,6 +1,5 @@
 .cards-container {
   padding: 20px;
-  margin: 0 auto;
   color: white !important;
   width: 100%;
   transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);

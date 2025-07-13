@@ -1,0 +1,126 @@
+/* Extension Settings Specific Styles */
+.extension-settings-content {
+  width: 100%;
+}
+
+.installation-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  background-color: var(--ui-bg-accent);
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: var(--accent);
+  color: var(--ui-text-color-on-accent);
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.step-content {
+  width: 100%;
+}
+
+.step-content h4 {
+  margin: 0 0 8px 0;
+  color: var(--tt);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.step-content p {
+  margin: 0;
+  color: var(--tt-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Download Buttons */
+.download-buttons {
+  gap: 12px;
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 1px solid transparent;
+  border-radius: var(--main-border-radius);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.download-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
+}
+
+.button-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.chrome-store-button {
+  background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+  color: white;
+  border-color: #4285f4;
+}
+
+.chrome-store-button:hover {
+  background: linear-gradient(135deg, #3367d6 0%, #2e7d32 100%);
+  border-color: #3367d6;
+  color: white;
+}
+
+.github-button {
+  background: linear-gradient(135deg, #24292e 0%, #586069 100%);
+  color: white;
+  border-color: #24292e;
+}
+
+.github-button:hover {
+  background: linear-gradient(135deg, #1b1f23 0%, #444d56 100%);
+  border-color: #1b1f23;
+  color: white;
+}
+
+/* Responsive Design for Extension Settings */
+@media (max-width: 768px) {
+  .download-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .download-button {
+    width: 100%;
+    min-width: auto;
+  }
+} 
