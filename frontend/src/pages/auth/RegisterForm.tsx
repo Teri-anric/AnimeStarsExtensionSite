@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AuthApi, SendVerificationCodeRequest, VerifyCodeRequest, RegisterWithVerificationRequest } from '../../client/api';
+import { AuthApi } from '../../client/api';
 import { createAuthenticatedClient } from '../../utils/apiClient';
 import { UsernameStep, VerificationStep, PasswordStep } from './Register';
 
@@ -16,7 +16,6 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [verificationSent, setVerificationSent] = useState(false);
 
   const handleSendVerificationCode = async () => {
     if (!username.trim()) {
@@ -31,7 +30,6 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       const response = await authApi.sendVerificationCodeApiAuthSendVerificationPost( { username: username.trim() });
       
       if (response.status === 200) {
-        setVerificationSent(true);
         setCurrentStep('verification');
       }
     } catch (err: any) {
@@ -85,7 +83,6 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const handleBackToUsername = () => {
     setCurrentStep('username');
     setVerificationCode('');
-    setVerificationSent(false);
     setError('');
   };
 
