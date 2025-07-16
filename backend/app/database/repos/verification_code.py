@@ -1,10 +1,12 @@
+from uuid import UUID
+
 from ..models import VerificationCode
 from .crud import CRUDRepository
 
 from sqlalchemy import select, and_
 
 
-class VerificationCodeRepository(CRUDRepository):
+class VerificationCodeRepository(CRUDRepository[VerificationCode, UUID]):
     @property
     def entry_class(self) -> type[VerificationCode]:
         return VerificationCode

@@ -18,6 +18,9 @@ class Card(BaseModel):
     mp4: str | None = None
     webm: str | None = None
 
+class AnimestarsUser(BaseModel):
+    username: str
+    club_id: int | None = None
 
 class PaginatedCards(PaginatedBase):
     cards: list[Card]

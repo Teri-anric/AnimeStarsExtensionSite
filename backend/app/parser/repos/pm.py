@@ -13,11 +13,13 @@ class AnimestarPMRepo(AnimestarBaseRepo):
         }
         resp = await self.client().post(
             "/engine/mods/pm/ajax.php",
-            data=from_data({
-                "message": message,
-                "name": username,
-                "action": "send",
-            }),
+            data=from_data(
+                {
+                    "message": message,
+                    "name": username,
+                    "action": "send",
+                }
+            ),
             headers=headers,
         )
         try:

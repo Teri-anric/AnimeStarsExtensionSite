@@ -11,6 +11,8 @@ class RateLimitError(AnimestarError):
 class LoginError(AnimestarError):
     pass
 
+class UnauthorizedError(AnimestarError):
+    pass
 
 class LoginHashError(AnimestarError):
     def __init__(self, url: str):

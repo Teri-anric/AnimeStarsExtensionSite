@@ -1,5 +1,6 @@
 from contextlib import AbstractAsyncContextManager
 from pathlib import Path
+from typing import Self
 
 import httpx
 from http.cookiejar import LWPCookieJar
@@ -139,14 +140,14 @@ class AnimestarBaseRepo(AbstractAsyncContextManager):
             )
         return self._client
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> Self:
         """Return `self` upon entering the runtime context."""
         return self
 
-    async def __aexit__(self, exc_type, exc_value, traceback):
+    async def __aexit__(self, exc_type, exc_value, traceback) -> None:
         await self.close()
 
-    async def close(self):
+    async def close(self) -> None:
         if self.cookie_file:
             self._save_cookie()
         if self._client:

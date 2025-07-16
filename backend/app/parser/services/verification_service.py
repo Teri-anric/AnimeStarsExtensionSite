@@ -1,10 +1,13 @@
 import secrets
 
-from ...database.repos import VerificationCodeRepository
-from ...config import settings
 from ..repos.pm import AnimestarPMRepo
 from ..repos.auth import AnimestarAuthRepo
-from ..exception import PMError
+from ..exception import AnimestarError, UnauthorizedError
+
+from ...database.repos.verification_code import VerificationCodeRepository
+from ...config import settings
+from ...database.repos.animestars_user import AnimestarsUserRepo
+from ...database.models.animestars.user import AnimestarsUser
 
 
 class VerificationServiceError(Exception):
@@ -14,42 +17,64 @@ class VerificationServiceError(Exception):
 class VerificationService:
     def __init__(self):
         self.verification_code_repo = VerificationCodeRepository()
+        self.animestars_user = AnimestarsUserRepo()
 
     def _generate_code(self) -> str:
         """Generate a 6-digit verification code."""
         return str(secrets.randbelow(1000000)).zfill(6)
 
+    def _generate_message(self, code: str) -> str:
+        return (
+            f"<p>Your code: {code}</p>\n"
+            f"<p>It code expired {settings.auth.code_expire_minutes} minutes.</p>"
+        )
+
     async def _send_pm_message(self, username: str, message: str):
         """Send PM message with automatic re-login on failure."""
-        try:
-            repo = AnimestarPMRepo(settings.pm.cookie_file)
-            result = await repo.send_pm(username, message)
-            return result
-        except PMError:
-            if not settings.pm.login or not settings.pm.password:
-                raise VerificationServiceError("Login and password are not set in the config")
-            
-            async with AnimestarAuthRepo(settings.pm.cookie_file) as auth_repo:
+        repo = AnimestarPMRepo(settings.pm.cookie_file)
+        result = await repo.send_pm(username, message)
+        return result
+
+    async def _check_username(self, username: str) -> str:
+        async with AnimestarAuthRepo(settings.pm.cookie_file) as auth_repo:
+            try:
+                user = await auth_repo.get_user(username)
+                return user.username
+            except UnauthorizedError:
+                if not settings.pm.login or not settings.pm.password:
+                    raise VerificationServiceError(
+                        "Login and password are not set in the config"
+                    )
                 await auth_repo.login(settings.pm.login, settings.pm.password)
-            # Retry sending the message
-            repo = AnimestarPMRepo(settings.pm.cookie_file)
-            return await repo.send_pm(username, message)
+                user = await auth_repo.get_user(username)
+                return user.username
+
+    async def _get_or_create_user(self, username: str) -> AnimestarsUser:
+        ani_user = await self.animestars_user.get_by_username(username)
+        if not ani_user:
+            ani_user = await self.animestars_user.create(username=username)
+        return ani_user
 
     async def create_and_send_code(self, username: str) -> bool:
         """Create a verification code and send it via PM."""
         code_obj = await self.verification_code_repo.get_active_code(username=username)
         if code_obj:
             return True
-        code = self._generate_code()
-        code_obj = await self.verification_code_repo.create(username=username, code=code)
 
-        # Send PM with the code
-        message = (
-            f"Your code: {code}\n"
-            f"It code expired {settings.auth.code_expire_minutes} minutes."
-        )
         try:
-            await self._send_pm_message(username, message)
+            ani_user = await self._get_or_create_user(
+                await self._check_username(username)
+            )
+        except AnimestarError:
+            raise VerificationServiceError(f"Not found user {username}")
+
+        code = self._generate_code()
+        code_obj = await self.verification_code_repo.create(
+            username=ani_user.username, code=code
+        )
+
+        try:
+            await self._send_pm_message(username, self._generate_message(code))
         except Exception as e:
             await self.verification_code_repo.delete(code_obj.id)
             raise e
@@ -69,7 +94,7 @@ class VerificationService:
         )
         if not is_valid:
             return False
-    
+
         return await self.verification_code_repo.mark_code_as_used(
             username=username, code=code
         )
