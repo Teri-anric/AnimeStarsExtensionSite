@@ -54,7 +54,7 @@ class AuthSettings(BaseSettings):
 
 class StorageSettings(BaseSettings):
     path: str = "/storage"
-    base_url: str = "/static/storage"
+    base_url: str = "/api/files/static/storage"
 
 
 class Settings(BaseSettings):

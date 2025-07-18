@@ -1,6 +1,14 @@
 ass-api.strawberrycat.dev {
+    # Кешування для статичних файлів
+    @static {
+        path /api/files/static/storage/*
+    }
+    
+    # Налаштування кешування для статичних файлів
+    header @static Cache-Control "public, max-age=31536000, immutable"
+    header @static X-Content-Type-Options "nosniff"
+    
     reverse_proxy http://backend:8000
-
 }
 
 ass.strawberrycat.dev {

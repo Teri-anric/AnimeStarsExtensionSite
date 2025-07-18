@@ -3,12 +3,17 @@ from datetime import datetime
 from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.web.deps import StorageServiceDep
 from app.web.auth.deps import get_current_user
 from app.database.models.animestars_user import AnimestarsUser
+from app.config import settings
 
 router = APIRouter(prefix="/files", tags=["files"])
+
+# Монтуємо статичну директорію для доступу до файлів
+router.mount("/static/storage", StaticFiles(directory=settings.storage.path), name="storage")
 
 
 @router.post("/upload")
