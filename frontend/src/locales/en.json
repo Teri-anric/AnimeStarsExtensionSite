@@ -59,7 +59,8 @@
     "randomGif": "Random GIF",
     "account": "Account",
     "extension": "Browser Extension",
-    "sessions": "Sessions"
+    "sessions": "Sessions",
+    "fqa": "FAQ"
   },
   "auth": {
     "login": "Login",
@@ -468,5 +469,126 @@
     "c": "C",
     "d": "D",
     "e": "E"
+  },
+  "fqa": {
+    "title": "Frequently Asked Questions",
+    "description": "Find answers to common questions about the Anime Stars browser extension and its features.",
+    "extensionSetup": {
+      "title": "Extension Setup",
+      "language": {
+        "question": "Language",
+        "answer": "What's unclear here? If you want localization in your language, write to me on Telegram."
+      }
+    },
+    "automaticFunctions": {
+      "title": "Automatic Functions",
+      "autoViewCards": {
+        "question": "Automatically view cards",
+        "answer": "Collects cards from anime viewing.\n\nHow does it work? It's simple - as soon as a card appears, the extension automatically clicks on it and closes the card modal window."
+      },
+      "collectCards": {
+        "question": "Collect cards from viewing",
+        "answer": "Does the same as automatically view cards, but after clicking, it leaves the card in place, and when the next one appears, it places it on top of the previous one.\n\nHow does it work? So that the site doesn't know that the card hasn't been opened yet, the extension makes a copy of this card so that the site doesn't know about its existence.\n\n![Card Stack Preview](/images/screenshot/card_stack_preview.png)"
+      },
+      "collectionAsWatchlist": {
+        "question": "Collection as watchlist",
+        "answer": "In the site header, there's a 'Collection' button that redirects to the user profile page.\nThis setting replaces the link to the 'Collection of viewing \"Watching\"' page."
+      },
+      "addMyCardsButton": {
+        "question": "Add 'My Cards' button to header",
+        "answer": "Adds a 'My Cards' button to the site header that redirects to the user's cards page."
+      },
+      "quickAccessButtons": {
+        "question": "Add quick access buttons to user's opened cards",
+        "answer": "When opening a user profile, next to the 'Card Collection' button, it adds a row of buttons that open links to the user's cards.\n\nCurrently such buttons:\nMagnifying glass - user's 'Want' page.\nHeart - cards page from your wishlist.\nOpen lock - opened cards page.\nA, B, C, D, E, S, ASS - open opened cards of a certain rank."
+      },
+      "autoTakeSkyStone": {
+        "question": "Automatically take sky stone",
+        "answer": "If there's a sky stone on any page, the extension automatically takes it.\n\nSky stone is a green stone that appears on any page."
+      },
+      "autoTakeCinemaStones": {
+        "question": "Automatically take stones in cinema",
+        "answer": "Collects stones that the penguin gives out in the cinema chat.\nThe cinema must be open (also collects when opened)."
+      }
+    },
+    "clubSettings": {
+      "title": "Club Settings",
+      "highlightInTop": {
+        "question": "Highlight me in top",
+        "answer": "Highlights your account in green in the club power top."
+      },
+      "autoBoost": {
+        "question": "Automatic club boosting",
+        "answer": "Automatically invests cards for you in the club (when the page is opened).\n\nAlso on the page there are hot keys such as:\n- R - refresh card,\n- E - donate card,\n- B - Enable/disable automatic boosting (This changes the setting)."
+      },
+      "refreshInterval": {
+        "question": "Refresh interval (ms)",
+        "answer": "Interval at which the extension will click the refresh card button."
+      },
+      "boostInterval": {
+        "question": "Boost interval (ms)",
+        "answer": "Interval at which the extension will click the donate card button."
+      }
+    },
+    "cardStatsSettings": {
+      "title": "Card Statistics Settings",
+      "showStats": {
+        "question": "Show card statistics",
+        "answer": "Demonstrates card statistics (Want, Have, Trade)."
+      },
+      "enableCaching": {
+        "question": "Enable caching",
+        "answer": "Uses previously saved card statistics values."
+      },
+      "parseUnlockedStats": {
+        "question": "Parse statistics of opened cards",
+        "answer": "Additionally makes a request to the opened cards page (on the card page there's a lock - consider that it presses it), you need to use the unlockedOwner value in the template."
+      },
+      "cacheLifetime": {
+        "question": "Maximum cache lifetime (hours)",
+        "answer": "Maximum time after which the stats will be considered current, if not then there will be a new request (no effect when caching is disabled)."
+      },
+      "requestDelay": {
+        "question": "Delay between requests",
+        "answer": "Delay between card statistics requests, that is, the interval at which cards will be opened to find out statistics. (This happens in the background)."
+      },
+      "showEvent": {
+        "question": "Event for showing card statistics",
+        "answer": "Choice of trigger for which a request for card statistics will be made.\nIf caching is enabled, the value will be taken from cache, and if it was before, then it will already be demonstrated."
+      },
+      "templateEditor": {
+        "question": "Configure the appearance of card statistics using the template editor",
+        "answer": "Here you can configure how card statistics will be displayed."
+      }
+    },
+    "cardSearchSettings": {
+      "title": "Card Search Settings",
+      "integration": {
+        "question": "Card search integration",
+        "answer": "Adds a search button to the card database page for quick search through the extension site API.\n\nYes, I'll then put this in API Integration, as I wrote."
+      }
+    },
+    "apiIntegration": {
+      "title": "API Integration",
+      "sendStats": {
+        "question": "Send statistics to site",
+        "answer": "Sends statistics to the extension site."
+      },
+      "receiveStats": {
+        "question": "Receive statistics from site",
+        "answer": "Currently does nothing, in the future it will make a request for current statistics from the extension site in addition to cache."
+      }
+    },
+    "updates": {
+      "title": "Updates",
+      "updateFlow": {
+        "question": "Update flow",
+        "answer": "About the update flow:\n- If you downloaded the extension from the Chrome store, it will be checked at a certain time, approximately 3 days after the version release. (Some updates may be skipped, this will be indicated in the GitHub release).\n- If you downloaded the extension yourself, you will need to update it yourself.\n- If you are a Firefox owner, you will need to update yourself the same way you installed it (click on the xpi in the GitHub release).\n\nThe GitHub release itself is always delayed as I check it and wait for Firefox verification (also goes through verification but usually takes 5 minutes).\n\nNotifications themselves may appear immediately, as soon as the extension code is updated."
+      },
+      "disableUpdateCheck": {
+        "question": "Don't check for updates",
+        "answer": "Doesn't show the annoying banner at the top of settings when a new version of the extension is released."
+      }
+    }
   }
 }

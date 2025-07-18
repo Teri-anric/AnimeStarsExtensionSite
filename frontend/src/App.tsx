@@ -8,7 +8,8 @@ import {
   CardsPage, 
   CardDetailPage,
   RandomAnimeGifPage, 
-  SettingsPage
+  SettingsPage,
+  FQAPage
 } from './pages';
 import { DecksListPage, DeckDetailPage } from './pages/decks';
 import Header from './components/Header';
@@ -57,6 +58,7 @@ function App() {
                       <SettingsPage />
                     </ProtectedRoute>
                   } />
+                  <Route path="/fqa" element={<FQAPage />} />
                   <Route path="/" element=
                     {
                     <ProtectedRoute>

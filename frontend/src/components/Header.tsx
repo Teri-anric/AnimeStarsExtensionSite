@@ -25,6 +25,9 @@ const Header = () => {
           <NavLink to="/random-gif" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
             {t('navigation.randomGif')}
           </NavLink>
+          <NavLink to="/fqa" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            {t('navigation.fqa')}
+          </NavLink>
         </nav>
       )}
       
@@ -44,6 +47,9 @@ const Header = () => {
         ) : (
           <div className="user-menu">
             <LanguageSwitcher />
+            <NavLink to="/fqa" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+              {t('navigation.fqa')}
+            </NavLink>
             <Link to="/login" className="login-button">
               {t('auth.login')}
             </Link>

@@ -1,0 +1,236 @@
+.fqa-page {
+  padding: 20px;
+  color: white !important;
+  width: 100%;
+}
+
+.fqa-container {
+  background-color: var(--ui-bg);
+  border-radius: var(--main-border-radius);
+  border: 1px solid var(--bdc-3);
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.fqa-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: white !important;
+  margin: 0;
+  padding: 20px;
+  border-bottom: 1px solid var(--bdc-3);
+}
+
+.fqa-description {
+  font-size: 16px;
+  color: var(--tt-2) !important;
+  margin: 0;
+  padding: 15px 20px;
+  line-height: 1.6;
+}
+
+.fqa-sections {
+  padding: 0 20px 20px;
+}
+
+.fqa-section {
+  margin-bottom: 10px;
+  border: 1px solid var(--bdc-3);
+  border-radius: var(--main-border-radius);
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.fqa-section:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.fqa-section-header {
+  width: 100%;
+  background-color: var(--ui-bg-2);
+  border: none;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16px;
+  font-weight: 500;
+  color: white !important;
+}
+
+.fqa-section-header:hover {
+  background-color: var(--ui-bg-accent);
+}
+
+.fqa-section-header.expanded {
+  background-color: var(--accent);
+  color: white !important;
+}
+
+.fqa-section-title {
+  flex: 1;
+  text-align: left;
+}
+
+.fqa-section-toggle {
+  font-size: 18px;
+  font-weight: 600;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.fqa-section-header.expanded .fqa-section-toggle {
+  transform: rotate(180deg);
+}
+
+.fqa-section-content {
+  background-color: var(--ui-bg);
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.fqa-section-header.expanded + .fqa-section-content {
+  max-height: none;
+  padding: 15px 20px;
+}
+
+.fqa-item {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--bdc-3);
+}
+
+.fqa-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.fqa-question {
+  font-size: 16px;
+  font-weight: 600;
+  color: white !important;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.fqa-answer {
+  font-size: 14px;
+  color: var(--tt-2) !important;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.fqa-answer strong {
+  color: white !important;
+  font-weight: 600;
+}
+
+.fqa-answer code {
+  background-color: var(--ui-bg-2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+  color: var(--accent-gold) !important;
+}
+
+.fqa-answer img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--main-border-radius);
+  margin: 15px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--bdc-3);
+}
+
+.fqa-answer ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.fqa-answer li {
+  margin-bottom: 5px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.fqa-answer li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .fqa-page {
+    padding: 15px;
+  }
+  
+  .fqa-title {
+    font-size: 20px;
+    padding: 15px;
+  }
+  
+  .fqa-description {
+    padding: 10px 15px;
+  }
+  
+  .fqa-sections {
+    padding: 0 15px 15px;
+  }
+  
+  .fqa-section-header {
+    padding: 12px 15px;
+    font-size: 15px;
+  }
+  
+  .fqa-section-header.expanded + .fqa-section-content {
+    padding: 12px 15px;
+  }
+  
+  .fqa-question {
+    font-size: 15px;
+  }
+  
+  .fqa-answer {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fqa-page {
+    padding: 10px;
+  }
+  
+  .fqa-title {
+    font-size: 18px;
+    padding: 12px;
+  }
+  
+  .fqa-description {
+    padding: 8px 12px;
+  }
+  
+  .fqa-sections {
+    padding: 0 12px 12px;
+  }
+  
+  .fqa-section-header {
+    padding: 10px 12px;
+  }
+  
+  .fqa-section-header.expanded + .fqa-section-content {
+    padding: 10px 12px;
+  }
+} 

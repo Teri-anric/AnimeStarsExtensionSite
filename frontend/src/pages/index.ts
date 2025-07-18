@@ -5,4 +5,7 @@ export * from './auth';
 export * from './main';
 
 // Settings pages
-export * from './settings'; 
+export * from './settings';
+
+// FQA page
+export { default as FQAPage } from './FQAPage'; 
