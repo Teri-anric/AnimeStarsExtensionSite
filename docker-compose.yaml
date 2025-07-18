@@ -56,6 +56,21 @@ services:
     volumes:
       - ./db:/var/lib/postgresql/data
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    env_file:
+      - .env
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ__USER:-admin}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ__PASSWORD:-admin}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./rabbitmq_data:/var/lib/rabbitmq
+
+
+
   # pgadmin:
   #   image: dpage/pgadmin4
   #   ports:

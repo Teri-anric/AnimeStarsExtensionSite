@@ -13,3 +13,4 @@ httpx[http2,socks]
 python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
+aio-pika

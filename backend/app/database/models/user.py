@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, UTC
 from sqlalchemy import Column, String, ForeignKey, Boolean, DateTime
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from .base import Base, UUIDPKMixin, TimestampMixin
 from ...config import settings
@@ -21,6 +22,10 @@ class User(UUIDPKMixin, TimestampMixin, Base):
     )
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
+
+    # Chat relationships
+    chat_messages = relationship("ChatMessage", back_populates="user", cascade="all, delete-orphan")
+    mentions = relationship("ChatMention", back_populates="user", cascade="all, delete-orphan")
 
 
 class Token(UUIDPKMixin, TimestampMixin, Base):
