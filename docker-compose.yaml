@@ -7,6 +7,7 @@ x-backend-app: &backend-app
     - ./backend/app:/app
     - ./backend/migration:/migration
     - ./cookies:/cookies:rw
+    - local_storage:/storage
   env_file:
     - .env
   environment:
@@ -69,6 +70,9 @@ services:
     volumes:
       - ./rabbitmq_data:/var/lib/rabbitmq
 
+
+volumes:
+  local_storage:
 
 
   # pgadmin:
