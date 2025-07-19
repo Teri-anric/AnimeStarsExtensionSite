@@ -1,72 +1,83 @@
 import os
 import aiofiles
+import uuid
+from datetime import datetime
 from pathlib import Path
 from fastapi import UploadFile
 from typing import Optional
 
 from .base import BaseStorageService
-from app.config import settings
 
 
 class LocalStorageService(BaseStorageService):
-    """Реалізація локального файлового сховища."""
+    """Local file storage implementation."""
+    LOCAL_STORAGE_PATH = "/storage"
+    LOCAL_STORAGE_URL = "/local/storage"
+    CHUNK_SIZE = 8192
     
     def __init__(self, storage_path: Optional[str] = None, base_url: Optional[str] = None):
         """
-        Ініціалізує локальне сховище.
+        Initializes local storage.
         
         Args:
-            storage_path: Шлях до директорії для зберігання файлів
-            base_url: Базовий URL для доступу до файлів
+            storage_path: Path to directory for storing files
+            base_url: Base URL for accessing files
         """
-        self.storage_path = Path(storage_path or settings.storage.path)
-        self.base_url = base_url or settings.storage.base_url
+        self.storage_path = Path(storage_path or self.LOCAL_STORAGE_PATH)
+        self.base_url = base_url or self.LOCAL_STORAGE_URL
         
-        # Створюємо директорію якщо вона не існує
         self.storage_path.mkdir(parents=True, exist_ok=True)
+    
+    def generate_path(self, upload_file: UploadFile) -> str:
+        file_extension = Path(upload_file.filename).suffix if upload_file.filename else ""
+        unique_filename = f"{uuid.uuid4()}{file_extension}"
+
+        current_date = datetime.now().strftime("%Y/%m/%d")
+        return f"{current_date}/{unique_filename}"
+    
     
     async def save(self, file: UploadFile, path: str) -> str:
         """
-        Зберігає файл локально.
+        Saves a file locally.
         
         Args:
-            file: Завантажений файл
-            path: Відносний шлях для збереження файлу
+            file: Uploaded file
+            path: Relative path for saving the file
             
         Returns:
-            Відносний шлях до збереженого файлу
+            Relative path to the saved file
         """
-        # Створюємо повний шлях до файлу
         full_path = self.storage_path / path
         
-        # Створюємо директорію якщо вона не існує
         full_path.parent.mkdir(parents=True, exist_ok=True)
         
-        # Зберігаємо файл
-        async with aiofiles.open(full_path, 'wb') as f:
-            content = await file.read()
-            await f.write(content)
+        fp = await aiofiles.open(full_path, 'wb')
+        try:
+            while chunk := await file.read(self.CHUNK_SIZE):
+                await fp.write(chunk)
+        finally:
+            await fp.close()
         
         return path
     
     def get_url(self, path: str) -> str:
         """
-        Повертає публічний URL для доступу до файлу.
+        Returns a public URL for accessing the file.
         
         Args:
-            path: Відносний шлях до файлу
+            path: Relative path to the file
             
         Returns:
-            Публічний URL для доступу до файлу
+            Public URL for accessing the file
         """
         return f"{self.base_url.rstrip('/')}/{path.lstrip('/')}"
     
     async def delete(self, path: str) -> None:
         """
-        Видаляє файл.
+        Deletes a file.
         
         Args:
-            path: Відносний шлях до файлу для видалення
+            path: Relative path to the file to delete
         """
         full_path = self.storage_path / path
         
@@ -75,13 +86,13 @@ class LocalStorageService(BaseStorageService):
     
     async def exists(self, path: str) -> bool:
         """
-        Перевіряє чи існує файл.
+        Checks if a file exists.
         
         Args:
-            path: Відносний шлях до файлу
+            path: Relative path to the file
             
         Returns:
-            True якщо файл існує, False інакше
+            True if the file exists, False otherwise
         """
         full_path = self.storage_path / path
         return full_path.exists()

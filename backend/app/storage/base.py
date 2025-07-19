@@ -1,57 +1,56 @@
 from abc import ABC, abstractmethod
 from fastapi import UploadFile
-from typing import Optional
 
 
 class BaseStorageService(ABC):
-    """Абстрактний базовий клас для сервісів файлового сховища."""
+    """Abstract base class for file storage services."""
     
     @abstractmethod
     async def save(self, file: UploadFile, path: str) -> str:
         """
-        Зберігає файл і повертає відносний шлях до нього.
+        Saves a file and returns the relative path to it.
         
         Args:
-            file: Завантажений файл
-            path: Шлях для збереження файлу
+            file: Uploaded file
+            path: Path for saving the file
             
         Returns:
-            Відносний шлях до збереженого файлу
+            Relative path to the saved file
         """
         pass
     
     @abstractmethod
     def get_url(self, path: str) -> str:
         """
-        Повертає публічний URL для доступу до файлу.
+        Returns a public URL for accessing the file.
         
         Args:
-            path: Відносний шлях до файлу
+            path: Relative path to the file
             
         Returns:
-            Публічний URL для доступу до файлу
+            Public URL for accessing the file
         """
         pass
     
     @abstractmethod
     async def delete(self, path: str) -> None:
         """
-        Видаляє файл.
+        Deletes a file.
         
         Args:
-            path: Відносний шлях до файлу для видалення
+            path: Relative path to the file to delete
         """
         pass
     
     @abstractmethod
     async def exists(self, path: str) -> bool:
         """
-        Перевіряє чи існує файл.
+        Checks if a file exists.
         
         Args:
-            path: Відносний шлях до файлу
+            path: Relative path to the file
             
         Returns:
-            True якщо файл існує, False інакше
+            True if the file exists, False otherwise
         """
         pass

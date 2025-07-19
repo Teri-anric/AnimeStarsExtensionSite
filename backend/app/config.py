@@ -52,11 +52,6 @@ class AuthSettings(BaseSettings):
     code_expire_minutes: int = 60  # 1 hour
 
 
-class StorageSettings(BaseSettings):
-    path: str = "/storage"
-    base_url: str = "/api/files/static/storage"
-
-
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")
 
@@ -64,7 +59,6 @@ class Settings(BaseSettings):
     parser: ParserSettings = Field(default_factory=ParserSettings)
     pm: PMSettings = Field(default_factory=PMSettings)
     auth: AuthSettings = Field(default_factory=AuthSettings)
-    storage: StorageSettings = Field(default_factory=StorageSettings)
 
 
 settings = Settings()

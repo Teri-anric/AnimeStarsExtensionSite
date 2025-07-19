@@ -1,10 +1,7 @@
 ass-api.strawberrycat.dev {
-    # Кешування для статичних файлів
     @static {
-        path /api/files/static/storage/*
+        path /local/storage/*
     }
-    
-    # Налаштування кешування для статичних файлів
     header @static Cache-Control "public, max-age=31536000, immutable"
     header @static X-Content-Type-Options "nosniff"
     
@@ -16,5 +13,10 @@ ass.strawberrycat.dev {
         root * /usr/share/nginx/html
         file_server
         try_files {path} /index.html
+    }
+
+    handle /local/storage/* {
+        root * /storage
+        file_server cache 1d
     }
 }
