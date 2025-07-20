@@ -3,3 +3,5 @@
 db
 cookies
 rabbitmq_data
+local_storage
+.mitmproxy

@@ -6,6 +6,7 @@ x-backend-app: &backend-app
     - ./backend/app:/app
     - ./backend/migration:/migration
     - ./cookies:/cookies:rw
+    - ./local_storage:/storage:rw
   env_file:
     - .env
   restart: unless-stopped
