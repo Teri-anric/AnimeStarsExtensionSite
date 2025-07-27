@@ -52,6 +52,13 @@ class AuthSettings(BaseSettings):
     code_expire_minutes: int = 60  # 1 hour
 
 
+class RabbitMQSettings(BaseSettings):
+    host: str = "localhost"
+    port: int = 5672
+    user: str = "admin"
+    password: str = "admin"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")
 
@@ -59,6 +66,7 @@ class Settings(BaseSettings):
     parser: ParserSettings = Field(default_factory=ParserSettings)
     pm: PMSettings = Field(default_factory=PMSettings)
     auth: AuthSettings = Field(default_factory=AuthSettings)
+    rabbitmq: RabbitMQSettings = Field(default_factory=RabbitMQSettings)
 
 
 settings = Settings()

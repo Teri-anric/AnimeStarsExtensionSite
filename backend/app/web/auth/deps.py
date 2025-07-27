@@ -12,7 +12,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 TokenRepositoryDep = Annotated[TokenRepository, Depends(lambda: TokenRepository())]
 UserRepositoryDep = Annotated[UserRepository, Depends(lambda: UserRepository())]
 
-
 async def get_token_obj(
     token: str = Depends(oauth2_scheme),
     token_repo: TokenRepositoryDep = None,

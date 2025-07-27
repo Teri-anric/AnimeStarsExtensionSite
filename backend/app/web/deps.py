@@ -6,6 +6,7 @@ from app.database.repos.card_users_stats import CardUsersStatsRepository
 from app.database.repos.animestars_user import AnimestarsUserRepo
 from app.database.repos.deck import DeckRepository
 from app.database.repos.health import HealthRepository
+from app.database.repos.chat import ChatRepository
 from app.parser.services import VerificationService
 from app.storage import LocalStorageService
 
@@ -16,7 +17,7 @@ CardUsersStatsRepositoryDep = Annotated[
 AnimestarsUserRepoDep = Annotated[AnimestarsUserRepo, Depends(lambda: AnimestarsUserRepo())]
 DeckRepositoryDep = Annotated[DeckRepository, Depends(lambda: DeckRepository())]
 HealthRepositoryDep = Annotated[HealthRepository, Depends(lambda: HealthRepository())]
-
+ChatRepositoryDep = Annotated[ChatRepository, Depends(lambda: ChatRepository())]
 VerificationServiceDep = Annotated[VerificationService, Depends(lambda: VerificationService())]
 
 # Storage service dependency
