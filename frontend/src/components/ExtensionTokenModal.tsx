@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { createAuthenticatedClient } from '../utils/apiClient';
+import { ExtensionApi } from '../client';
 import '../styles/components/ExtensionTokenModal.css';
 
 interface TokenRequestData {
@@ -90,11 +92,16 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
     setIsProcessing(true);
 
     try {
-      // Send token to extension
+      // Get extension token from API
+      const extensionApi = createAuthenticatedClient(ExtensionApi) as ExtensionApi;
+      const response = await extensionApi.getExtensionTokenApiExtensionTokenPost();
+      const extensionToken = response.data.access_token;
+
+      // Send extension token to extension
       const responseData = {
         type: 'token_response',
         success: true,
-        token: token,
+        token: extensionToken,
         username: username,
         timestamp: Date.now()
       };
@@ -110,7 +117,7 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
         type: 'ASS_EXTENSION_TOKEN_RESPONSE'
       }, window.location.origin);
 
-      console.log('Token shared with extension successfully');
+      console.log('Extension token shared with extension successfully');
       
       // Close modal after short delay
       setTimeout(() => {
@@ -118,8 +125,8 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
       }, 1000);
 
     } catch (error) {
-      console.error('Error sharing token with extension:', error);
-      handleDeny('Failed to share token');
+      console.error('Error getting extension token:', error);
+      handleDeny('Failed to get extension token');
     } finally {
       setIsProcessing(false);
     }
