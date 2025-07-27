@@ -138,6 +138,9 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
             )}
           </div>
 
+          {/* Card Statistics Display */}
+          <CardStatsDisplay cardId={card.card_id} />
+
           {/* Info Section */}
           <div className="card-info-details">
             <CardInfoRow label={t('cardInfoPanel.id')} value={card.card_id} externalLink={getAnisiteUrl('/cards/users/', { id: card.card_id })}/>
@@ -183,9 +186,6 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
             {card.updated_at && (
               <CardInfoRow label={t('cardInfoPanel.updated')} value={formatTimeAgo(card.updated_at, t)} />
             )}
-
-            {/* Card Statistics Display */}
-            <CardStatsDisplay cardId={card.card_id} />
           </div>
         </div>
       </div>
