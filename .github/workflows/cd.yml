@@ -1,0 +1,50 @@
+name: CD Pipeline
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SERVER_HOST }}
+          if_key_exists: replace
+
+      - name: Add known hosts
+        run: |
+          ssh-keyscan -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+            set -e
+
+            mkdir -p ${{ secrets.PROJECT_PATH }}
+            cd ${{ secrets.PROJECT_PATH }}
+
+            OLD_COMMIT=\$(git rev-parse HEAD)
+            [ -f .env ] && cp .env .env.old
+
+            trap 'echo "Deployment failed. Rolling back...";
+              git reset --hard \$OLD_COMMIT;
+              [ -f .env.old ] && mv .env.old .env;
+              make build && make up;
+              echo "Rollback complete.";
+              exit 1' ERR
+
+            git pull
+            echo "${{ secrets.ENV }}" > .env
+            make build-prod migration-upgrade-prod up-prod
+
+            trap - ERR
+            echo "Deployment successful."
+          EOF

@@ -31,13 +31,23 @@ logs-prod:
 	docker compose -f docker-compose.prod.yaml logs -f backend frontend scheduler
 
 migration-autogenerate:
-	docker compose run --remove-orphans backend python -m alembic revision --autogenerate
+	docker compose run --rm --remove-orphans backend python -m alembic revision --autogenerate
 
 migration-upgrade:
-	docker compose run backend python -m alembic upgrade head
+	docker compose run --rm backend python -m alembic upgrade head
+
+migration-upgrade-prod:
+	docker compose -f docker-compose.prod.yaml run --rm backend python -m alembic upgrade head
 
 migration-down:
-	docker compose run backend python -m alembic downgrade -1
+	docker compose run --rm backend python -m alembic downgrade -1
+
+backup:
+	docker compose exec -T db pg_dump -U $${DATABASE__USER:-postgres} $${DATABASE__DB:-animestars} > backup_$$(date +%Y%m%d_%H%M%S).sql
+
+restore:
+	docker compose exec -T db psql -U $${DATABASE__USER:-postgres} $${DATABASE__DB:-animestars} < ${file}
+
 
 clear:
 	find . -name "*.pyc" -delete
