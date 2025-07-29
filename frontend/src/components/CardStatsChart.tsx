@@ -105,15 +105,15 @@ const CardStatsChart: React.FC<CardStatsChartProps> = ({ cardId, className = '' 
   const getCollectionColor = (collection: CardCollection): string => {
     switch (collection) {
       case CardCollection.Trade:
-        return 'rgba(255, 99, 132, 1)';
+        return 'rgba(255, 107, 107, 1)'; // Яскравий червоний
       case CardCollection.Need:
-        return 'rgba(54, 162, 235, 1)';
+        return 'rgba(74, 144, 226, 1)'; // Синій
       case CardCollection.Owned:
-        return 'rgba(75, 192, 192, 1)';
+        return 'rgba(34, 197, 94, 1)'; // Зелений
       case CardCollection.UnlockedOwned:
-        return 'rgba(153, 102, 255, 1)';
+        return 'rgba(168, 85, 247, 1)'; // Фіолетовий
       default:
-        return 'rgba(128, 128, 128, 1)';
+        return 'rgba(156, 163, 175, 1)'; // Сірий
     }
   };
 
@@ -145,13 +145,15 @@ const CardStatsChart: React.FC<CardStatsChartProps> = ({ cardId, className = '' 
             y: stat.count,
           })),
           borderColor: getCollectionColor(collection),
-          backgroundColor: getCollectionColor(collection).replace('1)', '0.1)'),
+          backgroundColor: getCollectionColor(collection).replace('1)', '0.2)'),
           tension: 0.4,
-          fill: false,
+          fill: true, // Додаємо заливку під лінією
           pointBackgroundColor: getCollectionColor(collection),
-          pointBorderColor: getCollectionColor(collection),
-          pointRadius: 6,
-          pointHoverRadius: 8,
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          borderWidth: 3,
         },
       ],
     };
@@ -173,11 +175,20 @@ const CardStatsChart: React.FC<CardStatsChartProps> = ({ cardId, className = '' 
         text: `${collectionName} Collection`,
         color: '#ffffff',
         font: {
-          size: 14,
+          size: 16,
           weight: 'bold' as const,
+        },
+        padding: {
+          bottom: 20,
         },
       },
       tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
+        borderColor: 'rgba(255, 255, 255, 0.3)',
+        borderWidth: 1,
+        cornerRadius: 8,
         callbacks: {
           title: (context: any[]) => {
             if (context[0]?.parsed?.x) {
@@ -205,19 +216,27 @@ const CardStatsChart: React.FC<CardStatsChartProps> = ({ cardId, className = '' 
         ticks: {
           color: '#ffffff',
           maxTicksLimit: 6,
+          font: {
+            size: 12,
+          },
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
+          lineWidth: 1,
         },
       },
       y: {
-        beginAtZero: true,
+        beginAtZero: false, // Chart.js сам розберется з діапазоном
         ticks: {
           stepSize: 1,
           color: '#ffffff',
+          font: {
+            size: 12,
+          },
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
+          lineWidth: 1,
         },
       },
     },
