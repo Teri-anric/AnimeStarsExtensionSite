@@ -143,3 +143,84 @@
     grid-template-columns: 1fr;
   }
 } 
+
+/* Delta and Period Selector Styles */
+.period-selector select {
+  background-color: var(--ui-bg);
+  color: white;
+  border: 1px solid var(--bdc-3);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.delta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: #ccc;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+
+.delta-period {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #aaa;
+}
+
+.delta-prev {
+  color: #999;
+}
+
+.delta-value {
+  font-weight: 700;
+}
+
+.delta-value.delta-positive {
+  color: #4CAF50;
+}
+
+.delta-value.delta-negative {
+  color: #F44336;
+}
+
+.delta-value.delta-neutral {
+  color: #aaa;
+}
+
+/* Signal highlighting */
+.stat-item.mentions-surge {
+  border-color: #FF9800;
+  box-shadow: 0 0 0 1px rgba(255, 152, 0, 0.4);
+}
+
+.stat-item.strong-signal {
+  border-color: #FF5722;
+  box-shadow: 0 0 0 2px rgba(255, 87, 34, 0.5);
+}
+
+.signal-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 6px;
+  border-radius: 6px;
+  letter-spacing: 0.4px;
+}
+
+.signal-badge.surge {
+  background-color: rgba(255, 152, 0, 0.15);
+  color: #FFB74D;
+  border: 1px solid rgba(255, 152, 0, 0.5);
+}
+
+.signal-badge.strong {
+  background-color: rgba(255, 87, 34, 0.15);
+  color: #FF8A65;
+  border: 1px solid rgba(255, 87, 34, 0.5);
+} 
