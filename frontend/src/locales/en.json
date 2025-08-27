@@ -57,10 +57,27 @@
     "cards": "Cards",
     "decks": "Decks",
     "randomGif": "Random GIF",
+    "tokens": "Tokens",
+    "parsedContent": "Parsed Content",
     "account": "Account",
     "extension": "Browser Extension",
     "sessions": "Sessions",
     "fqa": "FAQ"
+  },
+  "tokensPage": {
+    "title": "Indexed Tokens",
+    "viewParsedContent": "View Parsed Content"
+  },
+  "tokenSentiment": {
+    "title": "Token Sentiment: {{symbol}}",
+    "viewAllTokens": "View All Tokens"
+  },
+  "parsedContent": {
+    "title": "Parsed Content",
+    "from": "From",
+    "to": "To",
+    "source": "Source",
+    "createdAt": "Created At"
   },
   "auth": {
     "login": "Login",

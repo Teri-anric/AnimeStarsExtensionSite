@@ -25,6 +25,12 @@ const Header = () => {
           <NavLink to="/random-gif" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
             {t('navigation.randomGif')}
           </NavLink>
+          <NavLink to="/tokens" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            {t('navigation.tokens')}
+          </NavLink>
+          <NavLink to="/parsed-content" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            {t('navigation.parsedContent')}
+          </NavLink>
           <NavLink to="/fqa" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
             {t('navigation.fqa')}
           </NavLink>

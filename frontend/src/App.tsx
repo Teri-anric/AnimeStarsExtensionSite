@@ -9,7 +9,10 @@ import {
   CardDetailPage,
   RandomAnimeGifPage, 
   SettingsPage,
-  FQAPage
+  FQAPage,
+  IndexedTokensPage,
+  TokenSentimentPage,
+  ParsedContentPage
 } from './pages';
 import { DecksListPage, DeckDetailPage } from './pages/decks';
 import Header from './components/Header';
@@ -59,6 +62,21 @@ function App() {
                     </ProtectedRoute>
                   } />
                   <Route path="/fqa" element={<FQAPage />} />
+                  <Route path="/tokens" element={
+                    <ProtectedRoute>
+                      <IndexedTokensPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/token/:symbol" element={
+                    <ProtectedRoute>
+                      <TokenSentimentPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/parsed-content" element={
+                    <ProtectedRoute>
+                      <ParsedContentPage />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/" element=
                     {
                     <ProtectedRoute>
