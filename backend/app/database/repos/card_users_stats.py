@@ -33,6 +33,21 @@ class CardUsersStatsRepository(
         )
         return results
 
+    async def get_last_card_users_stats_before_or_at(
+        self,
+        card_id: int,
+        before_ts,
+    ) -> list[CardUsersStats]:
+        results = await self.scalars(
+            select(CardUsersStats)
+            .where(
+                CardUsersStats.card_id == card_id,
+                CardUsersStats.created_at <= before_ts,
+            )
+            .order_by(CardUsersStats.collection, CardUsersStats.created_at.desc())
+            .distinct(CardUsersStats.collection)
+        )
+        return results
     async def get_last_card_users_stats_bulk(
         self, card_ids: list[int]
     ) -> list[CardUsersStats]:

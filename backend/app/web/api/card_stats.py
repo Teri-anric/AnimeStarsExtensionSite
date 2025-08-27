@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from datetime import UTC
+from datetime import UTC, datetime, timedelta
 
 from app.web.schema.card_stats import (
     CardUsersStatsSchema,
@@ -7,6 +7,9 @@ from app.web.schema.card_stats import (
     CardUsersStatsResponse,
     CardUsersStatsAddRequest,
     CardUsersStatsAddResponse,
+    CardUsersStatsLastWithPrevQuery,
+    CardUsersStatsLastWithPrevResponse,
+    CardUsersStatsWithPrevSchema,
 )
 from app.web.deps import CardUsersStatsRepositoryDep
 from app.web.auth.deps import UserDep, ProtectedDep
@@ -61,3 +64,41 @@ async def add_card_users_stats(
         status="ok",
         message=f"Added {len(request.stats)} card users stats",
     )
+
+
+@router.post("/last-with-prev")
+async def get_last_with_previous(
+    request: CardUsersStatsLastWithPrevQuery,
+    repo: CardUsersStatsRepositoryDep,
+) -> CardUsersStatsLastWithPrevResponse:
+    # Determine previous period cut-off
+    now = datetime.now(UTC).replace(tzinfo=None)
+    if request.period == "day":
+        delta = timedelta(days=1)
+    elif request.period == "week":
+        delta = timedelta(weeks=1)
+    else:
+        delta = timedelta(days=30)
+
+    last = await repo.get_last_card_users_stats(request.card_id)
+    prev = await repo.get_last_card_users_stats_before_or_at(request.card_id, now - delta)
+
+    prev_map = { (p.collection): p for p in prev }
+
+    items: list[CardUsersStatsWithPrevSchema] = []
+    for l in last:
+        prev_item = prev_map.get(l.collection)
+        previous_count = prev_item.count if prev_item else None
+        delta_count = (l.count - previous_count) if previous_count is not None else None
+        items.append(CardUsersStatsWithPrevSchema(
+            id=l.id,
+            card_id=l.card_id,
+            collection=l.collection,
+            count=l.count,
+            created_at=l.created_at,
+            updated_at=l.updated_at,
+            previous_count=previous_count,
+            delta=delta_count,
+        ))
+
+    return CardUsersStatsLastWithPrevResponse(items=items)

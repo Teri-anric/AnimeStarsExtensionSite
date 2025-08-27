@@ -16,6 +16,15 @@ class CardUsersStatsSchema(BaseSchema):
     updated_at: datetime
 
 
+class PeriodLiteral(BaseSchema):
+    period: Literal["day", "week", "month"]
+
+
+class CardUsersStatsWithPrevSchema(CardUsersStatsSchema):
+    previous_count: int | None = None
+    delta: int | None = None
+
+
 class CardUsersStatsAddSchema(BaseSchema):
     card_id: int
     collection: CardCollection
@@ -46,3 +55,12 @@ class CardUsersStatsQuery(BasePaginationQuery[CardUsersStatsFilter, CardUsersSta
 
 class CardUsersStatsResponse(BasePaginationResponse[CardUsersStatsSchema]):
     items: list[CardUsersStatsSchema]
+
+
+class CardUsersStatsLastWithPrevQuery(BaseSchema):
+    card_id: int
+    period: Literal["day", "week", "month"] = "day"
+
+
+class CardUsersStatsLastWithPrevResponse(BaseSchema):
+    items: list[CardUsersStatsWithPrevSchema]
