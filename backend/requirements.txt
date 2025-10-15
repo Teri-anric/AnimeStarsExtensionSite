@@ -6,7 +6,7 @@ psycopg2-binary
 pydantic-settings
 python-dotenv
 black
-beautifulsoup4
+beautifulsoup4==4.13.4
 httpx
 apscheduler~=3.10.0
 httpx[http2,socks]
