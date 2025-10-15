@@ -1,4 +1,4 @@
-fastapi==0.115.12
+api==0.115.12
 uvicorn
 alembic
 sqlalchemy
@@ -11,6 +11,7 @@ httpx
 apscheduler~=3.10.0
 httpx[http2,socks]
 python-jose[cryptography]
-passlib[bcrypt]
+passlib==1.6.4
+bcrypt==4.2.1
 python-multipart
 asyncpg
