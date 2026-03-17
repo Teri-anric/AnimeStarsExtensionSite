@@ -39,7 +39,7 @@ async def get_cards(
     return await repo.search(query.build())
 
 
-@router.post("/bulk", dependencies=[ProtectedDep])
+@router.post("/bulk")
 async def bulk_upsert_cards(
     request: CardBulkUpsertRequest,
     repo: CardRepositoryDep,
