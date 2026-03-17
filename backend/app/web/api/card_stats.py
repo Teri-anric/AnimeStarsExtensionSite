@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from datetime import UTC
 
 from app.web.schema.card_stats import (
@@ -25,9 +25,10 @@ async def get_last_card_users_stats(
 
 @router.get("/last/bulk")
 async def get_last_card_users_stats_bulk(
-    card_ids: list[int],
     repo: CardUsersStatsRepositoryDep,
-) -> list[CardUsersStatsSchema]:
+    card_ids_comma_separated: str = Query(..., description="Comma-separated list of card IDs"),
+    ) -> list[CardUsersStatsSchema]:
+    card_ids = list(map(int, card_ids_comma_separated.split(",")))
     return await repo.get_last_card_users_stats_bulk(card_ids)
 
 

@@ -9,7 +9,6 @@ from app.web.schema.card import (
     CardBulkUpsertResponse,
 )
 from app.web.deps import CardRepositoryDep
-from app.web.auth.deps import ProtectedDep
 
 
 router = APIRouter(prefix="/card", tags=["card"])
