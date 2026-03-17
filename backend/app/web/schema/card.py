@@ -83,8 +83,8 @@ class CardPaginationResponse(BasePaginationResponse[CardSchema]):
 
 class CardUpsertSchema(BaseSchema):
     card_id: int
-    name: str
-    rank: CardType
+    name: str | None = None
+    rank: CardType | None = None
     anime_name: str | None = None
     anime_link: str | None = None
     author: str | None = None

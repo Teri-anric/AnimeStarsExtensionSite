@@ -51,21 +51,33 @@ async def bulk_upsert_cards(
         "cards": [
             {
                 "card_id": 1,
-                "name": "Naruto",
-                "rank": "S",
-                "anime_name": "Naruto",
-                "anime_link": "https://naruto.com",
-                "author": "user",
                 "image": "https://naruto.com/image.jpg",
-                "mp4": "https://naruto.com/mp4.mp4",
-                "webm": "https://naruto.com/webm.webm"
+                "anime_link": "https://naruto.com",
             }
         ]
     }
     """
-    values = [card.model_dump() for card in request.cards]
-    count = await repo.upsert_bulk(values)
-    return CardBulkUpsertResponse(status="ok", count=count)
+    full_upsert_values: list[dict] = []
+    partial_update_values: list[dict] = []
+
+    for card in request.cards:
+        data = card.model_dump(exclude_none=True)
+        # Separate cards that have enough data to be fully upserted
+        # from those that should only partially update existing records.
+        if "name" in data and "rank" in data:
+            full_upsert_values.append(data)
+        else:
+            partial_update_values.append(data)
+
+    total_count = 0
+
+    if full_upsert_values:
+        total_count += await repo.upsert_bulk(full_upsert_values)
+
+    if partial_update_values:
+        total_count += await repo.partial_update_by_card_id_bulk(partial_update_values)
+
+    return CardBulkUpsertResponse(status="ok", count=total_count)
 
 
 @router.get("/{card_id}")
