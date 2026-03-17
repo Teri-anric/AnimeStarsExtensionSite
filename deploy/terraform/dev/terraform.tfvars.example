@@ -1,0 +1,16 @@
+# Required (set any password for local dev)
+postgres_password = "devpassword"
+
+# Optional overrides:
+# kubeconfig_path = "~/.kube/config"
+# kube_context    = "kind-animestars-dev"
+# namespace       = "animestars-dev"
+# host            = "animestars.local"
+# backend_image   = "animestars/backend"
+# frontend_image  = "animestars/frontend"
+# backend_tag     = "dev"
+# frontend_tag    = "dev"
+# postgres_db     = "animestars"
+# postgres_user   = "animestars"
+# parser_proxy    = null
+# parser_base_url = null

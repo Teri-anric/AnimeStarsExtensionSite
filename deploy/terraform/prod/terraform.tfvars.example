@@ -1,0 +1,18 @@
+# Required (set a strong password)
+postgres_password = "CHANGE_ME"
+
+# kubeconfig can also be set via env vars when using make targets
+kubeconfig_path = "~/.kube/k3s-s1.yaml"
+kube_context    = "k3s"
+
+# Optional overrides:
+# namespace      = "animestars-prod"
+# host           = "ass.strawberrycat.dev"
+# backend_image  = "localhost:5000/animestars/backend"
+# frontend_image = "localhost:5000/animestars/frontend"
+# backend_tag    = "prod"
+# frontend_tag   = "prod"
+# postgres_db    = "animestars"
+# postgres_user  = "animestars"
+# parser_proxy   = "socks5://proxy:8080"
+# parser_base_url = null
