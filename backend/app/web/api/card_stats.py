@@ -44,11 +44,11 @@ async def get_card_users_stats_by_card_id(
 async def add_card_users_stats(
     request: CardUsersStatsAddRequest,
     repo: CardUsersStatsRepositoryDep,
-    user: UserDep,
+    # user: UserDep,
 ) -> CardUsersStatsAddResponse:
     objs = (
         CardUsersStats(
-            owner_id=user.id,
+            owner_id=None,
             card_id=stat.card_id,
             collection=stat.collection,
             count=stat.count,
