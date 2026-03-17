@@ -5,8 +5,11 @@ from app.web.schema.card import (
     CardQuery,
     CardPaginationResponse,
     CardSchema,
+    CardBulkUpsertRequest,
+    CardBulkUpsertResponse,
 )
 from app.web.deps import CardRepositoryDep
+from app.web.auth.deps import ProtectedDep
 
 
 router = APIRouter(prefix="/card", tags=["card"])
@@ -34,6 +37,36 @@ async def get_cards(
     }
     """
     return await repo.search(query.build())
+
+
+@router.post("/bulk", dependencies=[ProtectedDep])
+async def bulk_upsert_cards(
+    request: CardBulkUpsertRequest,
+    repo: CardRepositoryDep,
+) -> CardBulkUpsertResponse:
+    """
+    Bulk upsert cards.
+
+    Example request:
+    {
+        "cards": [
+            {
+                "card_id": 1,
+                "name": "Naruto",
+                "rank": "S",
+                "anime_name": "Naruto",
+                "anime_link": "https://naruto.com",
+                "author": "user",
+                "image": "https://naruto.com/image.jpg",
+                "mp4": "https://naruto.com/mp4.mp4",
+                "webm": "https://naruto.com/webm.webm"
+            }
+        ]
+    }
+    """
+    values = [card.model_dump() for card in request.cards]
+    count = await repo.upsert_bulk(values)
+    return CardBulkUpsertResponse(status="ok", count=count)
 
 
 @router.get("/{card_id}")

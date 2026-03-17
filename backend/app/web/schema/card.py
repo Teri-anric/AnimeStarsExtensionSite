@@ -79,3 +79,31 @@ class CardQuery(BasePaginationQuery[CardFilter, CardSort | str]):
 
 class CardPaginationResponse(BasePaginationResponse[CardSchema]):
     items: list[CardSchema]
+
+
+class CardUpsertSchema(BaseSchema):
+    card_id: int
+    name: str
+    rank: CardType
+    anime_name: str | None = None
+    anime_link: str | None = None
+    author: str | None = None
+    image: str | None = None
+    mp4: str | None = None
+    webm: str | None = None
+
+    @field_validator("rank", mode="before")
+    def validate_rank(cls, v):
+        if isinstance(v, str):
+            return CardType(v.lower())
+        return v
+
+
+class CardBulkUpsertRequest(BaseSchema):
+    cards: list[CardUpsertSchema]
+
+
+class CardBulkUpsertResponse(BaseSchema):
+    status: Literal["ok", "error"]
+    count: int
+    message: str | None = None
