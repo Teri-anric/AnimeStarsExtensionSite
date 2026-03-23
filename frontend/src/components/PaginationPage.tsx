@@ -52,6 +52,9 @@ export interface PaginationPageProps<T, F = GenericFilter, Q = PaginationQuery<F
   // Custom pagination info
   showPaginationInfo?: boolean;
   paginationInfoTemplate?: (current: number, total: number, itemsCount: number) => string;
+
+  /** When this value changes, data is refetched (same page/filter). */
+  refreshTrigger?: number;
 }
 
 const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends PaginationQuery<F> = PaginationQuery<F>>({
@@ -67,7 +70,8 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
   emptyComponent,
   headerActions,
   showPaginationInfo = true,
-  paginationInfoTemplate
+  paginationInfoTemplate,
+  refreshTrigger = 0,
 }: PaginationPageProps<T, F, Q>) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
@@ -124,7 +128,7 @@ const PaginationPage = <T, F extends GenericFilter = GenericFilter, Q extends Pa
   // Fetch data effect
   useEffect(() => {
     fetchDataWithParams();
-  }, [page, currentFilter, sortBy]);
+  }, [page, currentFilter, sortBy, refreshTrigger]);
 
   // Update filter state when URL changes
   useEffect(() => {

@@ -109,7 +109,11 @@
     "cardImage": "Card Image",
     "cardVideo": "Card Video",
     "videoNotSupported": "Your browser does not support the video tag.",
-    "openInNewTab": "Open in new tab"
+    "openInNewTab": "Open in new tab",
+    "reportRemovedCard": "Report card removed at source",
+    "reportRemovedCardConfirm": "This permanently deletes the card from our database. Continue?",
+    "reportRemovedCardFailed": "Could not remove the card. Try again.",
+    "reportRemovedCardSubmitting": "Removing…"
   },
   "settings": {
     "title": "Settings",
@@ -342,7 +346,8 @@
     "anime": "Anime",
     "animeLink": "Anime Link",
     "created": "Created",
-    "updated": "Updated"
+    "updated": "Updated",
+    "reportRemovedCard": "Report card removed at source"
   },
   "cardStatsDisplay": {
     "cardStatistics": "📊 Card Statistics",
@@ -399,7 +404,8 @@
     "applyFilter": "Apply Filter",
     "remove": "Remove",
     "and": "AND",
-    "or": "OR"
+    "or": "OR",
+    "interGroupOperator": "How to combine filter groups"
   },
   "paginationPage": {
     "clickToJumpToPage": "Click to jump to page",
@@ -418,7 +424,11 @@
     "webmPath": "WebM Path",
     "createdDate": "Created Date",
     "updatedDate": "Updated Date",
-    "statsCount": "Stats Count",
+    "statsCount": "Stats rows (all types)",
+    "tradeCount": "Trade latest count (null if none)",
+    "needCount": "Need latest count (null if none)",
+    "ownedCount": "Owned latest count (null if none)",
+    "unlockedOwnedCount": "Unlocked owned latest (null if none)",
     "numberOfCards": "Number of Cards",
     "cards": "Cards",
     "cardAnimeName": "Card Anime Name",
@@ -453,7 +463,17 @@
     "recentlyUpdated": "Recently Updated",
     "leastRecentlyUpdated": "Least Recently Updated",
     "mostCards": "Most Cards",
-    "leastCards": "Least Cards"
+    "leastCards": "Least Cards",
+    "statsCountDescending": "Stat rows (most first)",
+    "statsCountAscending": "Stat rows (fewest first)",
+    "tradeCountDescending": "Trade latest (high to low)",
+    "tradeCountAscending": "Trade latest (low to high)",
+    "needCountDescending": "Need latest (high to low)",
+    "needCountAscending": "Need latest (low to high)",
+    "ownedCountDescending": "Owned latest (high to low)",
+    "ownedCountAscending": "Owned latest (low to high)",
+    "unlockedOwnedCountDescending": "Unlocked owned latest (high to low)",
+    "unlockedOwnedCountAscending": "Unlocked owned latest (low to high)"
   },
   "filterQuery": {
     "switchToAdvancedFilter": "Switch to Advanced Filter",

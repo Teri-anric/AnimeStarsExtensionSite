@@ -80,6 +80,16 @@ async def bulk_upsert_cards(
     return CardBulkUpsertResponse(status="ok", count=total_count)
 
 
+@router.post("/{card_id}/report-deleted-card", status_code=204)
+async def report_deleted_card(card_id: int | UUID, repo: CardRepositoryDep) -> None:
+    """
+    Report that the card no longer exists at the source; removes it from our database.
+    """
+    deleted = await repo.delete_by_ident(card_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Card not found")
+
+
 @router.get("/{card_id}")
 async def get_card(card_id: int | UUID, repo: CardRepositoryDep) -> CardSchema:
     card = await repo.get_by_ident(card_id)

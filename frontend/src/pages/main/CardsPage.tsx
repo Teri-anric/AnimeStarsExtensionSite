@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { createAuthenticatedClient } from '../../utils/apiClient';
 import { CardApi, CardSchema, CardQuery } from '../../client';
 import PaginationPage, { PaginationResponse } from '../../components/PaginationPage';
@@ -14,6 +14,11 @@ const CardsPage = () => {
   // Card info panel state
   const [selectedCard, setSelectedCard] = useState<CardSchema | null>(null);
   const [isCardInfoOpen, setIsCardInfoOpen] = useState(false);
+  const [listRefreshTrigger, setListRefreshTrigger] = useState(0);
+
+  const bumpListRefresh = useCallback(() => {
+    setListRefreshTrigger((n) => n + 1);
+  }, []);
 
   // API function for fetching cards
   const fetchCards = async (query: CardQuery): Promise<PaginationResponse<CardSchema>> => {
@@ -81,6 +86,7 @@ const CardsPage = () => {
         errorComponent={errorComponent}
         emptyComponent={emptyComponent}
         className="cards-pagination-page"
+        refreshTrigger={listRefreshTrigger}
       />
       
       {/* Card Info Panel */}
@@ -88,6 +94,7 @@ const CardsPage = () => {
         card={selectedCard}
         isOpen={isCardInfoOpen}
         onClose={handleCardInfoClose}
+        onCardRemoved={bumpListRefresh}
       />
     </div>
   );

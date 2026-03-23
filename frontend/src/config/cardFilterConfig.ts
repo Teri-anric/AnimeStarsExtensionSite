@@ -29,7 +29,15 @@ export const cardFilterConfig: EntityFilterConfig = {
     { value: 'webm', label: 'filterConfig.webmPath', type: 'string' },
     { value: 'created_at', label: 'filterConfig.createdDate', type: 'datetime' },
     { value: 'updated_at', label: 'filterConfig.updatedDate', type: 'datetime' },
-    { value: 'stats_count', label: 'filterConfig.statsCount', type: 'number' }
+    { value: 'stats_count', label: 'filterConfig.statsCount', type: 'number' },
+    { value: 'trade_count', label: 'filterConfig.tradeCount', type: 'number' },
+    { value: 'need_count', label: 'filterConfig.needCount', type: 'number' },
+    { value: 'owned_count', label: 'filterConfig.ownedCount', type: 'number' },
+    {
+      value: 'unlocked_owned_count',
+      label: 'filterConfig.unlockedOwnedCount',
+      type: 'number',
+    },
   ],
 
   shortFilterFields: [
@@ -139,6 +147,22 @@ export const cardFilterConfig: EntityFilterConfig = {
     { value: 'created_at asc', label: 'filterConfig.oldestFirst' },
     { value: 'updated_at desc', label: 'filterConfig.recentlyUpdated' },
     { value: 'updated_at asc', label: 'filterConfig.leastRecentlyUpdated' },
+    { value: 'stats_count desc', label: 'filterConfig.statsCountDescending' },
+    { value: 'stats_count asc', label: 'filterConfig.statsCountAscending' },
+    { value: 'trade_count desc', label: 'filterConfig.tradeCountDescending' },
+    { value: 'trade_count asc', label: 'filterConfig.tradeCountAscending' },
+    { value: 'need_count desc', label: 'filterConfig.needCountDescending' },
+    { value: 'need_count asc', label: 'filterConfig.needCountAscending' },
+    { value: 'owned_count desc', label: 'filterConfig.ownedCountDescending' },
+    { value: 'owned_count asc', label: 'filterConfig.ownedCountAscending' },
+    {
+      value: 'unlocked_owned_count desc',
+      label: 'filterConfig.unlockedOwnedCountDescending',
+    },
+    {
+      value: 'unlocked_owned_count asc',
+      label: 'filterConfig.unlockedOwnedCountAscending',
+    },
   ],
 
   defaults: {

@@ -1,5 +1,5 @@
-import React from 'react';
-import { FiExternalLink, FiMaximize2, FiClipboard, FiLayers } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiExternalLink, FiMaximize2, FiClipboard, FiLayers, FiAlertTriangle } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { CardSchema } from '../client';
 import { useDomain } from '../context/DomainContext';
@@ -7,11 +7,13 @@ import { useTranslation } from 'react-i18next';
 import { formatTimeAgo } from '../utils/dateUtils';
 import CardStatsDisplay from './CardStatsDisplay';
 import '../styles/CardInfoPanel.css';
+import { reportRemovedCard } from '../utils/reportRemovedCard';
 
 interface CardInfoPanelProps {
   card: CardSchema | null;
   isOpen: boolean;
   onClose: () => void;
+  onCardRemoved?: () => void;
 }
 
 const CardInfoRow = ({ 
@@ -59,14 +61,37 @@ const CardInfoRow = ({
   );
 };
 
-const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) => {
+const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose, onCardRemoved }) => {
   const { currentDomain } = useDomain();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [reporting, setReporting] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setReportError(null);
+    setReporting(false);
+  }, [card?.id]);
 
   const getCardMediaUrl = (path: string | null) => {
     if (!path) return '';
     return `${currentDomain}${path}`;
+  };
+
+  const handleReportRemovedCard = async () => {
+    if (!card) return;
+    if (!window.confirm(t('cards.reportRemovedCardConfirm'))) return;
+    setReportError(null);
+    setReporting(true);
+    try {
+      await reportRemovedCard(card.card_id);
+      onCardRemoved?.();
+      onClose();
+    } catch {
+      setReportError(t('cards.reportRemovedCardFailed'));
+    } finally {
+      setReporting(false);
+    }
   };
 
   const getAnisiteUrl = (path: string | null, params: object | null = null) => {
@@ -192,6 +217,19 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
             {card.updated_at && (
               <CardInfoRow label={t('cardInfoPanel.updated')} value={formatTimeAgo(card.updated_at, t)} />
             )}
+
+            <div className="card-info-report-section">
+              {reportError && <p className="card-info-report-error">{reportError}</p>}
+              <button
+                type="button"
+                className="report-removed-card-button"
+                disabled={reporting}
+                onClick={handleReportRemovedCard}
+              >
+                <FiAlertTriangle aria-hidden />
+                {reporting ? t('cards.reportRemovedCardSubmitting') : t('cardInfoPanel.reportRemovedCard')}
+              </button>
+            </div>
           </div>
         </div>
       </div>

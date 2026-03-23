@@ -53,6 +53,11 @@ CardSort = Literal[
     "webm",
     "created_at",
     "updated_at",
+    "stats_count",
+    "trade_count",
+    "need_count",
+    "owned_count",
+    "unlocked_owned_count",
 ]
 
 
@@ -74,6 +79,10 @@ class CardFilter(BaseFilter):
     updated_at: DateTimeEntryFilter | None = None
 
     stats_count: IntegerEntryFilter | None = None
+    trade_count: IntegerEntryFilter | None = None
+    need_count: IntegerEntryFilter | None = None
+    owned_count: IntegerEntryFilter | None = None
+    unlocked_owned_count: IntegerEntryFilter | None = None
 
 
 class CardQuery(BasePaginationQuery[CardFilter, CardSort | str]):

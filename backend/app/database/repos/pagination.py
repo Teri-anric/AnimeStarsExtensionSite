@@ -57,10 +57,11 @@ class PaginationRepository(BaseRepository, Generic[T], ABC):
             return stmt
 
         for sort in order_by.sorts:
+            col = getattr(self.entry_class, sort.property)
             if sort.direction == OrderBy.Sort.Direction.ASC:
-                stmt = stmt.order_by(asc(sort.property))
+                stmt = stmt.order_by(asc(col))
             else:
-                stmt = stmt.order_by(desc(sort.property))
+                stmt = stmt.order_by(desc(col))
         
         return stmt
 

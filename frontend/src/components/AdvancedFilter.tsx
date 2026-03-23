@@ -69,10 +69,15 @@ const arrayOperators = [
   { value: 'length', label: 'Number of items' }
 ];
 
-const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[]): FilterGroup[] => {
-  console.log('Parsing filter to groups:', filter);
-  console.log('Available field options:', fieldOptions.map(f => f.value));
+type ParsedFilterGroups = {
+  groups: FilterGroup[];
+  /** How multiple top-level groups are combined (from root `and` / `or` array). */
+  interGroupOperator: 'and' | 'or';
+};
+
+const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[]): ParsedFilterGroups => {
   const groups: FilterGroup[] = [];
+  let interGroupOperator: 'and' | 'or' = 'and';
   let groupId = 1;
   let ruleId = 1;
 
@@ -157,46 +162,33 @@ const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[])
   };
 
   const parseSubFilter = (subFilter: GenericFilter): FilterGroup | null => {
-    console.log('Parsing subFilter:', subFilter);
     const rules: FilterRule[] = [];
     let groupOperator: 'and' | 'or' = 'and';
 
     // Check if this subfilter has and/or operators
     if (subFilter.and && Array.isArray(subFilter.and)) {
-      console.log('Found AND operation with', subFilter.and.length, 'items');
       groupOperator = 'and';
       subFilter.and.forEach(item => {
         Object.entries(item).forEach(([key, value]) => {
-          console.log('Processing AND item:', key, value);
           if (fieldOptions.some(f => f.value === key)) {
             rules.push(parseFieldFilter(key, value));
-          } else {
-            console.log('Field not found in options:', key);
           }
         });
       });
     } else if (subFilter.or && Array.isArray(subFilter.or)) {
-      console.log('Found OR operation with', subFilter.or.length, 'items');
       groupOperator = 'or';
       subFilter.or.forEach(item => {
         Object.entries(item).forEach(([key, value]) => {
-          console.log('Processing OR item:', key, value);
           if (fieldOptions.some(f => f.value === key)) {
             rules.push(parseFieldFilter(key, value));
-          } else {
-            console.log('Field not found in options:', key);
           }
         });
       });
     } else {
-      // Single field filter
-      console.log('Processing single field filter');
+      // Single field filter (or implicit AND of several fields on one object)
       Object.entries(subFilter).forEach(([key, value]) => {
-        console.log('Processing field:', key, value);
         if (fieldOptions.some(f => f.value === key)) {
           rules.push(parseFieldFilter(key, value));
-        } else {
-          console.log('Field not found in options:', key);
         }
       });
     }
@@ -214,7 +206,7 @@ const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[])
 
   const processFilter = (currentFilter: GenericFilter): void => {
     if (currentFilter.and && Array.isArray(currentFilter.and)) {
-      // Create separate groups for each item in the AND array
+      interGroupOperator = 'and';
       currentFilter.and.forEach(subFilter => {
         const group = parseSubFilter(subFilter);
         if (group) {
@@ -222,7 +214,7 @@ const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[])
         }
       });
     } else if (currentFilter.or && Array.isArray(currentFilter.or)) {
-      // Create separate groups for each item in the OR array  
+      interGroupOperator = 'or';
       currentFilter.or.forEach(subFilter => {
         const group = parseSubFilter(subFilter);
         if (group) {
@@ -230,7 +222,7 @@ const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[])
         }
       });
     } else {
-      // Single level filter - create one group
+      interGroupOperator = 'and';
       const group = parseSubFilter(currentFilter);
       if (group) {
         groups.push(group);
@@ -240,11 +232,16 @@ const parseFilterToGroups = (filter: GenericFilter, fieldOptions: FieldOption[])
 
   processFilter(filter);
 
-  return groups.length > 0 ? groups : [{
+  const defaultGroup: FilterGroup = {
     id: '1',
     logicalOperator: 'and',
     rules: []
-  }];
+  };
+
+  return {
+    groups: groups.length > 0 ? groups : [defaultGroup],
+    interGroupOperator
+  };
 };
 
 const AdvancedFilter: React.FC<UniversalFilterProps> = ({ 
@@ -266,7 +263,7 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
   };
   const [groups, setGroups] = useState<FilterGroup[]>(() => {
     if (initialFilter) {
-      return parseFilterToGroups(initialFilter, fieldOptions);
+      return parseFilterToGroups(initialFilter, fieldOptions).groups;
     }
     return [{
       id: '1',
@@ -275,12 +272,19 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
     }];
   });
 
+  const [interGroupOperator, setInterGroupOperator] = useState<'and' | 'or'>(() => {
+    if (initialFilter) {
+      return parseFilterToGroups(initialFilter, fieldOptions).interGroupOperator;
+    }
+    return 'and';
+  });
+
   // Update groups when initialFilter changes (for URL parameters)
   useEffect(() => {
     if (initialFilter) {
-      console.log('AdvancedFilter: initialFilter changed, updating groups:', initialFilter);
-      const newGroups = parseFilterToGroups(initialFilter, fieldOptions);
-      setGroups(newGroups);
+      const parsed = parseFilterToGroups(initialFilter, fieldOptions);
+      setGroups(parsed.groups);
+      setInterGroupOperator(parsed.interGroupOperator);
     }
   }, [initialFilter, fieldOptions]);
 
@@ -555,17 +559,16 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
       return groupFilters[0];
     }
 
-    return { and: groupFilters };
+    return { [interGroupOperator]: groupFilters };
   };
 
   const applyFilter = () => {
     const filter = buildFilter();
-    console.log('Universal filter applying:', JSON.stringify(filter, null, 2));
-    console.log('Current groups:', JSON.stringify(groups, null, 2));
     onFilterChange(filter);
   };
 
   const clearFilter = () => {
+    setInterGroupOperator('and');
     setGroups([{
       id: '1',
       logicalOperator: 'and',
@@ -777,7 +780,17 @@ const AdvancedFilter: React.FC<UniversalFilterProps> = ({
           <div key={group.id} className="filter-group">
             <div className="filter-group-header">
               {groupIndex > 0 && (
-                <div className="group-connector">{t('advancedFilter.and')}</div>
+                <div className="group-connector">
+                  <select
+                    value={interGroupOperator}
+                    onChange={(e) => setInterGroupOperator(e.target.value as 'and' | 'or')}
+                    className="group-operator inter-group-operator"
+                    aria-label={t('advancedFilter.interGroupOperator')}
+                  >
+                    <option value="and">{t('advancedFilter.and')}</option>
+                    <option value="or">{t('advancedFilter.or')}</option>
+                  </select>
+                </div>
               )}
               
               <div className="filter-group-controls">

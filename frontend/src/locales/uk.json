@@ -109,7 +109,11 @@
     "cardImage": "Зображення картки",
     "cardVideo": "Відео картки",
     "videoNotSupported": "Ваш браузер не підтримує відео тег.",
-    "openInNewTab": "Відкрити в новій вкладці"
+    "openInNewTab": "Відкрити в новій вкладці",
+    "reportRemovedCard": "Повідомити: картку видалено у джерела",
+    "reportRemovedCardConfirm": "Картку буде безповоротно видалено з нашої бази. Продовжити?",
+    "reportRemovedCardFailed": "Не вдалося видалити картку. Спробуйте ще раз.",
+    "reportRemovedCardSubmitting": "Видалення…"
   },
   "settings": {
     "title": "Налаштування",
@@ -342,7 +346,8 @@
     "anime": "Аніме",
     "animeLink": "Посилання на аніме",
     "created": "Створено",
-    "updated": "Оновлено"
+    "updated": "Оновлено",
+    "reportRemovedCard": "Повідомити: картку видалено у джерела"
   },
   "cardStatsDisplay": {
     "cardStatistics": "📊 Статистика картки",
@@ -399,7 +404,8 @@
     "applyFilter": "Застосувати фільтр",
     "remove": "Вилучити",
     "and": "І",
-    "or": "АБО"
+    "or": "АБО",
+    "interGroupOperator": "Як поєднувати групи фільтрів"
   },
   "paginationPage": {
     "clickToJumpToPage": "Натисніть, щоб перейти на сторінку",
@@ -418,7 +424,11 @@
     "webmPath": "Шлях до WebM",
     "createdDate": "Дата створення",
     "updatedDate": "Дата оновлення",
-    "statsCount": "Кількість статистики",
+    "statsCount": "Рядків статистики (усі типи)",
+    "tradeCount": "Trade — останнє count (null якщо немає)",
+    "needCount": "Need — останнє count (null якщо немає)",
+    "ownedCount": "Owned — останнє count (null якщо немає)",
+    "unlockedOwnedCount": "Unlocked owned — останнє (null якщо немає)",
     "numberOfCards": "Кількість карток",
     "cards": "Картки",
     "cardAnimeName": "Назва аніме картки",
@@ -453,7 +463,17 @@
     "recentlyUpdated": "Найостанніші",
     "leastRecentlyUpdated": "Найменш оновлені",
     "mostCards": "Найбільше карток",
-    "leastCards": "Найменше карток"
+    "leastCards": "Найменше карток",
+    "statsCountDescending": "Рядків статистики (спочатку більше)",
+    "statsCountAscending": "Рядків статистики (спочатку менше)",
+    "tradeCountDescending": "Trade — останнє (від більшого)",
+    "tradeCountAscending": "Trade — останнє (від меншого)",
+    "needCountDescending": "Need — останнє (від більшого)",
+    "needCountAscending": "Need — останнє (від меншого)",
+    "ownedCountDescending": "Owned — останнє (від більшого)",
+    "ownedCountAscending": "Owned — останнє (від меншого)",
+    "unlockedOwnedCountDescending": "Unlocked owned — останнє (від більшого)",
+    "unlockedOwnedCountAscending": "Unlocked owned — останнє (від меншого)"
   },
   "filterQuery": {
     "switchToAdvancedFilter": "Перейти до розширеного фільтру",

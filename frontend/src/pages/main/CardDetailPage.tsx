@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiClipboard, FiExternalLink } from 'react-icons/fi';
+import { FiArrowLeft, FiClipboard, FiExternalLink, FiAlertTriangle } from 'react-icons/fi';
 import { CardApi, CardSchema } from '../../client';
 import { useDomain } from '../../context/DomainContext';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { formatTimeAgo, formatDateTime } from '../../utils/dateUtils';
 import CardStatsChart from '../../components/CardStatsChart';
 import '../../styles/CardDetail.css';
 import { createAuthenticatedClient } from '../../utils/apiClient';
+import { reportRemovedCard } from '../../utils/reportRemovedCard';
 
 const CardDetailPage: React.FC = () => {
   const { cardId } = useParams<{ cardId: string }>();
@@ -17,10 +18,14 @@ const CardDetailPage: React.FC = () => {
   const [card, setCard] = useState<CardSchema | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reporting, setReporting] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
 
 
   useEffect(() => {
     if (cardId) {
+      setReportError(null);
+      setReporting(false);
       fetchCard();
     }
   }, [cardId]);
@@ -74,6 +79,21 @@ const CardDetailPage: React.FC = () => {
       // You might want to add a toast notification here
     } catch (err) {
       console.error('Failed to copy text: ', err);
+    }
+  };
+
+  const handleReportRemovedCard = async () => {
+    if (!card) return;
+    if (!window.confirm(t('cards.reportRemovedCardConfirm'))) return;
+    setReportError(null);
+    setReporting(true);
+    try {
+      await reportRemovedCard(card.card_id);
+      navigate('/cards', { replace: true });
+    } catch {
+      setReportError(t('cards.reportRemovedCardFailed'));
+    } finally {
+      setReporting(false);
     }
   };
 
@@ -324,6 +344,19 @@ const CardDetailPage: React.FC = () => {
                   </div>
                 </div>
               )}
+            </div>
+
+            <div className="card-detail-report-section">
+              {reportError && <p className="card-detail-report-error">{reportError}</p>}
+              <button
+                type="button"
+                className="report-removed-card-button"
+                disabled={reporting}
+                onClick={handleReportRemovedCard}
+              >
+                <FiAlertTriangle aria-hidden />
+                {reporting ? t('cards.reportRemovedCardSubmitting') : t('cards.reportRemovedCard')}
+              </button>
             </div>
           </div>
         </div>

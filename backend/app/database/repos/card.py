@@ -2,10 +2,11 @@ from .crud import CRUDRepository
 from .deck import DeckRepository
 from .pagination import PaginationRepository
 from ..models.animestars.card import Card
+from ..models.animestars.card_users_stats import CardUsersStats
 from .base import BaseRepository
 from uuid import UUID
 from typing import Iterable
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 from sqlalchemy.dialects.postgresql import insert
 
 
@@ -62,6 +63,21 @@ class CardRepository(
         if isinstance(ident, int):
             return await self.get_by_card_id(ident)
         return await self.get(ident)
+
+    async def delete_by_ident(self, ident: int | UUID) -> bool:
+        """Remove card and related user stats (FK on card_id has no CASCADE)."""
+        async with self.auto_commit() as session:
+            if isinstance(ident, int):
+                card = await session.scalar(select(Card).where(Card.card_id == ident))
+            else:
+                card = await session.scalar(select(Card).where(Card.id == ident))
+            if not card:
+                return False
+            await session.execute(
+                delete(CardUsersStats).where(CardUsersStats.card_id == card.card_id)
+            )
+            await session.execute(delete(Card).where(Card.id == card.id))
+        return True
 
     async def upsert_bulk(self, cards: Iterable[dict]) -> int:
         values = list(cards)

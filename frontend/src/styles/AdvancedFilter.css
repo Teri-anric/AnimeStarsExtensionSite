@@ -81,11 +81,21 @@
   transform: translateX(-50%);
   background-color: var(--accent);
   color: white !important;
-  padding: 5px 15px;
+  padding: 4px 8px;
   border-radius: var(--main-border-radius);
   font-weight: bold;
   font-size: 12px;
   border: 2px solid var(--ui-bg);
+  z-index: 1;
+}
+
+.group-connector .inter-group-operator {
+  min-width: 72px;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-width: 1px;
+  background-color: var(--ui-bg);
+  color: var(--accent) !important;
 }
 
 .filter-group-controls {

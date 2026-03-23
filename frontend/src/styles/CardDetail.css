@@ -188,6 +188,43 @@
   transform: scale(1.1);
 }
 
+.card-detail-report-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--bdc-3);
+}
+
+.card-detail-report-error {
+  color: #ff6b6b;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.card-detail-report-section .report-removed-card-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 71, 87, 0.5);
+  border-radius: var(--main-border-radius);
+  background: rgba(255, 71, 87, 0.12);
+  color: #ff8787;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.card-detail-report-section .report-removed-card-button:hover:not(:disabled) {
+  background: rgba(255, 71, 87, 0.22);
+  border-color: #ff4757;
+}
+
+.card-detail-report-section .report-removed-card-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .card-stats-section {
   margin-top: 32px;
   padding-top: 24px;

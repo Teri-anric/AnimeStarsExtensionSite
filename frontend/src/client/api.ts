@@ -160,6 +160,36 @@ export interface CardFilter {
      * @memberof CardFilter
      */
     'updated_at'?: DateTimeEntryFilter | null;
+    /**
+     * Number of CardUsersStats rows for this card (0 if none)
+     * @type {IntegerEntryFilter}
+     * @memberof CardFilter
+     */
+    'stats_count'?: IntegerEntryFilter | null;
+    /**
+     * Latest trade collection `count`; null if no row (use is_null when absent)
+     * @type {IntegerEntryFilter}
+     * @memberof CardFilter
+     */
+    'trade_count'?: IntegerEntryFilter | null;
+    /**
+     * Latest need collection `count`; null if no row
+     * @type {IntegerEntryFilter}
+     * @memberof CardFilter
+     */
+    'need_count'?: IntegerEntryFilter | null;
+    /**
+     * Latest owned collection `count`; null if no row
+     * @type {IntegerEntryFilter}
+     * @memberof CardFilter
+     */
+    'owned_count'?: IntegerEntryFilter | null;
+    /**
+     * Latest unlocked_owned collection `count`; null if no row
+     * @type {IntegerEntryFilter}
+     * @memberof CardFilter
+     */
+    'unlocked_owned_count'?: IntegerEntryFilter | null;
 }
 /**
  * 
@@ -2219,6 +2249,38 @@ export const CardApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
+         * Report that the card no longer exists at the source; removes it from our database.
+         * @summary Report Deleted Card
+         * @param {CardId} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportDeletedCardApiCardCardIdReportDeletedCardPost: async (cardId: CardId, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            assertParamExists('reportDeletedCardApiCardCardIdReportDeletedCardPost', 'cardId', cardId)
+            const localVarPath = `/api/card/{card_id}/report-deleted-card`
+                .replace(`{${"card_id"}}`, encodeURIComponent(String(cardId)));
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get cards with filtering support.  The new filter system supports: - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm - Computed fields: author_username (demonstrates custom logic)  Example filter usage: {     \"filter\": {         \"name\": {\"contains\": \"Naruto\"},         \"author_username\": {\"icontains\": \"user\"},         \"rank\": {\"eq\": \"S\"}     } }
          * @summary Get Cards
          * @param {CardQuery} cardQuery 
@@ -2282,6 +2344,19 @@ export const CardApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Report that the card no longer exists at the source; removes it from our database.
+         * @summary Report Deleted Card
+         * @param {CardId} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async reportDeletedCardApiCardCardIdReportDeletedCardPost(cardId: CardId, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportDeletedCardApiCardCardIdReportDeletedCardPost(cardId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CardApi.reportDeletedCardApiCardCardIdReportDeletedCardPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Get cards with filtering support.  The new filter system supports: - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm - Computed fields: author_username (demonstrates custom logic)  Example filter usage: {     \"filter\": {         \"name\": {\"contains\": \"Naruto\"},         \"author_username\": {\"icontains\": \"user\"},         \"rank\": {\"eq\": \"S\"}     } }
          * @summary Get Cards
          * @param {CardQuery} cardQuery 
@@ -2315,6 +2390,16 @@ export const CardApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.getCardApiCardCardIdGet(cardId, options).then((request) => request(axios, basePath));
         },
         /**
+         * Report that the card no longer exists at the source; removes it from our database.
+         * @summary Report Deleted Card
+         * @param {CardId} cardId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportDeletedCardApiCardCardIdReportDeletedCardPost(cardId: CardId, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.reportDeletedCardApiCardCardIdReportDeletedCardPost(cardId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get cards with filtering support.  The new filter system supports: - All standard fields: id, card_id, name, rank, anime_name, anime_link, author, image, mp4, webm - Computed fields: author_username (demonstrates custom logic)  Example filter usage: {     \"filter\": {         \"name\": {\"contains\": \"Naruto\"},         \"author_username\": {\"icontains\": \"user\"},         \"rank\": {\"eq\": \"S\"}     } }
          * @summary Get Cards
          * @param {CardQuery} cardQuery 
@@ -2344,6 +2429,18 @@ export class CardApi extends BaseAPI {
      */
     public getCardApiCardCardIdGet(cardId: CardId, options?: RawAxiosRequestConfig) {
         return CardApiFp(this.configuration).getCardApiCardCardIdGet(cardId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Report that the card no longer exists at the source; removes it from our database.
+     * @summary Report Deleted Card
+     * @param {CardId} cardId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CardApi
+     */
+    public reportDeletedCardApiCardCardIdReportDeletedCardPost(cardId: CardId, options?: RawAxiosRequestConfig) {
+        return CardApiFp(this.configuration).reportDeletedCardApiCardCardIdReportDeletedCardPost(cardId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -109,7 +109,11 @@
     "cardImage": "Изображение карточки",
     "cardVideo": "Видео карточки",
     "videoNotSupported": "Ваш браузер не поддерживает тег video.",
-    "openInNewTab": "Открыть в новой вкладке"
+    "openInNewTab": "Открыть в новой вкладке",
+    "reportRemovedCard": "Сообщить: карточка удалена у источника",
+    "reportRemovedCardConfirm": "Карточка будет безвозвратно удалена из нашей базы. Продолжить?",
+    "reportRemovedCardFailed": "Не удалось удалить карточку. Попробуйте снова.",
+    "reportRemovedCardSubmitting": "Удаление…"
   },
   "settings": {
     "title": "Настройки",
@@ -342,7 +346,8 @@
     "anime": "Аниме",
     "animeLink": "Ссылка на аниме",
     "created": "Создано",
-    "updated": "Обновлено"
+    "updated": "Обновлено",
+    "reportRemovedCard": "Сообщить: карточка удалена у источника"
   },
   "cardStatsDisplay": {
     "cardStatistics": "📊 Статистика карточки",
@@ -399,7 +404,8 @@
     "applyFilter": "Применить фильтр",
     "remove": "Удалить",
     "and": "И",
-    "or": "ИЛИ"
+    "or": "ИЛИ",
+    "interGroupOperator": "Как объединять группы фильтров"
   },
   "paginationPage": {
     "clickToJumpToPage": "Нажмите, чтобы перейти на страницу",
@@ -418,7 +424,11 @@
     "webmPath": "Путь к WebM",
     "createdDate": "Дата создания",
     "updatedDate": "Дата обновления",
-    "statsCount": "Количество статистики",
+    "statsCount": "Строк статистики (все типы)",
+    "tradeCount": "Trade — последнее count (null если нет)",
+    "needCount": "Need — последнее count (null если нет)",
+    "ownedCount": "Owned — последнее count (null если нет)",
+    "unlockedOwnedCount": "Unlocked owned — последнее (null если нет)",
     "numberOfCards": "Количество карточек",
     "cards": "Карточки",
     "cardAnimeName": "Назва аниме карточки",
@@ -453,7 +463,17 @@
     "recentlyUpdated": "Самые новые",
     "leastRecentlyUpdated": "Самые старые",
     "mostCards": "Самые много карточек",
-    "leastCards": "Самые мало карточек"
+    "leastCards": "Самые мало карточек",
+    "statsCountDescending": "Строк статистики (сначала больше)",
+    "statsCountAscending": "Строк статистики (сначала меньше)",
+    "tradeCountDescending": "Trade — последнее (по убыванию)",
+    "tradeCountAscending": "Trade — последнее (по возрастанию)",
+    "needCountDescending": "Need — последнее (по убыванию)",
+    "needCountAscending": "Need — последнее (по возрастанию)",
+    "ownedCountDescending": "Owned — последнее (по убыванию)",
+    "ownedCountAscending": "Owned — последнее (по возрастанию)",
+    "unlockedOwnedCountDescending": "Unlocked owned — последнее (по убыванию)",
+    "unlockedOwnedCountAscending": "Unlocked owned — последнее (по возрастанию)"
   },
   "filterQuery": {
     "switchToAdvancedFilter": "Перейти до расширенного фильтра",
