@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, select, func
-from sqlalchemy.orm import relationship, column_property
+from sqlalchemy.orm import column_property, declared_attr, relationship
 
 from ..base import Base, UUIDPKMixin, TimestampMixin
 from .card import Card
@@ -19,8 +19,11 @@ class AnimestarsDeck(Base, UUIDPKMixin, TimestampMixin):
         foreign_keys="Card.deck_id",
     )
 
-    card_count = column_property(
-        select(func.count(Card.id))
-        .where(Card.deck_id == id)
-        .scalar_subquery()
-    )
+    @declared_attr
+    def card_count(cls):
+        return column_property(
+            select(func.count(Card.id))
+            .where(Card.deck_id == cls.id)
+            .correlate_except(Card)
+            .scalar_subquery()
+        )
