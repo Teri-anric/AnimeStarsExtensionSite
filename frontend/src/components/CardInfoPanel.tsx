@@ -165,18 +165,24 @@ const CardInfoPanel: React.FC<CardInfoPanelProps> = ({ card, isOpen, onClose }) 
               />
             )}
             
-            {card.anime_link && (
-              <CardInfoRow label={t('cardInfoPanel.animeLink')} value={card.anime_link} addComponent={
-                <a
-                  href={`/deck/${encodeURIComponent(card.anime_link)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="action-button-arrow deck-button"
-                  title={t('cardInfoPanel.viewDeck')}
-                >
-                  <FiLayers />
-                </a>
-              }/>
+            {(card.anime_link || card.deck_id) && (
+              <CardInfoRow
+                label={t('cardInfoPanel.animeLink')}
+                value={card.anime_link ?? '—'}
+                addComponent={
+                  card.deck_id ? (
+                    <a
+                      href={`/deck/${card.deck_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="action-button-arrow deck-button"
+                      title={t('cardInfoPanel.viewDeck')}
+                    >
+                      <FiLayers />
+                    </a>
+                  ) : undefined
+                }
+              />
             )}
             
             {card.created_at && (

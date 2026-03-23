@@ -1,36 +1,26 @@
-from sqlalchemy import func, select
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, select, func
+from sqlalchemy.orm import relationship, column_property
 
-from ..base import Base
+from ..base import Base, UUIDPKMixin, TimestampMixin
 from .card import Card
 
 
-class AnimestarsCardDeck(Base):
-    """Model for animestars card decks"""
+class AnimestarsDeck(Base, UUIDPKMixin, TimestampMixin):
+    """One deck per canonical anime name (unique); cards reference deck_id."""
 
-    __table__ = (
-        select(
-            Card.anime_link.label("anime_link"),
-            Card.anime_name.label("anime_name"),
-            func.count(Card.id).label("card_count"),
-        )
-        .where(Card.anime_link.isnot(None))
-        .group_by(Card.anime_link, Card.anime_name)
-        .cte("animestarts_card_deck")
-    )
+    __tablename__ = "animestars_decks"
 
-    __mapper_args__ = {
-        "primary_key": [__table__.c.anime_link, __table__.c.anime_name]  # composite PK
-    }
-
-    anime_link: str = __table__.c.anime_link
-    anime_name: str = __table__.c.anime_name
-    card_count: int = __table__.c.card_count
+    anime_name: str = Column(String, nullable=False, unique=True, index=True)
+    anime_link: str | None = Column(String, nullable=True, index=True)
 
     cards = relationship(
-        Card,
-        primaryjoin="AnimestarsCardDeck.anime_link == Card.anime_link",
-        foreign_keys="Card.anime_link",
-        uselist=True,
-        viewonly=True,
+        "Card",
+        back_populates="deck",
+        foreign_keys="Card.deck_id",
+    )
+
+    card_count = column_property(
+        select(func.count(Card.id))
+        .where(Card.deck_id == id)
+        .scalar_subquery()
     )

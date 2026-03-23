@@ -376,6 +376,7 @@
     "loadingDeck": "Завантаження колоди...",
     "failedToFetchDeck": "Не вдалося завантажити деталі колоди. Спробуйте ще раз пізніше.",
     "invalidDeckLink": "Недійсне посилання на колоду",
+    "invalidDeckId": "Некоректний ідентифікатор колоди",
     "pleaseLogInToViewDeck": "Будь ласка, увійдіть, щоб переглядати деталі колоди.",
     "deckInfo": "{{cardCount}} картка • {{animeLink}}",
     "deckInfoPlural": "{{cardCount}} карток • {{animeLink}}"

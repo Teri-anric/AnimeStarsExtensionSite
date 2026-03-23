@@ -23,6 +23,7 @@ class CardSchema(BaseSchema):
     rank: CardType
     anime_name: str | None = None
     anime_link: str | None = None
+    deck_id: UUID | None = None
     author: str | None = None
     image: str | None = None
     mp4: str | None = None
@@ -45,6 +46,7 @@ CardSort = Literal[
     "rank",
     "anime_name",
     "anime_link",
+    "deck_id",
     "author",
     "image",
     "mp4",
@@ -63,6 +65,7 @@ class CardFilter(BaseFilter):
     rank: EnumEntryFilter[CardType] | None = None
     anime_name: StringEntryFilter | None = None
     anime_link: StringEntryFilter | None = None
+    deck_id: UUIDEntryFilter | None = None
     author: StringEntryFilter | None = None
     image: StringEntryFilter | None = None
     mp4: StringEntryFilter | None = None

@@ -31,7 +31,7 @@ function App() {
                 <Route path="/cards" element={<CardsPage />} />
                 <Route path="/card/:cardId" element={<CardDetailPage />} />
                 <Route path="/decks" element={<DecksListPage />} />
-                <Route path="/deck/:anime_link" element={<DeckDetailPage />} />
+                <Route path="/deck/:deck_id" element={<DeckDetailPage />} />
                 <Route path="/settings/*" element={<SettingsPage />} />
                 <Route path="/fqa" element={<FQAPage />} />
                 <Route path="/" element={<Navigate to="/random-gif" replace />} />

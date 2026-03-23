@@ -1,16 +1,18 @@
+import uuid
+
 from sqlalchemy import (
     Column,
     String,
     Enum,
     ForeignKey,
     Integer,
+    UUID,
     select,
-    func
+    func,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import column_property
-from sqlalchemy.ext.hybrid import hybrid_property
-from ...enum import CardType, CardCollection
+from ...enum import CardType
 from ..base import Base, TimestampMixin, UUIDPKMixin
 from .user import AnimestarsUser
 from .card_users_stats import CardUsersStats
@@ -26,6 +28,14 @@ class Card(Base, UUIDPKMixin, TimestampMixin):
 
     anime_name: str = Column(String, nullable=True)
     anime_link: str = Column(String, nullable=True)
+
+    deck_id: uuid.UUID | None = Column(
+        UUID(as_uuid=True),
+        ForeignKey("animestars_decks.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    deck = relationship("AnimestarsDeck", back_populates="cards")
 
     author: str = Column(String, ForeignKey(AnimestarsUser.username), nullable=True)
 

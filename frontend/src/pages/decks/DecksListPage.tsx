@@ -8,7 +8,7 @@ import '../../styles/Decks.css';
 import { createAuthenticatedClient } from '../../utils/apiClient';
 
 interface DecksListPageProps {
-  onDeckSelect?: (animeLink: string) => void;
+  onDeckSelect?: (deckId: string) => void;
 }
 
 const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
@@ -34,7 +34,7 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
   const renderDecks = (decks: DeckSummarySchema[]) => (
     <div className="decks-list">
       {decks.map((deck) => (
-        <div key={deck.anime_link} className="deck-row" onClick={() => handleDeckClick(deck.anime_link)}>
+        <div key={deck.id} className="deck-row" onClick={() => handleDeckClick(deck.id)}>
           <div className="deck-header-section">
             <div className="deck-info">
               <h2 className="deck-title">
@@ -47,9 +47,9 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
                     : t('decks.cardCountPlural', { count: deck.card_count })
                   }
                 </span>
-                <span className="deck-link">
-                  {deck.anime_link}
-                </span>
+                {deck.anime_link ? (
+                  <span className="deck-link">{deck.anime_link}</span>
+                ) : null}
               </div>
             </div>
           </div>
@@ -70,13 +70,11 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
     </div>
   );
 
-  const handleDeckClick = (anime_link: string) => {
+  const handleDeckClick = (deckId: string) => {
     if (onDeckSelect) {
-      onDeckSelect(anime_link);
+      onDeckSelect(deckId);
     } else {
-      // Navigate to the new deck detail route with anime_link as parameter
-      const encodedAnimeLink = encodeURIComponent(anime_link);
-      navigate(`/deck/${encodedAnimeLink}`);
+      navigate(`/deck/${deckId}`);
     }
   };
 

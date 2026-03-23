@@ -376,6 +376,7 @@
     "loadingDeck": "Loading deck...",
     "failedToFetchDeck": "Failed to fetch deck details. Please try again later.",
     "invalidDeckLink": "Invalid deck link",
+    "invalidDeckId": "Invalid deck id",
     "pleaseLogInToViewDeck": "Please log in to view deck details.",
     "deckInfo": "{{cardCount}} card • {{animeLink}}",
     "deckInfoPlural": "{{cardCount}} cards • {{animeLink}}"

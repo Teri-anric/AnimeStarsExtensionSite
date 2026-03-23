@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Query
-from typing import Annotated
+from uuid import UUID
+
+from fastapi import APIRouter, HTTPException
 
 from app.web.schema.deck import (
     DeckPaginationResponse,
     DeckDetailSchema,
-    DeckQuery
+    DeckQuery,
 )
 from app.web.deps import DeckRepositoryDep
 
@@ -17,19 +18,19 @@ async def get_decks(
     deck_query: DeckQuery,
     repo: DeckRepositoryDep = None,
 ) -> DeckPaginationResponse:
-    """Get all decks (anime grouped by anime_link) with pagination, search and sorting"""
+    """List decks with pagination, filters and sorting."""
     return await repo.search(deck_query.build())
 
 
-@router.get("/detail")
+@router.get("/{deck_id}")
 async def get_deck_detail(
-    anime_link: Annotated[str, Query()],
+    deck_id: UUID,
     repo: DeckRepositoryDep = None,
 ) -> DeckDetailSchema:
-    """Get detailed view of a specific deck with all its cards"""
-    deck = await repo.get_deck_by_anime_link(anime_link)
-    
+    """Deck detail by internal id (UUID)."""
+    deck = await repo.get_deck_by_id(deck_id)
+
     if deck is None:
         raise HTTPException(status_code=404, detail="Deck not found")
-    
+
     return deck

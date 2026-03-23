@@ -289,6 +289,12 @@ export interface CardSchema {
      * @type {string}
      * @memberof CardSchema
      */
+    'deck_id'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CardSchema
+     */
     'author'?: string | null;
     /**
      * 
@@ -685,13 +691,19 @@ export interface DeckDetailSchema {
      * @type {string}
      * @memberof DeckDetailSchema
      */
-    'anime_link': string;
+    'id': string;
     /**
      * 
      * @type {string}
      * @memberof DeckDetailSchema
      */
-    'anime_name': string | null;
+    'anime_name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeckDetailSchema
+     */
+    'anime_link'?: string | null;
     /**
      * 
      * @type {Array<CardSchema>}
@@ -729,6 +741,12 @@ export interface DeckFilter {
      * @memberof DeckFilter
      */
     'cards'?: ArrayEntryFilterCardFilter | null;
+    /**
+     * 
+     * @type {UUIDEntryFilter}
+     * @memberof DeckFilter
+     */
+    'id'?: UUIDEntryFilter | null;
     /**
      * 
      * @type {StringEntryFilter}
@@ -833,13 +851,19 @@ export interface DeckSummarySchema {
      * @type {string}
      * @memberof DeckSummarySchema
      */
-    'anime_link': string;
+    'id': string;
     /**
      * 
      * @type {string}
      * @memberof DeckSummarySchema
      */
-    'anime_name': string | null;
+    'anime_name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeckSummarySchema
+     */
+    'anime_link'?: string | null;
     /**
      * 
      * @type {number}
@@ -2686,14 +2710,15 @@ export const DeckApiAxiosParamCreator = function (configuration?: Configuration)
         /**
          * Get detailed view of a specific deck with all its cards
          * @summary Get Deck Detail
-         * @param {string} animeLink 
+         * @param {string} deckId Deck UUID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getDeckDetailApiDeckDetailGet: async (animeLink: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'animeLink' is not null or undefined
-            assertParamExists('getDeckDetailApiDeckDetailGet', 'animeLink', animeLink)
-            const localVarPath = `/api/deck/detail`;
+        getDeckDetailApiDeckDeckIdGet: async (deckId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deckId' is not null or undefined
+            assertParamExists('getDeckDetailApiDeckDeckIdGet', 'deckId', deckId)
+            const localVarPath = `/api/deck/{deck_id}`
+                .replace(`{${"deck_id"}}`, encodeURIComponent(String(deckId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2708,10 +2733,6 @@ export const DeckApiAxiosParamCreator = function (configuration?: Configuration)
             // authentication OAuth2PasswordBearer required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "OAuth2PasswordBearer", [], configuration)
-
-            if (animeLink !== undefined) {
-                localVarQueryParameter['anime_link'] = animeLink;
-            }
 
 
     
@@ -2777,14 +2798,14 @@ export const DeckApiFp = function(configuration?: Configuration) {
         /**
          * Get detailed view of a specific deck with all its cards
          * @summary Get Deck Detail
-         * @param {string} animeLink 
+         * @param {string} deckId Deck UUID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getDeckDetailApiDeckDetailGet(animeLink: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeckDetailSchema>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getDeckDetailApiDeckDetailGet(animeLink, options);
+        async getDeckDetailApiDeckDeckIdGet(deckId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeckDetailSchema>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDeckDetailApiDeckDeckIdGet(deckId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DeckApi.getDeckDetailApiDeckDetailGet']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DeckApi.getDeckDetailApiDeckDeckIdGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2813,12 +2834,12 @@ export const DeckApiFactory = function (configuration?: Configuration, basePath?
         /**
          * Get detailed view of a specific deck with all its cards
          * @summary Get Deck Detail
-         * @param {string} animeLink 
+         * @param {string} deckId Deck UUID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getDeckDetailApiDeckDetailGet(animeLink: string, options?: RawAxiosRequestConfig): AxiosPromise<DeckDetailSchema> {
-            return localVarFp.getDeckDetailApiDeckDetailGet(animeLink, options).then((request) => request(axios, basePath));
+        getDeckDetailApiDeckDeckIdGet(deckId: string, options?: RawAxiosRequestConfig): AxiosPromise<DeckDetailSchema> {
+            return localVarFp.getDeckDetailApiDeckDeckIdGet(deckId, options).then((request) => request(axios, basePath));
         },
         /**
          * Get all decks (anime grouped by anime_link) with pagination, search and sorting
@@ -2843,13 +2864,13 @@ export class DeckApi extends BaseAPI {
     /**
      * Get detailed view of a specific deck with all its cards
      * @summary Get Deck Detail
-     * @param {string} animeLink 
+     * @param {string} deckId Deck UUID
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DeckApi
      */
-    public getDeckDetailApiDeckDetailGet(animeLink: string, options?: RawAxiosRequestConfig) {
-        return DeckApiFp(this.configuration).getDeckDetailApiDeckDetailGet(animeLink, options).then((request) => request(this.axios, this.basePath));
+    public getDeckDetailApiDeckDeckIdGet(deckId: string, options?: RawAxiosRequestConfig) {
+        return DeckApiFp(this.configuration).getDeckDetailApiDeckDeckIdGet(deckId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

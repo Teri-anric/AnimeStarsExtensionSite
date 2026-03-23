@@ -1,16 +1,19 @@
-from pydantic import Field, BaseModel
+from uuid import UUID
+
+from pydantic import Field
 from typing import List, Literal
 from .card import CardSchema, CardFilter
 from .base import BaseSchema
 from .pagination import BasePaginationResponse, BasePaginationQuery
-from app.filters.types import ArrayEntryFilter, StringFilter, IntFilter, BaseFilter
+from app.filters.types import ArrayEntryFilter, StringFilter, IntFilter, BaseFilter, UUIDEntryFilter
 
 
 class DeckSummarySchema(BaseSchema):
     """Schema for deck summary in listings"""
 
-    anime_link: str
-    anime_name: str | None
+    id: UUID
+    anime_name: str
+    anime_link: str | None = None
     card_count: int
     cards: List[CardSchema] = Field(default_factory=list)
 
@@ -24,12 +27,14 @@ class DeckPaginationResponse(BasePaginationResponse[DeckSummarySchema]):
 class DeckDetailSchema(BaseSchema):
     """Schema for detailed deck view with all cards"""
 
-    anime_link: str
-    anime_name: str | None
+    id: UUID
+    anime_name: str
+    anime_link: str | None = None
     cards: List[CardSchema]
 
 
 DeckSort = Literal[
+    "id",
     "anime_name",
     "anime_link",
     "card_count",
@@ -38,8 +43,9 @@ DeckSort = Literal[
 
 class DeckFilter(BaseFilter):
     cards: ArrayEntryFilter[CardFilter] | None = None
+    id: UUIDEntryFilter | None = None
     anime_name: StringFilter | None = None
-    anime_link: StringFilter | None = None  
+    anime_link: StringFilter | None = None
     card_count: IntFilter | None = None
 
 
