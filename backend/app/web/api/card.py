@@ -13,6 +13,15 @@ from app.web.deps import CardRepositoryDep
 
 router = APIRouter(prefix="/card", tags=["card"])
 
+def clear_cards_data_without_stars(cards: list[dict]):
+    for card in cards:
+        if card.get("image") is None:
+            yield card
+            continue
+        image = card.get("image") or ""
+        if "_stars_" in image:
+            continue
+        yield card
 
 @router.post("/")
 async def get_cards(
@@ -70,6 +79,9 @@ async def bulk_upsert_cards(
             partial_update_values.append(data)
 
     total_count = 0
+
+    full_upsert_values = list(clear_cards_data_without_stars(full_upsert_values))
+    partial_update_values = list(clear_cards_data_without_stars(partial_update_values))
 
     if full_upsert_values:
         total_count += await repo.upsert_bulk(full_upsert_values)
