@@ -4,35 +4,203 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
   "id": null,
-  "links": [],
+  "links": [
+    {
+      "icon": "cloud",
+      "keepTime": true,
+      "title": "API overview",
+      "type": "link",
+      "url": "/d/anime-stars-backend"
+    },
+    {
+      "icon": "document-info",
+      "keepTime": true,
+      "title": "Logs (Loki)",
+      "type": "link",
+      "url": "/d/anime-stars-logs"
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
+      "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
+      "id": 200,
+      "options": {
+        "content": "## Database layer\n**SQLAlchemy** pool + query histograms from the app; **Postgres** counters refreshed from `pg_stat_database` (enable `DB_METRICS_PG_STATS` if empty).",
+        "mode": "markdown"
+      },
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 3 },
+      "id": 201,
+      "title": "Connection pool",
+      "type": "row"
+    },
+    {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "fillOpacity": 15, "showPoints": "never" } },
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never",
+            "stacking": { "group": "A", "mode": "normal" }
+          },
+          "unit": "none"
+        },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
       "id": 1,
-      "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true }, "tooltip": { "mode": "multi" } },
+      "options": {
+        "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "right", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
       "targets": [
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sqlalchemy_pool_connections_checked_out", "legendFormat": "checked_out", "refId": "A" },
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sqlalchemy_pool_connections_idle", "legendFormat": "idle", "refId": "B" },
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sqlalchemy_pool_overflow", "legendFormat": "overflow", "refId": "C" }
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sqlalchemy_pool_connections_checked_out",
+          "legendFormat": "checked_out",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sqlalchemy_pool_connections_idle",
+          "legendFormat": "idle",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sqlalchemy_pool_overflow",
+          "legendFormat": "overflow",
+          "refId": "C"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sqlalchemy_pool_connections_open",
+          "legendFormat": "open_total",
+          "refId": "D"
+        }
       ],
-      "title": "SQLAlchemy pool",
+      "title": "SQLAlchemy pool (stacked)",
       "type": "timeseries"
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "fillOpacity": 15, "showPoints": "never" }, "unit": "ops" },
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 0,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "green", "value": 90 }
+            ]
+          },
+          "unit": "percent"
+        },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 4 },
+      "id": 10,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "editorMode": "code",
+          "expr": "100 * postgres_stat_database_blks_hit / (postgres_stat_database_blks_hit + postgres_stat_database_blks_read + 1e-9)",
+          "legendFormat": "hit %",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Buffer hit ratio",
+      "type": "gauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "purple", "mode": "fixed" },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "purple", "value": null }] },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 4 },
+      "id": 11,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "postgres_stat_database_num_backends",
+          "legendFormat": "backends",
+          "refId": "A"
+        }
+      ],
+      "title": "Active backends",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 12 },
+      "id": 202,
+      "title": "Query workload",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 22,
+            "gradientMode": "hue",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
       "id": 2,
-      "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true }, "tooltip": { "mode": "multi" } },
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "right", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
@@ -42,31 +210,103 @@
           "refId": "A"
         }
       ],
-      "title": "SQL query rate by kind",
+      "title": "SQL statements / s by kind",
       "type": "timeseries"
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "unit": "s" },
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "ops"
+        },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-      "id": 3,
-      "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true }, "tooltip": { "mode": "multi" } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+      "id": 12,
+      "options": {
+        "legend": { "calcs": ["mean"], "displayMode": "table", "placement": "right", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(sqlalchemy_query_duration_seconds_bucket[5m])) by (le))",
-          "legendFormat": "p99",
+          "expr": "delta(postgres_stat_database_xact_commit[5m]) / 300",
+          "legendFormat": "commits/s (approx)",
+          "range": true,
           "refId": "A"
         },
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "editorMode": "code",
+          "expr": "delta(postgres_stat_database_xact_rollback[5m]) / 300",
+          "legendFormat": "rollbacks/s (approx)",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Postgres commits & rollbacks (from pg_stat)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 },
+      "id": 203,
+      "title": "Latency & cache",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "p50" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "semi-dark-green", "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "p99" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "semi-dark-red", "mode": "fixed" } }]
+          }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+      "id": 3,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "right", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "editorMode": "code",
           "expr": "histogram_quantile(0.50, sum(rate(sqlalchemy_query_duration_seconds_bucket[5m])) by (le))",
           "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum(rate(sqlalchemy_query_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p99",
           "refId": "B"
         }
       ],
@@ -76,32 +316,28 @@
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
-        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "fillOpacity": 15, "showPoints": "never" } },
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisSoftMin": 0,
+            "axisSoftMax": 1,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "max": 1,
+          "min": 0,
+          "unit": "percentunit"
+        },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
-      "id": 4,
-      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single" } },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "postgres_stat_database_num_backends",
-          "legendFormat": "backends",
-          "refId": "A"
-        }
-      ],
-      "title": "Postgres backends (pg_stat_database)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": { "color": { "mode": "palette-classic" }, "max": 1, "min": 0, "unit": "percentunit" },
-        "overrides": []
-      },
-      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 16 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
       "id": 5,
-      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single" } },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
@@ -111,7 +347,40 @@
           "refId": "A"
         }
       ],
-      "title": "Shared buffers hit ratio (approx)",
+      "title": "Shared buffers hit ratio (time series)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 30 },
+      "id": 4,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "showLegend": true },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "postgres_stat_database_num_backends",
+          "legendFormat": "backends",
+          "refId": "A"
+        }
+      ],
+      "title": "Postgres backends (history)",
       "type": "timeseries"
     }
   ],
@@ -124,6 +393,6 @@
   "timezone": "browser",
   "title": "Anime Stars — DB (SQLAlchemy / Postgres)",
   "uid": "anime-stars-db",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

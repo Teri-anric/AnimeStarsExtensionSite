@@ -1,0 +1,161 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {
+      "icon": "cloud",
+      "keepTime": true,
+      "title": "API (Prometheus)",
+      "type": "link",
+      "url": "/d/anime-stars-backend"
+    },
+    {
+      "icon": "database",
+      "keepTime": true,
+      "title": "Database",
+      "type": "link",
+      "url": "/d/anime-stars-db"
+    }
+  ],
+  "liveNow": false,
+  "panels": [
+    {
+      "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
+      "id": 300,
+      "options": {
+        "content": "## Container logs\nPromtail scrapes Docker; filter by **compose service**. When `LOG_JSON=true`, backend lines parse with `| json`. HTTP audit lines include `event=\"http_audit\"` (only if body logging is enabled).",
+        "mode": "markdown"
+      },
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 3 },
+      "id": 301,
+      "options": {
+        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "sum by (compose_service) (rate({job=\"docker\"}[$__auto]))",
+          "legendFormat": "{{compose_service}}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Log lines / s by Compose service",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 11 },
+      "id": 302,
+      "options": {
+        "dedupStrategy": "none",
+        "enableInfiniteScrolling": false,
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "{job=\"docker\", compose_service=~\"$service\"} | json",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Parsed JSON (backend-friendly)",
+      "type": "logs"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 15 },
+      "id": 303,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": true,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "{job=\"docker\", compose_service=~\"$service\"} |= \"http_audit\" | json",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP audit events (when enabled)",
+      "type": "logs"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["anime-stars", "loki", "logs"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": true, "text": "backend", "value": "backend" },
+        "hide": 0,
+        "label": "Service",
+        "name": "service",
+        "options": [
+          { "selected": true, "text": "backend", "value": "backend" },
+          { "selected": false, "text": "frontend", "value": "frontend" },
+          { "selected": false, "text": "db", "value": "db" },
+          { "selected": false, "text": "grafana", "value": "grafana" },
+          { "selected": false, "text": "prometheus", "value": "prometheus" },
+          { "selected": false, "text": "All", "value": ".+" }
+        ],
+        "query": "backend,frontend,db,grafana,prometheus,.+",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Anime Stars — Logs",
+  "uid": "anime-stars-logs",
+  "version": 1,
+  "weekStart": ""
+}
