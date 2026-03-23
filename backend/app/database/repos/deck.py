@@ -1,7 +1,7 @@
 import uuid
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, delete
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -101,4 +101,9 @@ class DeckRepository(PaginationRepository[AnimestarsDeck]):
             select(AnimestarsDeck)
             .where(AnimestarsDeck.id == deck_id)
             .options(selectinload(AnimestarsDeck.cards))
+        )
+
+    async def delete_empty_decks(self) -> int:
+        return await self.execute(
+            delete(AnimestarsDeck).where(AnimestarsDeck.card_count == 0)
         )
