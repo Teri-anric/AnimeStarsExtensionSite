@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { DeckApi, DeckSummarySchema, DeckQuery } from '../../client';
 import { useTranslation } from 'react-i18next';
 import PaginationPage, { PaginationResponse } from '../../components/PaginationPage';
@@ -13,7 +12,6 @@ interface DecksListPageProps {
 }
 
 const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
-  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -103,10 +101,6 @@ const DecksListPage: React.FC<DecksListPageProps> = ({ onDeckSelect }) => {
       {t('decks.description')}
     </p>
   );
-
-  if (!isAuthenticated) {
-    return <div className="auth-message">{t('decks.pleaseLogIn')}</div>;
-  }
 
   return (
     <div className="decks-container">

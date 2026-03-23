@@ -1,6 +1,12 @@
 import asyncio
+
+from app.config import settings
+from app.json_logging import configure_json_app_logging
+
+configure_json_app_logging(settings.log_json)
+
 from .scheduler import scheduler
-from .tasks import update_cards # noqa
+from .tasks import update_cards  # noqa: F401
 
 
 async def idle(scheduler):

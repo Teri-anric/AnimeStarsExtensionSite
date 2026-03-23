@@ -1,19 +1,23 @@
-from app.parser.types import PaginatedCards as CardPaginationResponse
-from app.database.repos.card import CardRepository
-from app.database.repos.animestars_user import AnimestarsUserRepo
-from app.parser.repos.cards import AnimestarCardsRepo
-from app.parser.exception import AnimestarError, UnauthorizedError
-from logging import getLogger, StreamHandler, INFO
+from logging import getLogger, INFO
 import traceback
 import asyncio
 from urllib.parse import urlparse
 import random
 from datetime import datetime, UTC
+
 from app.config import settings
+from app.json_logging import configure_json_app_logging
+
+configure_json_app_logging(settings.log_json)
+
+from app.parser.types import PaginatedCards as CardPaginationResponse
+from app.database.repos.card import CardRepository
+from app.database.repos.animestars_user import AnimestarsUserRepo
+from app.parser.repos.cards import AnimestarCardsRepo
+from app.parser.exception import AnimestarError, UnauthorizedError
 
 logger = getLogger(__name__)
 logger.setLevel(INFO)
-logger.addHandler(StreamHandler())
 
 card_repo = CardRepository()
 user_repo = AnimestarsUserRepo()

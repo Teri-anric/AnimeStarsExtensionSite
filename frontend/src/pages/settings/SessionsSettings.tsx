@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
 import { formatTimeAgo, formatDateTime } from '../../utils/dateUtils';
 import '../../styles/settings/SessionsSettings.css';
 
@@ -12,6 +14,7 @@ interface Session {
 
 const SessionsSettings = () => {
   const { t } = useTranslation();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,9 +80,33 @@ const SessionsSettings = () => {
   };
 
   useEffect(() => {
-    fetchSessions();
-  }, []);
+    if (!authLoading && isAuthenticated) {
+      fetchSessions();
+    }
+  }, [authLoading, isAuthenticated]);
 
+
+  if (authLoading) {
+    return (
+      <div className="sessions-content">
+        <div className="loading">{t('settings.loadingSessions')}</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="sessions-content">
+        <div className="settings-section">
+          <h2>{t('settings.sessionManagement')}</h2>
+          <p className="setting-description">{t('auth.pleaseLogIn')}</p>
+          <Link to="/login" className="button button-secondary">
+            {t('auth.login')}
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!apiAvailable && !loading) {
     return (

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { createAuthenticatedClient } from '../utils/apiClient';
@@ -178,6 +179,9 @@ const ExtensionTokenModal: React.FC<ExtensionTokenModalProps> = ({
             <div className="extension-icon">🔌</div>
             <p>{t('extension.needLoginFirst')}</p>
             <div className="modal-actions">
+              <Link to="/login" className="approve-button" onClick={handleClose}>
+                {t('auth.login')}
+              </Link>
               <button className="deny-button" onClick={() => handleDeny(t('extension.userNotLoggedIn'))}>
                 {t('common.close')}
               </button>

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { createAuthenticatedClient } from '../../utils/apiClient';
 import { CardApi, CardSchema, CardQuery } from '../../client';
 import PaginationPage, { PaginationResponse } from '../../components/PaginationPage';
@@ -10,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import '../../styles/Cards.css';
 
 const CardsPage = () => {
-  const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   
   // Card info panel state
@@ -70,10 +68,6 @@ const CardsPage = () => {
   const emptyComponent = (
     <div className="no-cards">{t('cards.noCardsFound')}</div>
   );
-
-  if (!isAuthenticated) {
-    return <div className="auth-message">{t('auth.pleaseLogIn')}</div>;
-  }
 
   return (
     <div className={`cards-container ${isCardInfoOpen ? 'with-panel' : ''}`}>

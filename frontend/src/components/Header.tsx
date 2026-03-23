@@ -14,26 +14,25 @@ const Header = () => {
         <Link to="/">{t('header.logo')}</Link>
       </div>
       
-      {isAuthenticated && (
-        <nav className="main-nav">
-          <NavLink to="/cards" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
-            {t('navigation.cards')}
-          </NavLink>
-          <NavLink to="/decks" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
-            {t('navigation.decks')}
-          </NavLink>
-          <NavLink to="/random-gif" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
-            {t('navigation.randomGif')}
-          </NavLink>
-          <NavLink to="/fqa" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
-            {t('navigation.fqa')}
-          </NavLink>
-        </nav>
-      )}
-      
+      <nav className="main-nav">
+        <NavLink to="/cards" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+          {t('navigation.cards')}
+        </NavLink>
+        <NavLink to="/decks" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+          {t('navigation.decks')}
+        </NavLink>
+        <NavLink to="/random-gif" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+          {t('navigation.randomGif')}
+        </NavLink>
+        <NavLink to="/fqa" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+          {t('navigation.fqa')}
+        </NavLink>
+      </nav>
+
       <nav className="user-nav">
         {isAuthenticated ? (
           <div className="user-menu">
+            <LanguageSwitcher />
             <span className="username">{t('auth.welcomeUser', { username })}</span>
             <div className="user-actions">
               <Link to="/settings" className="settings-link">
@@ -47,9 +46,6 @@ const Header = () => {
         ) : (
           <div className="user-menu">
             <LanguageSwitcher />
-            <NavLink to="/fqa" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
-              {t('navigation.fqa')}
-            </NavLink>
             <Link to="/login" className="login-button">
               {t('auth.login')}
             </Link>

@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-from logging import getLogger, StreamHandler, INFO
+from logging import getLogger, INFO
 from datetime import datetime, timedelta
 import traceback
 
@@ -13,7 +13,6 @@ from .scheduler import scheduler
 
 logger = getLogger(__name__)
 logger.setLevel(INFO)
-logger.addHandler(StreamHandler())
 
 
 def url_path(url: str | None) -> str | None:

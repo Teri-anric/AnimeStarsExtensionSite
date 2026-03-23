@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiClock } from 'react-icons/fi';
 import { CardUsersStatsSchema, CardStatsApi, CardCollection } from '../client';
-import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { createAuthenticatedClient } from '../utils/apiClient';
 import { formatTimeAgo } from '../utils/dateUtils';
@@ -16,14 +15,13 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
   const [statsData, setStatsData] = useState<CardUsersStatsSchema[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-  const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (isAuthenticated && cardId) {
+    if (cardId) {
       fetchLastStats();
     }
-  }, [cardId, isAuthenticated]);
+  }, [cardId]);
 
   const fetchLastStats = async () => {
     try {
@@ -83,19 +81,6 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
     if (diffInHours < 168) return '#F44336'; // Red - old
     return '#757575'; // Gray - very old
   };
-
-  if (!isAuthenticated) {
-    return (
-      <div className={`card-stats-display ${className}`}>
-        <div className="card-stats-header">
-          <h3>{t('cardStatsDisplay.cardStatistics')}</h3>
-        </div>
-        <div className="stats-empty">
-          {t('cardStatsDisplay.pleaseLogIn')}
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (

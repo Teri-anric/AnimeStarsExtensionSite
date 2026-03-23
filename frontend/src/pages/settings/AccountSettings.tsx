@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useDomain } from '../../context/DomainContext';
+import { useAuth } from '../../context/AuthContext';
 import { createAuthenticatedClient } from '../../utils/apiClient';
 import { AuthApi, UserResponse } from '../../client';
 import { formatTimeAgo } from '../../utils/dateUtils';
@@ -9,6 +11,7 @@ import LanguageSwitcher from '../../components/LanguageSwitcher';
 
 const AccountSettings = () => {
   const { t } = useTranslation();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const { currentDomain, setCurrentDomain, availableDomains } = useDomain();
   const [successMessage, setSuccessMessage] = useState('');
   const [userInfo, setUserInfo] = useState<UserResponse | null>(null);
@@ -16,6 +19,16 @@ const AccountSettings = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+    if (!isAuthenticated) {
+      setLoading(false);
+      setUserInfo(null);
+      setError(null);
+      return;
+    }
+
     const fetchUserInfo = async () => {
       try {
         setLoading(true);
@@ -32,7 +45,7 @@ const AccountSettings = () => {
     };
 
     fetchUserInfo();
-  }, []);
+  }, [authLoading, isAuthenticated, t]);
 
   const handleDomainChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newDomain = e.target.value;
@@ -47,50 +60,54 @@ const AccountSettings = () => {
 
 
 
-  if (loading) {
-    return (
-      <div className="account-settings-content">
-        <div className="settings-section">
-          <h2>{t('settings.userInformation')}</h2>
-          <div className="setting-item">
-            <div className="loading">{t('settings.loadingUserInfo')}</div>
-          </div>
+  const userSection = (() => {
+    if (authLoading || (isAuthenticated && loading)) {
+      return (
+        <div className="setting-item">
+          <div className="loading">{t('settings.loadingUserInfo')}</div>
         </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="account-settings-content">
-        <div className="settings-section">
-          <h2>{t('settings.userInformation')}</h2>
-          <div className="setting-item">
-            <div className="error-message">{error}</div>
-          </div>
+      );
+    }
+    if (!isAuthenticated) {
+      return (
+        <div className="setting-item">
+          <p className="setting-description">{t('auth.pleaseLogIn')}</p>
+          <Link to="/login" className="button button-secondary">
+            {t('auth.login')}
+          </Link>
         </div>
-      </div>
-    );
-  }
+      );
+    }
+    if (error) {
+      return (
+        <div className="setting-item">
+          <div className="error-message">{error}</div>
+        </div>
+      );
+    }
+    if (userInfo) {
+      return (
+        <>
+          <div className="setting-item">
+            <label>{t('common.username')}</label>
+            <div className="setting-value">{userInfo.username}</div>
+          </div>
+          <div className="setting-item">
+            <label>{t('settings.accountCreated')}</label>
+            <div className="setting-value">{formatTimeAgo(userInfo.created_at, t)}</div>
+          </div>
+          <LanguageSwitcher />
+        </>
+      );
+    }
+    return null;
+  })();
 
   return (
     <div className="account-settings-content">
       <div className="settings-section">
         <h2>{t('settings.userInformation')}</h2>
-        {userInfo && (
-          <>
-            <div className="setting-item">
-              <label>{t('common.username')}</label>
-              <div className="setting-value">{userInfo.username}</div>
-            </div>
-            <div className="setting-item">
-              <label>{t('settings.accountCreated')}</label>
-              <div className="setting-value">{formatTimeAgo(userInfo.created_at, t)}</div>
-            </div>
-            <LanguageSwitcher />
-
-          </>
-        )}
+        {userSection}
       </div>
       
       <div className="settings-section">

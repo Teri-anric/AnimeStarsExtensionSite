@@ -19,7 +19,6 @@ import {
   Direction 
 } from '../client';
 import { createAuthenticatedClient } from '../utils/apiClient';
-import { useAuth } from '../context/AuthContext';
 import { formatChartDate } from '../utils/dateUtils';
 import 'chartjs-adapter-date-fns';
 
@@ -43,10 +42,8 @@ const CardStatsChart: React.FC<CardStatsChartProps> = ({ cardId, className = '' 
   const [statsData, setStatsData] = useState<CardUsersStatsSchema[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-  const { isAuthenticated } = useAuth();
-
   const fetchCardStats = useCallback(async () => {
-    if (!isAuthenticated || !cardId) {
+    if (!cardId) {
       setLoading(false);
       return;
     }
@@ -81,7 +78,7 @@ const CardStatsChart: React.FC<CardStatsChartProps> = ({ cardId, className = '' 
     } finally {
       setLoading(false);
     }
-  }, [cardId, isAuthenticated]);
+  }, [cardId]);
 
   useEffect(() => {
     fetchCardStats();

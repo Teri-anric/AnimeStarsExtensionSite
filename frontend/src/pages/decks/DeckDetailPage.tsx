@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { DeckApi, DeckDetailSchema, CardSchema } from '../../client';
 import { useTranslation } from 'react-i18next';
 import '../../styles/DeckDetail.css';
@@ -11,7 +10,6 @@ import { createAuthenticatedClient } from '../../utils/apiClient';
 const DeckDetailPage: React.FC = () => {
   const { anime_link } = useParams<{ anime_link: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   const [deck, setDeck] = useState<DeckDetailSchema | null>(null);
   const [loading, setLoading] = useState(true);
@@ -24,10 +22,10 @@ const DeckDetailPage: React.FC = () => {
   const decodedAnimeLink = anime_link ? decodeURIComponent(anime_link) : '';
 
   useEffect(() => {
-    if (isAuthenticated && decodedAnimeLink) {
+    if (decodedAnimeLink) {
       fetchDeckDetail();
     }
-  }, [isAuthenticated, decodedAnimeLink]);
+  }, [decodedAnimeLink]);
 
   const fetchDeckDetail = async () => {
     try {
@@ -61,10 +59,6 @@ const DeckDetailPage: React.FC = () => {
 
   if (!anime_link) {
     return <div className="error-message">{t('decks.invalidDeckLink')}</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <div className="auth-message">{t('decks.pleaseLogInToViewDeck')}</div>;
   }
 
   return (

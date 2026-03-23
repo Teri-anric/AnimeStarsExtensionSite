@@ -13,7 +13,6 @@ import {
 } from './pages';
 import { DecksListPage, DeckDetailPage } from './pages/decks';
 import Header from './components/Header';
-import ProtectedRoute from './components/ProtectedRoute';
 import ExtensionTokenModal from './components/ExtensionTokenModal';
 
 function App() {
@@ -28,43 +27,14 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/auth" element={<Navigate to="/login" replace />} />
-                  <Route path="/random-gif" element={
-                    <ProtectedRoute>
-                      <RandomAnimeGifPage />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/cards" element={
-                    <ProtectedRoute>
-                      <CardsPage />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/card/:cardId" element={
-                    <ProtectedRoute>
-                      <CardDetailPage />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/decks" element={
-                    <ProtectedRoute>
-                      <DecksListPage />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/deck/:anime_link" element={
-                    <ProtectedRoute>
-                      <DeckDetailPage />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/settings/*" element={
-                    <ProtectedRoute>
-                      <SettingsPage />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/fqa" element={<FQAPage />} />
-                  <Route path="/" element=
-                    {
-                    <ProtectedRoute>
-                      <Navigate to="/random-gif" replace />
-                    </ProtectedRoute>
-                    } />
+                <Route path="/random-gif" element={<RandomAnimeGifPage />} />
+                <Route path="/cards" element={<CardsPage />} />
+                <Route path="/card/:cardId" element={<CardDetailPage />} />
+                <Route path="/decks" element={<DecksListPage />} />
+                <Route path="/deck/:anime_link" element={<DeckDetailPage />} />
+                <Route path="/settings/*" element={<SettingsPage />} />
+                <Route path="/fqa" element={<FQAPage />} />
+                <Route path="/" element={<Navigate to="/random-gif" replace />} />
 
               </Routes>
             </main>

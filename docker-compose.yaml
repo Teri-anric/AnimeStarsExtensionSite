@@ -56,6 +56,62 @@ services:
     volumes:
       - ./db:/var/lib/postgresql/data
 
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - backend
+
+  loki:
+    image: grafana/loki:3.3.2
+    restart: unless-stopped
+    command: -config.file=/etc/loki/config.yaml
+    expose:
+      - "3100"
+    volumes:
+      - loki_data:/loki
+      - ./docker/loki/config.yaml:/etc/loki/config.yaml:ro
+
+  promtail:
+    image: grafana/promtail:3.3.2
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/config.yaml
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/promtail/config.yaml:/etc/promtail/config.yaml:ro
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:11.3.1
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA__ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA__ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: ${GRAFANA__ROOT_URL:-http://localhost:3001}
+      GRAFANA_DS_PG_USER: ${DATABASE__USER}
+      GRAFANA_DS_PG_PASSWORD: ${DATABASE__PASSWORD}
+      GRAFANA_DS_PG_DATABASE: ${DATABASE__DB}
+      GRAFANA_DS_PG_PORT: ${DATABASE__PORT}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+      - loki
+
   # pgadmin:
   #   image: dpage/pgadmin4
   #   ports:
@@ -68,6 +124,10 @@ services:
   #   configs:
   #     - source: pgadmin_servers
   #       target: /pgadmin4/servers.json
+
+volumes:
+  grafana_data:
+  loki_data:
 
 configs:
   pgadmin_servers:
