@@ -12,7 +12,12 @@ def get_engine(db_url: str | None = None) -> AsyncEngine:
     if db_url is not None:
         return create_async_engine(db_url, pool_pre_ping=True)
     if _default_engine is None:
-        _default_engine = create_async_engine(settings.database.url, pool_pre_ping=True)
+        _default_engine = create_async_engine(
+            settings.database.url,
+            pool_pre_ping=True,
+            pool_size=10,
+            max_overflow=20,
+        )
     return _default_engine
 
 

@@ -27,7 +27,6 @@ def _latest_stat_count_scalar(collection: CardCollection, card_id_col):
             CardUsersStats.collection == collection,
         )
         .order_by(
-            CardUsersStats.updated_at.desc(),
             CardUsersStats.created_at.desc(),
         )
         .limit(1)
@@ -64,18 +63,23 @@ class Card(Base, UUIDPKMixin, TimestampMixin):
     webm: str = Column(String, nullable=True)
 
     stats_count = column_property(
-        select(func.count(CardUsersStats.id)).where(CardUsersStats.card_id == card_id)
+        select(func.count(CardUsersStats.id)).where(CardUsersStats.card_id == card_id),
+        deferred=True,
     )
 
     trade_count = column_property(
-        _latest_stat_count_scalar(CardCollection.TRADE, card_id)
+        _latest_stat_count_scalar(CardCollection.TRADE, card_id),
+        deferred=True,
     )
     need_count = column_property(
-        _latest_stat_count_scalar(CardCollection.NEED, card_id)
+        _latest_stat_count_scalar(CardCollection.NEED, card_id),
+        deferred=True,
     )
     owned_count = column_property(
-        _latest_stat_count_scalar(CardCollection.OWNED, card_id)
+        _latest_stat_count_scalar(CardCollection.OWNED, card_id),
+        deferred=True,
     )
     unlocked_owned_count = column_property(
-        _latest_stat_count_scalar(CardCollection.UNLOCKED_OWNED, card_id)
+        _latest_stat_count_scalar(CardCollection.UNLOCKED_OWNED, card_id),
+        deferred=True,
     )
