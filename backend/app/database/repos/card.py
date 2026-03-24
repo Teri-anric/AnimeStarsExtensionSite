@@ -1,3 +1,4 @@
+from .animestars_user import AnimestarsUserRepo
 from .crud import CRUDRepository
 from .deck import DeckRepository
 from .pagination import PaginationRepository
@@ -85,6 +86,7 @@ class CardRepository(
             return 0
         async with self.auto_commit() as session:
             await DeckRepository.attach_deck_ids(session, values)
+            await AnimestarsUserRepo.ensure_authors_for_card_payloads(session, values)
             stmt = insert(Card).values(values)
             stmt = stmt.on_conflict_do_update(
                 index_elements=["card_id"],
@@ -143,6 +145,10 @@ class CardRepository(
                             fields.get("anime_link"),
                             fields.get("anime_name"),
                         )
+                if "author" in fields:
+                    await AnimestarsUserRepo.ensure_authors_for_card_payloads(
+                        session, [fields]
+                    )
                 result = await session.execute(
                     update(Card).where(Card.card_id == card_id).values(**fields)
                 )

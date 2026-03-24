@@ -67,6 +67,7 @@ services:
       - "9091:9090"
     volumes:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
     depends_on:
       - backend
 
@@ -128,6 +129,7 @@ services:
 volumes:
   grafana_data:
   loki_data:
+  prometheus_data:
 
 configs:
   pgadmin_servers:
