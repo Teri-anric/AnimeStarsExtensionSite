@@ -1,7 +1,9 @@
+import json
 from typing import TypeVar, Generic
 from abc import ABC, abstractmethod
 
-from sqlalchemy import select, delete, update, Select, func, asc, desc
+from sqlalchemy import select, delete, update, Select, func, asc, desc, text
+from sqlalchemy.dialects import postgresql
 from .base import BaseRepository
 from ..types.pagination import Pagination, PaginationQuery
 from ..types.order_by import OrderBy
@@ -50,7 +52,19 @@ class PaginationRepository(BaseRepository, Generic[T], ABC):
         return await self.scalars(stmt)
 
     async def _total(self, stmt: Select, *args, **kwargs) -> int:
-        return await self.scalar(select(func.count()).select_from(stmt))
+        try:
+            compiled = stmt.compile(
+                dialect=postgresql.dialect(),
+                compile_kwargs={"literal_binds": True},
+            )
+            async with self.session as session:
+                result = await session.execute(
+                    text(f"EXPLAIN (FORMAT JSON) {compiled.string}")
+                )
+                plan_json = result.scalar()
+            return int(json.loads(plan_json)[0]["Plan"]["Plan Rows"])
+        except Exception:
+            return await self.scalar(select(func.count()).select_from(stmt.subquery()))
 
     def _apply_sorts(self, stmt: Select, order_by: OrderBy | None) -> Select:
         if not order_by:

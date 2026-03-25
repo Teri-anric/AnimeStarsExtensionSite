@@ -25,5 +25,6 @@ class AnimestarsDeck(Base, UUIDPKMixin, TimestampMixin):
             select(func.count(Card.id))
             .where(Card.deck_id == cls.id)
             .correlate_except(Card)
-            .scalar_subquery()
+            .scalar_subquery(),
+            deferred=True,
         )

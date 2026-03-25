@@ -58,7 +58,7 @@ class Card(Base, UUIDPKMixin, TimestampMixin):
     # Relationship to access the author user object
     author_user = relationship("AnimestarsUser", foreign_keys=[author], lazy="select")
 
-    image: str = Column(String, nullable=True)
+    image: str = Column(String, nullable=True, index=True)
     mp4: str = Column(String, nullable=True)
     webm: str = Column(String, nullable=True)
 

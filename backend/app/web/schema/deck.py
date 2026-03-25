@@ -14,7 +14,6 @@ class DeckSummarySchema(BaseSchema):
     id: UUID
     anime_name: str
     anime_link: str | None = None
-    card_count: int
     cards: List[CardSchema] = Field(default_factory=list)
 
 

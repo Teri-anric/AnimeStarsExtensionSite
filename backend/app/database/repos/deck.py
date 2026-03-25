@@ -1,7 +1,7 @@
 import uuid
 from typing import Any
 
-from sqlalchemy import func, select, delete
+from sqlalchemy import func, select, delete, exists
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 from ..deck_key import canonical_deck_key
 from .pagination import PaginationRepository
 from ..models.animestars.deck import AnimestarsDeck
+from ..models.animestars.card import Card
 from ..types.pagination import PaginationQuery, Pagination
 
 
@@ -105,5 +106,7 @@ class DeckRepository(PaginationRepository[AnimestarsDeck]):
 
     async def delete_empty_decks(self) -> int:
         return await self.execute(
-            delete(AnimestarsDeck).where(AnimestarsDeck.card_count == 0)
+            delete(AnimestarsDeck).where(
+                ~exists(select(Card.id).where(Card.deck_id == AnimestarsDeck.id))
+            )
         )
