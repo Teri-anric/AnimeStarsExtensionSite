@@ -7,7 +7,7 @@ from collections.abc import Awaitable, Callable
 
 from starlette.datastructures import MutableHeaders
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
+from starlette.requests import ClientDisconnect, Request
 from starlette.responses import Response
 from starlette.types import ASGIApp, Message, Receive
 
@@ -61,27 +61,30 @@ class HttpAuditLogMiddleware(BaseHTTPMiddleware):
 
         if request.method in ("POST", "PUT", "PATCH", "DELETE"):
             cl_header = request.headers.get("content-length")
-            if cl_header is not None:
-                try:
-                    cl = int(cl_header)
-                except ValueError:
-                    cl = self.max_bytes + 1
-                if cl > self.max_bytes:
-                    req_preview = f"<skipped request body {cl} bytes>"
+            try:
+                if cl_header is not None:
+                    try:
+                        cl = int(cl_header)
+                    except ValueError:
+                        cl = self.max_bytes + 1
+                    if cl > self.max_bytes:
+                        req_preview = f"<skipped request body {cl} bytes>"
+                    else:
+                        body = await request.body()
+                        req_preview = _preview_bytes(body, self.max_bytes)
+                        receive = _receive_with_body(body, request.receive)
                 else:
                     body = await request.body()
-                    req_preview = _preview_bytes(body, self.max_bytes)
+                    if len(body) > self.max_bytes:
+                        req_preview = (
+                            _preview_bytes(body[: self.max_bytes], self.max_bytes)
+                            + f"... [truncated, total {len(body)} bytes]"
+                        )
+                    else:
+                        req_preview = _preview_bytes(body, self.max_bytes)
                     receive = _receive_with_body(body, request.receive)
-            else:
-                body = await request.body()
-                if len(body) > self.max_bytes:
-                    req_preview = (
-                        _preview_bytes(body[: self.max_bytes], self.max_bytes)
-                        + f"... [truncated, total {len(body)} bytes]"
-                    )
-                else:
-                    req_preview = _preview_bytes(body, self.max_bytes)
-                receive = _receive_with_body(body, request.receive)
+            except ClientDisconnect:
+                return Response(status_code=499)
 
         new_request = Request(scope, receive)
         response = await call_next(new_request)
