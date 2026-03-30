@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from urllib.parse import urlparse
 from uuid import UUID
 
 from app.web.schema.card import (
@@ -12,6 +13,22 @@ from app.web.deps import CardRepositoryDep
 
 
 router = APIRouter(prefix="/card", tags=["card"])
+
+_URL_FIELDS = ("image", "mp4", "webm", "anime_link")
+
+
+def _url_path(url: str | None) -> str | None:
+    if not url:
+        return None
+    return urlparse(url).path or url
+
+
+def strip_host_from_url_fields(card: dict) -> dict:
+    for field in _URL_FIELDS:
+        if field in card:
+            card[field] = _url_path(card[field])
+    return card
+
 
 def clear_cards_data_without_stars(cards: list[dict]):
     for card in cards:
@@ -70,7 +87,7 @@ async def bulk_upsert_cards(
     partial_update_values: list[dict] = []
 
     for card in request.cards:
-        data = card.model_dump(exclude_none=True)
+        data = strip_host_from_url_fields(card.model_dump(exclude_none=True))
         # Separate cards that have enough data to be fully upserted
         # from those that should only partially update existing records.
         if "name" in data and "rank" in data:
