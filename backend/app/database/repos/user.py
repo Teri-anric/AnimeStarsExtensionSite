@@ -9,11 +9,12 @@ from .crud import CRUDRepository
 
 class UserRepository(CRUDRepository[User, UUID]):
     async def create_user(self, username: str, hashed_password: str) -> User:
-        user = User(username=username, hashed_password=hashed_password)
-        self.session.add(user)
-        await self.session.commit()
-        await self.session.refresh(user)
-        return user
+        async with self.session as session:
+            user = User(username=username, hashed_password=hashed_password)
+            session.add(user)
+            await session.commit()
+            await session.refresh(user)
+            return user
 
     async def get_user_by_username(self, username: str) -> User | None:
         return await self.scalar(select(User).where(func.lower(User.username) == username.lower()))
@@ -31,13 +32,13 @@ class TokenRepository(CRUDRepository[Token, UUID]):
 
     async def get_active_sessions_by_user_id(self, user_id: UUID) -> List[Token]:
         """Get all active sessions for a specific user"""
-        stmt = select(Token).where(
-            Token.user_id == user_id,
-            Token.expire_at > datetime.now(UTC).replace(tzinfo=None),
-            Token.is_active.is_(True),
-        ).order_by(Token.created_at.desc())
-        result = await self.session.execute(stmt)
-        return result.scalars().all()
+        return await self.scalars(
+            select(Token).where(
+                Token.user_id == user_id,
+                Token.expire_at > datetime.now(UTC).replace(tzinfo=None),
+                Token.is_active.is_(True),
+            ).order_by(Token.created_at.desc())
+        )
 
     async def get_token(self, token_id: UUID) -> Token | None:
         """Get a specific token by ID"""

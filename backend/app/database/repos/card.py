@@ -20,7 +20,7 @@ class CardRepository(
         return Card
 
     async def create(self, **kwargs) -> Card:
-        async with self.auto_commit() as session:
+        async with self.session as session:
             kwargs["deck_id"] = await DeckRepository.ensure_deck_id(
                 session, kwargs.get("anime_link"), kwargs.get("anime_name")
             )

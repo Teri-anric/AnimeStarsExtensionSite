@@ -24,9 +24,9 @@ class BaseRepository(ABC):
     
     @asynccontextmanager
     async def auto_commit(self):
-        session = self.session
-        yield session
-        await session.commit()
+        async with self.session as session:
+            yield session
+            await session.commit()
 
     async def execute(self, stmt: Select):
         async with self.auto_commit() as session:
