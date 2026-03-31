@@ -43,7 +43,7 @@ class Card(Base, UUIDPKMixin, TimestampMixin):
     rank: CardType = Column(Enum(CardType), nullable=False)
 
     anime_name: str = Column(String, nullable=True)
-    anime_link: str = Column(String, nullable=True, index=True)
+    anime_link: str = Column(String, nullable=True)
 
     deck_id: uuid.UUID | None = Column(
         UUID(as_uuid=True),

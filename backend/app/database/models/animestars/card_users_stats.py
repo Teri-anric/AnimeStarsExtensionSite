@@ -9,7 +9,7 @@ class CardUsersStats(Base, UUIDPKMixin, OwnerMixin, TimestampMixin):
     __tablename__ = "animestars_card_users_stats"
 
     card_id: Mapped[int] = mapped_column(Integer, ForeignKey("animestars_cards.card_id"), nullable=False, index=True)
-    collection: Mapped[CardCollection] = mapped_column(Enum(CardCollection, name="card_collection"), nullable=False, index=True)
+    collection: Mapped[CardCollection] = mapped_column(Enum(CardCollection, name="card_collection"), nullable=False)
     count: Mapped[int] = mapped_column(Integer, nullable=False)
 
     __table_args__ = (

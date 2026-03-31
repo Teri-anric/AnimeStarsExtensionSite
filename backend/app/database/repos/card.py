@@ -7,7 +7,8 @@ from ..models.animestars.card_users_stats import CardUsersStats
 from .base import BaseRepository
 from uuid import UUID
 from typing import Iterable
-from sqlalchemy import select, update, delete
+from collections import defaultdict
+from sqlalchemy import case, select, update, delete
 from sqlalchemy.dialects.postgresql import insert
 
 
@@ -112,45 +113,63 @@ class CardRepository(
         Only fields provided in each payload will be updated; other fields remain unchanged.
         Cards are not created if they do not already exist.
         """
-        total = 0
+        _updatable = {"name", "rank", "anime_name", "anime_link", "deck_id", "author", "image", "mp4", "webm"}
+
+        all_cards = [
+            {k: v for k, v in d.items()}
+            for d in cards
+            if d.get("card_id") is not None and len(d) > 1
+        ]
+        if not all_cards:
+            return 0
+
         async with self.auto_commit() as session:
-            for data in cards:
-                card_id = data.get("card_id")
-                if card_id is None:
-                    continue
-                fields = {k: v for k, v in data.items() if k != "card_id"}
-                if not fields:
-                    continue
-                if "anime_link" in fields or "anime_name" in fields:
-                    existing = await session.scalar(
-                        select(Card).where(Card.card_id == card_id)
+            # Batch deck resolution: one SELECT + one INSERT instead of N of each
+            need_deck = [d for d in all_cards if "anime_link" in d or "anime_name" in d]
+            if need_deck:
+                ids = [d["card_id"] for d in need_deck]
+                existing_by_id = {
+                    c.card_id: c
+                    for c in (
+                        await session.scalars(select(Card).where(Card.card_id.in_(ids)))
+                    ).all()
+                }
+                for d in need_deck:
+                    ex = existing_by_id.get(d["card_id"])
+                    if ex:
+                        d.setdefault("anime_link", ex.anime_link)
+                        d.setdefault("anime_name", ex.anime_name)
+                await DeckRepository.attach_deck_ids(session, need_deck)
+                deck_by_card_id = {d["card_id"]: d.get("deck_id") for d in need_deck}
+                for d in all_cards:
+                    if d["card_id"] in deck_by_card_id:
+                        d["deck_id"] = deck_by_card_id[d["card_id"]]
+
+            # Batch author resolution: one call instead of N
+            need_author = [d for d in all_cards if "author" in d]
+            if need_author:
+                await AnimestarsUserRepo.ensure_authors_for_card_payloads(session, need_author)
+
+            # Batch UPDATE: group by field set → one UPDATE per group via CASE WHEN
+            groups: dict[frozenset, list[dict]] = defaultdict(list)
+            for d in all_cards:
+                key = frozenset(k for k in d if k != "card_id" and k in _updatable)
+                if key:
+                    groups[key].append(d)
+
+            total = 0
+            for fields_set, group in groups.items():
+                card_ids = [d["card_id"] for d in group]
+                val_by_id = {d["card_id"]: d for d in group}
+                set_clause = {
+                    field: case(
+                        *[(Card.card_id == cid, val_by_id[cid][field]) for cid in card_ids]
                     )
-                    if existing:
-                        al = (
-                            fields["anime_link"]
-                            if "anime_link" in fields
-                            else existing.anime_link
-                        )
-                        an = (
-                            fields["anime_name"]
-                            if "anime_name" in fields
-                            else existing.anime_name
-                        )
-                        fields["deck_id"] = await DeckRepository.ensure_deck_id(
-                            session, al, an
-                        )
-                    elif fields.get("anime_link"):
-                        fields["deck_id"] = await DeckRepository.ensure_deck_id(
-                            session,
-                            fields.get("anime_link"),
-                            fields.get("anime_name"),
-                        )
-                if "author" in fields:
-                    await AnimestarsUserRepo.ensure_authors_for_card_payloads(
-                        session, [fields]
-                    )
+                    for field in fields_set
+                }
                 result = await session.execute(
-                    update(Card).where(Card.card_id == card_id).values(**fields)
+                    update(Card).where(Card.card_id.in_(card_ids)).values(**set_clause)
                 )
                 total += result.rowcount
+
         return total

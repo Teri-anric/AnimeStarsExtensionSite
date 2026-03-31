@@ -11,7 +11,7 @@ class AnimestarsDeck(Base, UUIDPKMixin, TimestampMixin):
     __tablename__ = "animestars_decks"
 
     anime_name: str = Column(String, nullable=False, unique=True, index=True)
-    anime_link: str | None = Column(String, nullable=True, index=True)
+    anime_link: str | None = Column(String, nullable=True)
 
     cards = relationship(
         "Card",
