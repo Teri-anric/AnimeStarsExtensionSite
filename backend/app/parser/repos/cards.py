@@ -10,6 +10,7 @@ class AnimestarCardsRepo(AnimestarBaseRepo):
         self,
         page: int = 1,
         rank: Literal[
+            "sss",
             "ass",
             "s_plus", "s",
             "a_plus", "a",
@@ -17,13 +18,13 @@ class AnimestarCardsRepo(AnimestarBaseRepo):
             "c_plus", "c",
             "d_plus", "d",
             "e_plus", "e",
-        ] = None,
+        ] | None = None,
     ) -> PaginatedCards:
         """Get cards."""
         CARD_SELECTOR = ".anime-cards--full-page .anime-cards__item"
         TOTAL_SELECTOR = ".tabs__item--active > span"
 
-        params = None
+        params: dict[str, str] | None = None
         if rank:
             params = {"rank": rank}
             if rank.endswith("_plus"):

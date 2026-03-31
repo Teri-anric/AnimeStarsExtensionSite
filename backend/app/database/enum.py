@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class CardType(Enum):
+    SSS = "sss"
     ASS = "ass"
     S_PLUS = "s_plus"
     S = "s"
