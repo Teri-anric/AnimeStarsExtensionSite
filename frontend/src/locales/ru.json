@@ -484,11 +484,17 @@
   },
   "ranks": {
     "ass": "ASS",
+    "s_plus": "S+",
     "s": "S",
+    "a_plus": "A+",
     "a": "A",
+    "b_plus": "B+",
     "b": "B",
+    "c_plus": "C+",
     "c": "C",
+    "d_plus": "D+",
     "d": "D",
+    "e_plus": "E+",
     "e": "E"
   },
   "fqa": {

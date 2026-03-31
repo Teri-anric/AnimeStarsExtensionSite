@@ -367,11 +367,17 @@ export interface CardSchema {
 
 export const CardType = {
     Ass: 'ass',
+    SPlus: 's_plus',
     S: 's',
+    APlus: 'a_plus',
     A: 'a',
+    BPlus: 'b_plus',
     B: 'b',
+    CPlus: 'c_plus',
     C: 'c',
+    DPlus: 'd_plus',
     D: 'd',
+    EPlus: 'e_plus',
     E: 'e'
 } as const;
 

@@ -13,11 +13,17 @@ export const cardFilterConfig: EntityFilterConfig = {
       type: 'enum',
       enumOptions: [
         { value: 'ass', label: 'ranks.ass' },
+        { value: 's_plus', label: 'ranks.s_plus' },
         { value: 's', label: 'ranks.s' },
+        { value: 'a_plus', label: 'ranks.a_plus' },
         { value: 'a', label: 'ranks.a' },
+        { value: 'b_plus', label: 'ranks.b_plus' },
         { value: 'b', label: 'ranks.b' },
+        { value: 'c_plus', label: 'ranks.c_plus' },
         { value: 'c', label: 'ranks.c' },
+        { value: 'd_plus', label: 'ranks.d_plus' },
         { value: 'd', label: 'ranks.d' },
+        { value: 'e_plus', label: 'ranks.e_plus' },
         { value: 'e', label: 'ranks.e' }
       ]
     },
@@ -57,11 +63,17 @@ export const cardFilterConfig: EntityFilterConfig = {
       placeholder: 'filterConfig.allRanks',
       options: [
         { value: 'ass', label: 'ranks.ass' },
+        { value: 's_plus', label: 'ranks.s_plus' },
         { value: 's', label: 'ranks.s' },
+        { value: 'a_plus', label: 'ranks.a_plus' },
         { value: 'a', label: 'ranks.a' },
+        { value: 'b_plus', label: 'ranks.b_plus' },
         { value: 'b', label: 'ranks.b' },
+        { value: 'c_plus', label: 'ranks.c_plus' },
         { value: 'c', label: 'ranks.c' },
+        { value: 'd_plus', label: 'ranks.d_plus' },
         { value: 'd', label: 'ranks.d' },
+        { value: 'e_plus', label: 'ranks.e_plus' },
         { value: 'e', label: 'ranks.e' }
       ]
     }

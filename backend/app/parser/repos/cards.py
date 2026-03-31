@@ -7,7 +7,17 @@ from .base import AnimestarBaseRepo
 
 class AnimestarCardsRepo(AnimestarBaseRepo):
     async def get_cards(
-        self, page: int = 1, rank: Literal["ass", "s", "a", "b", "c", "d", "e"] = None
+        self,
+        page: int = 1,
+        rank: Literal[
+            "ass",
+            "s_plus", "s",
+            "a_plus", "a",
+            "b_plus", "b",
+            "c_plus", "c",
+            "d_plus", "d",
+            "e_plus", "e",
+        ] = None,
     ) -> PaginatedCards:
         """Get cards."""
         CARD_SELECTOR = ".anime-cards--full-page .anime-cards__item"
@@ -16,6 +26,9 @@ class AnimestarCardsRepo(AnimestarBaseRepo):
         params = None
         if rank:
             params = {"rank": rank}
+            if rank.endswith("_plus"):
+                params["plus"] = "1"
+                params["rank"] = rank.removesuffix("_plus")
 
         soup = await self.get_page(f"/cards/page/{page}", params=params)
 
