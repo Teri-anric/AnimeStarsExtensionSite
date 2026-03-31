@@ -22,23 +22,22 @@ class PaginationRepository(BaseRepository, Generic[T], ABC):
         self, stmt: Select, query: PaginationQuery, *args, **kwargs
     ) -> Pagination[T]:
         base_stmt = self._apply_filter(stmt, query.filter)
+        data_stmt = self._apply_pagination(self._apply_sorts(base_stmt, query.order_by), query)
 
-        stmt = self._apply_sorts(base_stmt, query.order_by)
-        stmt = self._apply_pagination(stmt, query)
-        
         if "total_base_stmt" in kwargs:
-            total = await self._total(self._apply_filter(kwargs["total_base_stmt"], query.filter))
+            total_stmt = self._apply_filter(kwargs["total_base_stmt"], query.filter)
         else:
-            total = await self._total(base_stmt)
+            total_stmt = base_stmt
 
-        items = await self._execute_search(stmt, *args, **kwargs)
-        if kwargs.get("is_dto", False):
-            return Pagination(
-                total=total,
-                page=query.page,
-                per_page=query.per_page,
-                items=items,
-            )
+        # Single connection for both count-estimate and data — halves pool pressure
+        async with self.session as session:
+            total = await self._total(total_stmt, session)
+            result = await session.execute(data_stmt)
+            if kwargs.get("is_dto", False):
+                items = list(result.all())
+            else:
+                items = list(result.scalars().all())
+
         return Pagination[T](
             total=total,
             page=query.page,
@@ -51,20 +50,25 @@ class PaginationRepository(BaseRepository, Generic[T], ABC):
             return await self.execute(stmt)
         return await self.scalars(stmt)
 
-    async def _total(self, stmt: Select, *args, **kwargs) -> int:
+    async def _total(self, stmt: Select, session=None) -> int:
         try:
             compiled = stmt.compile(
                 dialect=postgresql.dialect(),
                 compile_kwargs={"literal_binds": True},
             )
-            async with self.session as session:
-                result = await session.execute(
-                    text(f"EXPLAIN (FORMAT JSON) {compiled.string}")
-                )
-                plan_json = result.scalar()
+            explain_sql = text(f"EXPLAIN (FORMAT JSON) {compiled.string}")
+            if session is not None:
+                result = await session.execute(explain_sql)
+            else:
+                async with self.session as session:
+                    result = await session.execute(explain_sql)
+            plan_json = result.scalar()
             return int(json.loads(plan_json)[0]["Plan"]["Plan Rows"])
         except Exception:
-            return await self.scalar(select(func.count()).select_from(stmt.subquery()))
+            count_stmt = select(func.count()).select_from(stmt.subquery())
+            if session is not None:
+                return (await session.execute(count_stmt)).scalar()
+            return await self.scalar(count_stmt)
 
     def _apply_sorts(self, stmt: Select, order_by: OrderBy | None) -> Select:
         if not order_by:
