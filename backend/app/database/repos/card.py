@@ -8,7 +8,7 @@ from .base import BaseRepository
 from uuid import UUID
 from typing import Iterable
 from collections import defaultdict
-from sqlalchemy import case, cast, select, update, delete
+from sqlalchemy import case, literal, select, update, delete
 from sqlalchemy.dialects.postgresql import insert
 
 
@@ -85,6 +85,19 @@ class CardRepository(
         values = list(cards)
         if not values:
             return 0
+        insert_fields = (
+            "card_id",
+            "name",
+            "rank",
+            "anime_name",
+            "anime_link",
+            "deck_id",
+            "author",
+            "image",
+            "mp4",
+            "webm",
+        )
+        values = [{field: row.get(field) for field in insert_fields} for row in values]
         async with self.auto_commit() as session:
             await DeckRepository.attach_deck_ids(session, values)
             await AnimestarsUserRepo.ensure_authors_for_card_payloads(session, values)
@@ -163,11 +176,17 @@ class CardRepository(
                 val_by_id = {d["card_id"]: d for d in group}
                 set_clause = {}
                 for field in fields_set:
-                    expr = case(
-                        *[(Card.card_id == cid, val_by_id[cid][field]) for cid in card_ids]
+                    whens = []
+                    for cid in card_ids:
+                        value = val_by_id[cid][field]
+                        if field == "deck_id":
+                            value = literal(value, type_=Card.deck_id.type)
+                        whens.append((Card.card_id == cid, value))
+                    expr = (
+                        case(*whens, else_=Card.deck_id)
+                        if field == "deck_id"
+                        else case(*whens)
                     )
-                    if field == "deck_id":
-                        expr = cast(expr, Card.deck_id.type)
                     set_clause[field] = expr
                 result = await session.execute(
                     update(Card).where(Card.card_id.in_(card_ids)).values(**set_clause)
