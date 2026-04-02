@@ -1,32 +1,34 @@
 from abc import ABC
 from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Select
 from ..connection import get_session_factory
 from typing import Any, Iterable
 
 
 class BaseRepository(ABC):
-    __Session: AsyncSession | None = None
-    __session: AsyncSession | None = None
+    __Session: sessionmaker[AsyncSession] | None = None
 
     @property
-    def Session(self) -> type[AsyncSession]:
+    def Session(self) -> sessionmaker[AsyncSession]:
         if BaseRepository.__Session is None:
             BaseRepository.__Session = get_session_factory()
         return BaseRepository.__Session
 
     @property
     def session(self) -> AsyncSession:
-        if self.__session is None:
-            self.__session = self.Session()
-        return self.__session
+        return self.Session()
     
     @asynccontextmanager
     async def auto_commit(self):
         async with self.session as session:
-            yield session
-            await session.commit()
+            try:
+                yield session
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
 
     async def execute(self, stmt: Select):
         async with self.auto_commit() as session:
