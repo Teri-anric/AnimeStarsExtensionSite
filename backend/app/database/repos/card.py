@@ -8,7 +8,7 @@ from .base import BaseRepository
 from uuid import UUID
 from typing import Iterable
 from collections import defaultdict
-from sqlalchemy import case, select, update, delete
+from sqlalchemy import case, cast, select, update, delete
 from sqlalchemy.dialects.postgresql import insert
 
 
@@ -161,12 +161,14 @@ class CardRepository(
             for fields_set, group in groups.items():
                 card_ids = [d["card_id"] for d in group]
                 val_by_id = {d["card_id"]: d for d in group}
-                set_clause = {
-                    field: case(
+                set_clause = {}
+                for field in fields_set:
+                    expr = case(
                         *[(Card.card_id == cid, val_by_id[cid][field]) for cid in card_ids]
                     )
-                    for field in fields_set
-                }
+                    if field == "deck_id":
+                        expr = cast(expr, Card.deck_id.type)
+                    set_clause[field] = expr
                 result = await session.execute(
                     update(Card).where(Card.card_id.in_(card_ids)).values(**set_clause)
                 )
