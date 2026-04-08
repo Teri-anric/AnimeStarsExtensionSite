@@ -2,11 +2,15 @@ import json
 import logging
 import secrets
 from dataclasses import dataclass
+from datetime import date, datetime
+from enum import Enum
 from typing import Iterable
+from uuid import UUID
 
 from redis.exceptions import RedisError
 
 from app.config import settings
+from app.database.enum import CardType
 from app.redis_client import get_redis
 
 logger = logging.getLogger(__name__)
@@ -46,7 +50,7 @@ class CardBulkBufferService:
             for key, value in card.items():
                 if key == "card_id" or value is None:
                     continue
-                mapping[key] = json.dumps(value)
+                mapping[key] = json.dumps(self._to_json_compatible(value))
 
             if not mapping:
                 continue
@@ -112,7 +116,13 @@ class CardBulkBufferService:
                 continue
             payload = {"card_id": card_id}
             for key, value in raw.items():
-                payload[key] = json.loads(value)
+                decoded_value = json.loads(value)
+                if key == "rank" and isinstance(decoded_value, str):
+                    try:
+                        decoded_value = CardType(decoded_value)
+                    except ValueError:
+                        pass
+                payload[key] = decoded_value
             payloads.append(payload)
         return payloads
 
@@ -163,3 +173,13 @@ class CardBulkBufferService:
     @staticmethod
     def is_redis_error(exc: Exception) -> bool:
         return isinstance(exc, RedisError)
+
+    @staticmethod
+    def _to_json_compatible(value):
+        if isinstance(value, Enum):
+            return value.value
+        if isinstance(value, (datetime, date)):
+            return value.isoformat()
+        if isinstance(value, UUID):
+            return str(value)
+        return value
