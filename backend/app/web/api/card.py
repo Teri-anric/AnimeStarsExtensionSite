@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from urllib.parse import urlparse
 from uuid import UUID
+import logging
 
 from app.web.schema.card import (
     CardQuery,
@@ -10,9 +11,11 @@ from app.web.schema.card import (
     CardBulkUpsertResponse,
 )
 from app.web.deps import CardRepositoryDep
+from app.services import CardBulkBufferService
 
 
 router = APIRouter(prefix="/card", tags=["card"])
+logger = logging.getLogger(__name__)
 
 _URL_FIELDS = ("image", "mp4", "webm", "anime_link")
 
@@ -39,6 +42,36 @@ def clear_cards_data_without_stars(cards: list[dict]):
         if "_stars_" in image:
             continue
         yield card
+
+
+async def _write_cards_directly(
+    repo,
+    cards: list,
+) -> int:
+    full_upsert_values: list[dict] = []
+    partial_update_values: list[dict] = []
+
+    for card in cards:
+        data = strip_host_from_url_fields(card.model_dump(exclude_none=True))
+        # Separate cards that have enough data to be fully upserted
+        # from those that should only partially update existing records.
+        if "name" in data and "rank" in data:
+            full_upsert_values.append(data)
+        else:
+            partial_update_values.append(data)
+
+    total_count = 0
+    full_upsert_values = list(clear_cards_data_without_stars(full_upsert_values))
+    partial_update_values = list(clear_cards_data_without_stars(partial_update_values))
+
+    if full_upsert_values:
+        total_count += await repo.upsert_bulk(full_upsert_values)
+
+    if partial_update_values:
+        total_count += await repo.partial_update_by_card_id_bulk(partial_update_values)
+
+    return total_count
+
 
 @router.post("/")
 async def get_cards(
@@ -83,30 +116,22 @@ async def bulk_upsert_cards(
         ]
     }
     """
-    full_upsert_values: list[dict] = []
-    partial_update_values: list[dict] = []
-
+    normalized_cards: list[dict] = []
     for card in request.cards:
         data = strip_host_from_url_fields(card.model_dump(exclude_none=True))
-        # Separate cards that have enough data to be fully upserted
-        # from those that should only partially update existing records.
-        if "name" in data and "rank" in data:
-            full_upsert_values.append(data)
-        else:
-            partial_update_values.append(data)
+        normalized_cards.append(data)
+    normalized_cards = list(clear_cards_data_without_stars(normalized_cards))
 
-    total_count = 0
-
-    full_upsert_values = list(clear_cards_data_without_stars(full_upsert_values))
-    partial_update_values = list(clear_cards_data_without_stars(partial_update_values))
-
-    if full_upsert_values:
-        total_count += await repo.upsert_bulk(full_upsert_values)
-
-    if partial_update_values:
-        total_count += await repo.partial_update_by_card_id_bulk(partial_update_values)
-
-    return CardBulkUpsertResponse(status="ok", count=total_count)
+    buffer_service = CardBulkBufferService()
+    try:
+        accepted = await buffer_service.enqueue_cards(normalized_cards)
+        return CardBulkUpsertResponse(status="ok", count=accepted)
+    except Exception as exc:
+        if not buffer_service.is_redis_error(exc):
+            raise
+        logger.warning("Redis is unavailable for /card/bulk, using direct DB fallback: %s", exc)
+        total_count = await _write_cards_directly(repo, request.cards)
+        return CardBulkUpsertResponse(status="ok", count=total_count)
 
 
 @router.post("/{card_id}/report-deleted-card", status_code=204)
@@ -125,4 +150,3 @@ async def get_card(card_id: int | UUID, repo: CardRepositoryDep) -> CardSchema:
     if card is None:
         raise HTTPException(status_code=404, detail="Card not found")
     return card
-

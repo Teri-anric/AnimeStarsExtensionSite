@@ -52,6 +52,23 @@ class AuthSettings(BaseSettings):
     code_expire_minutes: int = 60  # 1 hour
 
 
+class RedisSettings(BaseSettings):
+    host: str = "localhost"
+    port: int = 6379
+    db: int = 0
+    password: str | None = None
+    username: str | None = None
+    ssl: bool = False
+    socket_timeout_seconds: float = 2.0
+
+
+class CardBulkSettings(BaseSettings):
+    flush_interval_seconds: int = 5
+    flush_batch_size: int = 500
+    key_prefix: str = "card_bulk"
+    lock_ttl_seconds: int = 30
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")
 
@@ -67,6 +84,8 @@ class Settings(BaseSettings):
     # SQLAlchemy / Postgres metrics → Prometheus (/metrics) for Grafana
     db_metrics_refresh_seconds: float = Field(default=15.0, ge=5.0, le=600.0)
     db_metrics_pg_stats: bool = True
+    redis: RedisSettings = Field(default_factory=RedisSettings)
+    card_bulk: CardBulkSettings = Field(default_factory=CardBulkSettings)
 
 
 settings = Settings()

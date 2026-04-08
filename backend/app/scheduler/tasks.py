@@ -9,6 +9,8 @@ from app.database.repos.card import CardRepository
 from app.database.repos.animestars_user import AnimestarsUserRepo
 from app.database.repos.card_users_stats import CardUsersStatsRepository
 from app.database.repos.deck import DeckRepository
+from app.config import settings
+from app.services import CardBulkBufferService
 from .scheduler import scheduler
 
 logger = getLogger(__name__)
@@ -127,4 +129,27 @@ async def delete_empty_decks():
         logger.info(f"Empty decks deleted, affected rows: {affected}")
     except Exception as e:
         logger.error(f"Error during empty decks deletion: {e}")
+        logger.error(traceback.format_exc())
+
+
+@scheduler.scheduled_job(
+    "interval",
+    seconds=settings.card_bulk.flush_interval_seconds,
+    next_run_time=datetime.now() + timedelta(seconds=2),
+    id="animestar.card_bulk.flush_buffer",
+    max_instances=1,
+)
+async def flush_card_bulk_buffer():
+    card_repo = CardRepository()
+    buffer_service = CardBulkBufferService()
+    try:
+        result = await buffer_service.flush_into_repo(card_repo)
+        if result.candidate_count:
+            logger.info(
+                "Flushed card bulk buffer: candidates=%s written=%s",
+                result.candidate_count,
+                result.written_count,
+            )
+    except Exception as e:
+        logger.error(f"Error during card bulk buffer flush: {e}")
         logger.error(traceback.format_exc())

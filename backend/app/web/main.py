@@ -22,6 +22,7 @@ configure_json_app_logging(settings.log_json)
 async def lifespan(_app: FastAPI):
     from app.database.connection import get_engine
     from app.database.metrics import instrument_engine, start_metrics_background_task
+    from app.redis_client import close_redis
 
     engine = get_engine()
     instrument_engine(engine)
@@ -32,6 +33,7 @@ async def lifespan(_app: FastAPI):
         await metrics_task
     except asyncio.CancelledError:
         pass
+    await close_redis()
 
 
 app = FastAPI(

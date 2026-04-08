@@ -15,8 +15,13 @@ async def idle(scheduler):
 
 
 async def main():
+    from app.redis_client import close_redis
+
     scheduler.start()
-    await idle(scheduler)
+    try:
+        await idle(scheduler)
+    finally:
+        await close_redis()
 
 
 if __name__ == "__main__":
