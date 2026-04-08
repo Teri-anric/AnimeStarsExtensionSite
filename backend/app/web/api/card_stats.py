@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Query
 from datetime import UTC
+import logging
 
 from app.web.schema.card_stats import (
     CardUsersStatsSchema,
@@ -10,7 +11,9 @@ from app.web.schema.card_stats import (
 )
 from app.web.deps import CardUsersStatsRepositoryDep, CardStatsCacheServiceDep
 from app.database.models.animestars.card_users_stats import CardUsersStats
-from app.logger import logger
+
+
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter(prefix="/card/stats", tags=["card-stats"])
@@ -28,8 +31,10 @@ async def get_last_card_users_stats(
 async def get_last_card_users_stats_bulk(
     repo: CardUsersStatsRepositoryDep,
     cache_service: CardStatsCacheServiceDep,
-    card_ids_comma_separated: str = Query(..., description="Comma-separated list of card IDs"),
-    ) -> list[CardUsersStatsSchema]:
+    card_ids_comma_separated: str = Query(
+        ..., description="Comma-separated list of card IDs"
+    ),
+) -> list[CardUsersStatsSchema]:
     card_ids = list(map(int, card_ids_comma_separated.split(",")))
     return await cache_service.get_last_bulk(repo, card_ids)
 
