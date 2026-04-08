@@ -10,8 +10,7 @@ from app.web.schema.card import (
     CardBulkUpsertRequest,
     CardBulkUpsertResponse,
 )
-from app.web.deps import CardRepositoryDep
-from app.services import CardBulkBufferService
+from app.web.deps import CardRepositoryDep, CardBulkBufferServiceDep
 
 
 router = APIRouter(prefix="/card", tags=["card"])
@@ -101,6 +100,7 @@ async def get_cards(
 async def bulk_upsert_cards(
     request: CardBulkUpsertRequest,
     repo: CardRepositoryDep,
+    buffer_service: CardBulkBufferServiceDep,
 ) -> CardBulkUpsertResponse:
     """
     Bulk upsert cards.
@@ -122,7 +122,6 @@ async def bulk_upsert_cards(
         normalized_cards.append(data)
     normalized_cards = list(clear_cards_data_without_stars(normalized_cards))
 
-    buffer_service = CardBulkBufferService()
     try:
         accepted = await buffer_service.enqueue_cards(normalized_cards)
         return CardBulkUpsertResponse(status="ok", count=accepted)

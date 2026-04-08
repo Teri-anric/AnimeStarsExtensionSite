@@ -69,6 +69,11 @@ class CardBulkSettings(BaseSettings):
     lock_ttl_seconds: int = 30
 
 
+class CardStatsCacheSettings(BaseSettings):
+    key_prefix: str = "card_stats:last"
+    ttl_seconds: int = 2_880_000  # 800 hours
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")
 
@@ -86,6 +91,7 @@ class Settings(BaseSettings):
     db_metrics_pg_stats: bool = True
     redis: RedisSettings = Field(default_factory=RedisSettings)
     card_bulk: CardBulkSettings = Field(default_factory=CardBulkSettings)
+    card_stats_cache: CardStatsCacheSettings = Field(default_factory=CardStatsCacheSettings)
 
 
 settings = Settings()

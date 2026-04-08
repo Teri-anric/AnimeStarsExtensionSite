@@ -7,6 +7,7 @@ from app.database.repos.animestars_user import AnimestarsUserRepo
 from app.database.repos.deck import DeckRepository
 from app.database.repos.health import HealthRepository
 from app.parser.services import VerificationService
+from app.services import CardBulkBufferService, CardStatsCacheService
 
 CardRepositoryDep = Annotated[CardRepository, Depends(lambda: CardRepository())]
 CardUsersStatsRepositoryDep = Annotated[
@@ -17,3 +18,9 @@ DeckRepositoryDep = Annotated[DeckRepository, Depends(lambda: DeckRepository())]
 HealthRepositoryDep = Annotated[HealthRepository, Depends(lambda: HealthRepository())]
 
 VerificationServiceDep = Annotated[VerificationService, Depends(lambda: VerificationService())]
+CardBulkBufferServiceDep = Annotated[
+    CardBulkBufferService, Depends(lambda: CardBulkBufferService())
+]
+CardStatsCacheServiceDep = Annotated[
+    CardStatsCacheService, Depends(lambda: CardStatsCacheService())
+]
