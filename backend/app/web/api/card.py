@@ -129,7 +129,7 @@ async def bulk_upsert_cards(
     except Exception as exc:
         if not buffer_service.is_redis_error(exc):
             raise
-        logger.warning("Redis is unavailable for /card/bulk, using direct DB fallback: %s", exc)
+        logger.exception("Redis is unavailable for /card/bulk, using direct DB fallback")
         total_count = await _write_cards_directly(repo, request.cards)
         return CardBulkUpsertResponse(status="ok", count=total_count)
 
