@@ -91,6 +91,9 @@ services:
       - ./.mitmproxy:/home/mitmproxy/.mitmproxy
     expose:
       - 8080
+    networks:
+      - default
+      - shared-proxy
 
   prometheus:
     image: prom/prometheus:v2.55.1
@@ -149,6 +152,9 @@ services:
       - prometheus
       - loki
 
+networks:
+  shared-proxy:
+    name: animestars-shared-proxy
 
 volumes:
   caddy_data:
