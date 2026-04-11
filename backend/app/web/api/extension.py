@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.database.enum import CardCollection
 from app.database.models.animestars.card_users_stats import CardUsersStats
 from app.database.repos.user import TokenRepository
-from app.web.auth.deps import ProtectedDep, UserDep
+from app.web.auth.deps import UserDep
 from app.web.deps import (
     CardRepositoryDep,
     CardStatsCacheServiceDep,
@@ -26,7 +26,7 @@ from app.web.schema.extension_api import (
 )
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/extension", tags=["extension"], dependencies=[ProtectedDep])
+router = APIRouter(prefix="/extension", tags=["extension"])
 
 
 def _owner_item_from_stats(
