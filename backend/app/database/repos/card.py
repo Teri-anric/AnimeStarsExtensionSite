@@ -2,13 +2,14 @@ from .animestars_user import AnimestarsUserRepo
 from .crud import CRUDRepository
 from .deck import DeckRepository
 from .pagination import PaginationRepository
+from ..enum import CardType
 from ..models.animestars.card import Card
 from ..models.animestars.card_users_stats import CardUsersStats
 from .base import BaseRepository
 from uuid import UUID
 from typing import Iterable
 from collections import defaultdict
-from sqlalchemy import case, literal, select, update, delete
+from sqlalchemy import case, func, literal, select, update, delete
 from sqlalchemy.dialects.postgresql import insert
 
 
@@ -126,7 +127,17 @@ class CardRepository(
         Only fields provided in each payload will be updated; other fields remain unchanged.
         Cards are not created if they do not already exist.
         """
-        _updatable = {"name", "rank", "anime_name", "anime_link", "deck_id", "author", "image", "mp4", "webm"}
+        _updatable = {
+            "name",
+            "rank",
+            "anime_name",
+            "anime_link",
+            "deck_id",
+            "author",
+            "image",
+            "mp4",
+            "webm",
+        }
 
         all_cards = [
             {k: v for k, v in d.items()}
@@ -161,7 +172,9 @@ class CardRepository(
             # Batch author resolution: one call instead of N
             need_author = [d for d in all_cards if "author" in d]
             if need_author:
-                await AnimestarsUserRepo.ensure_authors_for_card_payloads(session, need_author)
+                await AnimestarsUserRepo.ensure_authors_for_card_payloads(
+                    session, need_author
+                )
 
             # Batch UPDATE: group by field set → one UPDATE per group via CASE WHEN
             groups: dict[frozenset, list[dict]] = defaultdict(list)
@@ -194,3 +207,51 @@ class CardRepository(
                 total += result.rowcount
 
         return total
+
+    async def get_card_ids_by_image_paths(self, paths: list[str]) -> dict[str, int]:
+        """Map normalized image path → card_id (smallest card_id if duplicates)."""
+        paths = [p for p in paths if p]
+        if not paths:
+            return {}
+        stmt = select(Card.image, Card.card_id).where(Card.image.in_(paths))
+        async with self.session as session:
+            result = await session.execute(stmt)
+            rows = result.all()
+        return {row[0]: row[1] for row in rows}
+
+    async def deck_rank_counts_by_reference_card_ids(
+        self, card_ids: list[int]
+    ) -> dict[int, dict[str, int]]:
+        """
+        For each reference card_id, count cards per rank in that card's deck.
+        Missing card_id or null deck_id → all ranks zero.
+        """
+        unique_ids = sorted(set(card_ids))
+        zeros = {t.value: 0 for t in CardType}
+        if not unique_ids:
+            return {}
+
+        ref = (  # find all cards with a deck_id
+            select(Card.card_id, Card.deck_id)
+            .where(Card.card_id.in_(unique_ids), Card.deck_id.isnot(None))
+            .cte("ref")
+        )
+        deck_counts = (  # count cards per rank in each deck
+            select(Card.deck_id, Card.rank, func.count().label("cnt"))
+            .where(Card.deck_id.in_(select(ref.c.deck_id).distinct()))
+            .group_by(Card.deck_id, Card.rank)
+            .cte("deck_counts")
+        )
+        stmt = select(ref.c.card_id, deck_counts.c.rank, deck_counts.c.cnt).select_from(
+            ref.join(deck_counts, deck_counts.c.deck_id == ref.c.deck_id)
+        )
+        async with self.session as session:
+            result = await session.execute(stmt)
+            rows = result.all()
+        out: dict[int, dict[str, int]] = {cid: dict(zeros) for cid in unique_ids}
+        for card_id, rank, cnt in rows:
+            if card_id not in out:
+                continue
+            key = rank.value if isinstance(rank, CardType) else str(rank)
+            out[card_id][key] = int(cnt)
+        return out

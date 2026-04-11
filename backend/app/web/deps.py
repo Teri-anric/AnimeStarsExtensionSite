@@ -8,6 +8,7 @@ from app.database.repos.deck import DeckRepository
 from app.database.repos.health import HealthRepository
 from app.parser.services import VerificationService
 from app.services import CardBulkBufferService, CardStatsCacheService
+from app.services.extension_card_image_cache import ExtensionCardImageCacheService
 
 CardRepositoryDep = Annotated[CardRepository, Depends(lambda: CardRepository())]
 CardUsersStatsRepositoryDep = Annotated[
@@ -23,4 +24,7 @@ CardBulkBufferServiceDep = Annotated[
 ]
 CardStatsCacheServiceDep = Annotated[
     CardStatsCacheService, Depends(lambda: CardStatsCacheService())
+]
+ExtensionCardImageCacheServiceDep = Annotated[
+    ExtensionCardImageCacheService, Depends(lambda: ExtensionCardImageCacheService())
 ]

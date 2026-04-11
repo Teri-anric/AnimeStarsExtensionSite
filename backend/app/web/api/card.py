@@ -11,7 +11,7 @@ from app.web.schema.card import (
     CardBulkUpsertResponse,
 )
 from app.web.deps import CardRepositoryDep, CardBulkBufferServiceDep
-
+from app.web.util.media_path import normalize_media_path
 
 router = APIRouter(prefix="/card", tags=["card"])
 logger = logging.getLogger(__name__)
@@ -19,16 +19,11 @@ logger = logging.getLogger(__name__)
 _URL_FIELDS = ("image", "mp4", "webm", "anime_link")
 
 
-def _url_path(url: str | None) -> str | None:
-    if not url:
-        return None
-    return urlparse(url).path or url
-
 
 def strip_host_from_url_fields(card: dict) -> dict:
     for field in _URL_FIELDS:
         if field in card:
-            card[field] = _url_path(card[field])
+            card[field] = normalize_media_path(card[field])
     return card
 
 
