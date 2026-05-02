@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException
-from urllib.parse import urlparse
 from uuid import UUID
 import logging
 
@@ -11,7 +10,7 @@ from app.web.schema.card import (
     CardBulkUpsertResponse,
 )
 from app.web.deps import CardRepositoryDep, CardBulkBufferServiceDep
-from app.web.util.media_path import normalize_media_path
+from app.util.media_path import normalize_media_path
 
 router = APIRouter(prefix="/card", tags=["card"])
 logger = logging.getLogger(__name__)

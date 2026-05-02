@@ -4,7 +4,7 @@ import logging
 from app.config import settings
 from app.database.repos.card import CardRepository
 from app.redis_client import get_redis
-from app.web.util.media_path import normalize_media_path
+from app.util.media_path import normalize_media_path
 
 logger = logging.getLogger(__name__)
 
