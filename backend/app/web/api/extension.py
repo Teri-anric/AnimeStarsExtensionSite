@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import html
 import logging
 from collections import defaultdict
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import HTMLResponse
 
 from app.database.enum import CardCollection
 from app.database.models.animestars.card_users_stats import CardUsersStats
@@ -13,10 +15,12 @@ from app.web.deps import (
     CardRepositoryDep,
     CardStatsCacheServiceDep,
     CardUsersStatsRepositoryDep,
+    ExtensionBannerRepositoryDep,
     ExtensionCardImageCacheServiceDep,
 )
 from app.web.schema.auth import Token
 from app.web.schema.extension_api import (
+    ExtensionBannerConfigResponse,
     DeckRankHistogram,
     ExtensionCardImageResolveItem,
     ExtensionCardsByImagePathsRequest,
@@ -59,6 +63,93 @@ def _owner_item_from_stats(
         item.unlocked = unlocked_s.count
         item.unlocked_updated_at = unlocked_s.updated_at
     return item
+
+
+def _build_iframe_html(config: ExtensionBannerConfigResponse) -> str:
+    if not config.is_active:
+        return """
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: transparent; }
+    </style>
+  </head>
+  <body></body>
+</html>
+"""
+
+    title = html.escape(config.title)
+    message = html.escape(config.message)
+    action_text = html.escape(config.action_text) if config.action_text else ""
+    action_url = html.escape(config.action_url or "", quote=True)
+    cta_html = (
+        f'<a class="banner-link" target="_blank" rel="noopener noreferrer" href="{action_url}">{action_text}</a>'
+        if config.action_text and config.action_url
+        else ""
+    )
+
+    return f"""
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {{
+        color-scheme: dark;
+      }}
+      html, body {{
+        margin: 0;
+        width: 100%;
+      }}
+      body {{
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: transparent;
+        padding: 8px;
+        box-sizing: border-box;
+      }}
+      .banner {{
+        border: 1px solid #6f253f;
+        background: linear-gradient(90deg, #2f1220 0%, #1b1a2d 100%);
+        border-radius: 12px;
+        color: #f5f6ff;
+        padding: 12px;
+      }}
+      .banner-title {{
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }}
+      .banner-message {{
+        font-size: 13px;
+        line-height: 1.4;
+        opacity: 0.92;
+      }}
+      .banner-link {{
+        margin-top: 8px;
+        display: inline-block;
+        color: #f79dbb;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+      }}
+      .banner-link:hover {{
+        text-decoration: underline;
+      }}
+    </style>
+  </head>
+  <body>
+    <div class="banner">
+      <div class="banner-title">{title}</div>
+      <div class="banner-message">{message}</div>
+      {cta_html}
+    </div>
+  </body>
+</html>
+"""
 
 
 @router.post("/token", response_model=Token)
@@ -133,3 +224,34 @@ async def extension_owner_counts_last_bulk_post(
         _owner_item_from_stats(cid, by_card.get(cid, []), body.unlocked)
         for cid in body.card_ids
     ]
+
+
+@router.get("/banner-config", response_model=ExtensionBannerConfigResponse)
+async def extension_banner_config(
+    banner_repo: ExtensionBannerRepositoryDep,
+) -> ExtensionBannerConfigResponse:
+    banner = await banner_repo.get_or_create()
+    return ExtensionBannerConfigResponse(
+        title=banner.title,
+        message=banner.message,
+        action_text=banner.action_text,
+        action_url=banner.action_url,
+        is_active=banner.is_active,
+    )
+
+
+@router.get("/banner-iframe", response_class=HTMLResponse)
+async def extension_banner_iframe(
+    banner_repo: ExtensionBannerRepositoryDep,
+) -> HTMLResponse:
+    banner = await banner_repo.get_or_create()
+    if not banner.is_active:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Banner is not active")
+    config = ExtensionBannerConfigResponse(
+        title=banner.title,
+        message=banner.message,
+        action_text=banner.action_text,
+        action_url=banner.action_url,
+        is_active=banner.is_active,
+    )
+    return HTMLResponse(content=_build_iframe_html(config))

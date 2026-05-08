@@ -46,3 +46,11 @@ class ExtensionOwnerCountsLastItem(BaseSchema):
     trade_updated_at: datetime | None = None
     unlocked: int | None = None
     unlocked_updated_at: datetime | None = None
+
+
+class ExtensionBannerConfigResponse(BaseSchema):
+    title: str
+    message: str
+    action_text: str | None = None
+    action_url: str | None = None
+    is_active: bool
