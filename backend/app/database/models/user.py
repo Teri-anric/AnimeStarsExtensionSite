@@ -22,6 +22,10 @@ class User(UUIDPKMixin, TimestampMixin, Base):
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
 
+    @property
+    def is_admin(self) -> bool:
+        return self.username == settings.admin_username
+
 
 class Token(UUIDPKMixin, TimestampMixin, Base):
     __tablename__ = "tokens"

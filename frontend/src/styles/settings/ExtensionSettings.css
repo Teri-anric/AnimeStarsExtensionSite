@@ -88,6 +88,12 @@
   object-fit: contain;
 }
 
+.button-icon-svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 .chrome-store-button {
   background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
   color: white;
@@ -97,6 +103,18 @@
 .chrome-store-button:hover {
   background: linear-gradient(135deg, #3367d6 0%, #2e7d32 100%);
   border-color: #3367d6;
+  color: white;
+}
+
+.firefox-store-button {
+  background: linear-gradient(135deg, #ff7139 0%, #ff4f5e 100%);
+  color: white;
+  border-color: #ff7139;
+}
+
+.firefox-store-button:hover {
+  background: linear-gradient(135deg, #e65a2c 0%, #e63d4f 100%);
+  border-color: #e65a2c;
   color: white;
 }
 

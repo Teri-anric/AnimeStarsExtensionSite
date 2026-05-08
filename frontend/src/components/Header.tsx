@@ -5,7 +5,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 import '../styles/Header.css';
 
 const Header = () => {
-  const { isAuthenticated, username, logout } = useAuth();
+  const { isAuthenticated, username, logout, isAdmin } = useAuth();
   const { t } = useTranslation();
 
   return (
@@ -35,6 +35,11 @@ const Header = () => {
             <LanguageSwitcher />
             <span className="username">{t('auth.welcomeUser', { username })}</span>
             <div className="user-actions">
+              {isAdmin && (
+                <Link to="/admin" className="settings-link">
+                  {t('navigation.admin')}
+                </Link>
+              )}
               <Link to="/settings" className="settings-link">
                 {t('common.settings')}
               </Link>

@@ -92,6 +92,7 @@ class Settings(BaseSettings):
     redis: RedisSettings = Field(default_factory=RedisSettings)
     card_bulk: CardBulkSettings = Field(default_factory=CardBulkSettings)
     card_stats_cache: CardStatsCacheSettings = Field(default_factory=CardStatsCacheSettings)
+    admin_username: str = "Teri"
 
 
 settings = Settings()

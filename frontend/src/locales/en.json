@@ -60,6 +60,7 @@
     "account": "Account",
     "extension": "Browser Extension",
     "sessions": "Sessions",
+    "admin": "Admin",
     "fqa": "FAQ"
   },
   "auth": {
@@ -136,11 +137,13 @@
     "extensionDescription": "Connect the Anime Stars browser extension to sync your card statistics and get enhanced features.",
     "installation": "Installation",
     "downloadExtension": "Download Extension",
-    "downloadExtensionDescription": "Download the Anime Stars browser extension from the Chrome Web Store or GitHub releases.",
+    "downloadExtensionDescription": "Download the Anime Stars browser extension from the Chrome Web Store, Firefox Add-ons, or GitHub releases.",
     "chromeWebStore": "Chrome Web Store",
+    "firefoxAddons": "Firefox Add-ons",
+    "githubReleases": "GitHub Releases",
     "githubFirefoxXpi": "GitHub (Firefox XPI)",
     "installExtension": "Install Extension",
-    "installExtensionDescription": "For Chrome: Follow the installation instructions in the Chrome Web Store. For Firefox: Download the XPI file from GitHub and install it manually.",
+    "installExtensionDescription": "For Chrome and Firefox store installs: follow the instructions on the store page. For manual install: download the latest release from GitHub.",
     "connectAccount": "Connect Account",
     "connectAccountDescription": "Use the extension token above to connect your account.",
     "sessionManagement": "Session Management",
@@ -169,7 +172,17 @@
     "refreshSessions": "Refresh Sessions",
     "failedToRevokeSession": "Failed to revoke session",
     "apiNotAvailable": "API not available yet",
-    "retry": "Retry"
+    "retry": "Retry",
+    "adminPanel": "Admin Panel",
+    "adminPanelDescription": "Administrative database metrics are available only for administrator users.",
+    "adminAccessDenied": "You do not have access to this section.",
+    "loadingAdminStats": "Loading admin statistics...",
+    "failedToLoadAdminStats": "Failed to load admin statistics",
+    "refreshAdminStats": "Refresh admin statistics",
+    "totalCards": "Total cards",
+    "totalUsers": "Total users",
+    "cardsWithStats": "Cards with stats",
+    "statsToday": "Stats today"
   },
   "extensionStatus": {
     "connecting": "Connecting...",

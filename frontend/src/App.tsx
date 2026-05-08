@@ -9,6 +9,7 @@ import {
   CardDetailPage,
   RandomAnimeGifPage, 
   SettingsPage,
+  AdminPage,
   FQAPage
 } from './pages';
 import { DecksListPage, DeckDetailPage } from './pages/decks';
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/decks" element={<DecksListPage />} />
                 <Route path="/deck/:deck_id" element={<DeckDetailPage />} />
                 <Route path="/settings/*" element={<SettingsPage />} />
+                <Route path="/admin" element={<AdminPage />} />
                 <Route path="/fqa" element={<FQAPage />} />
                 <Route path="/" element={<Navigate to="/random-gif" replace />} />
 

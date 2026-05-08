@@ -1,47 +1,42 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import AccountSettings from './AccountSettings';
-import ExtensionSettings from './ExtensionSettings';
 import SessionsSettings from './SessionsSettings';
 import { useTranslation } from 'react-i18next';
 import '../../styles/settings/index.css';
-
-
-const SETTINGS_TABS = [
-  {
-    id: 'account',
-    label: 'navigation.account',
-    path: '/settings',
-  },
-  {
-    id: 'extension',
-    label: 'navigation.extension',
-    path: '/settings/extension',
-  },
-  {
-    id: 'sessions',
-    label: 'navigation.sessions',
-    path: '/settings/sessions',
-  }
-];
 
 
 const SettingsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const settingsTabs = useMemo(
+    () => [
+      {
+        id: 'account',
+        label: 'navigation.account',
+        path: '/settings',
+      },
+      {
+        id: 'sessions',
+        label: 'navigation.sessions',
+        path: '/settings/sessions',
+      },
+    ],
+    [],
+  );
   const [activeTab, setActiveTab] = useState(() => {
     const path = location.pathname;
-    const tab = SETTINGS_TABS.find(tab => path === tab.path);
+    const tab = settingsTabs.find(tab => path === tab.path);
     return tab?.id || 'account';
   });
   
 
   useEffect(() => {
     const path = location.pathname;
-    const tab = SETTINGS_TABS.find(tab => path === tab.path);
+    const tab = settingsTabs.find(tab => path === tab.path);
     setActiveTab(tab?.id || 'account');
-  }, [location.pathname]);
+  }, [location.pathname, settingsTabs]);
 
   return (
     <div className="settings-page">
@@ -52,7 +47,7 @@ const SettingsPage = () => {
       <div className="settings-layout">
         <div className="settings-sidebar">
           <nav className="settings-nav">
-            {SETTINGS_TABS.map((tab) => (
+            {settingsTabs.map((tab) => (
               <a
                 key={tab.id}
                 href={tab.path}
@@ -72,7 +67,6 @@ const SettingsPage = () => {
         <div className="settings-content">
           <Routes>
             <Route path="/" element={<AccountSettings />} />
-            <Route path="/extension" element={<ExtensionSettings />} />
             <Route path="/sessions" element={<SessionsSettings />} />
             <Route path="*" element={<Navigate to="/settings" replace />} />
           </Routes>

@@ -25,6 +25,7 @@ class TokenData(BaseModel):
 class UserResponse(UserBase):
     id: UUID
     is_active: bool
+    is_admin: bool
     created_at: datetime
     
     class Config:

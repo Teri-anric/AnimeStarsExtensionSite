@@ -60,6 +60,7 @@
     "account": "Аккаунт",
     "extension": "Расширение браузера",
     "sessions": "Сессии",
+    "admin": "Админка",
     "fqa": "FAQ"
   },
   "auth": {
@@ -136,11 +137,13 @@
     "extensionDescription": "Подключите расширение браузера Anime Stars для синхронизации статистики карточек и получения расширенных функций.",
     "installation": "Установка",
     "downloadExtension": "Скачать расширение",
-    "downloadExtensionDescription": "Скачайте расширение браузера Anime Stars из Chrome Web Store или GitHub releases.",
+    "downloadExtensionDescription": "Скачайте расширение браузера Anime Stars из Chrome Web Store, Firefox Add-ons или GitHub releases.",
     "chromeWebStore": "Chrome Web Store",
+    "firefoxAddons": "Firefox Add-ons",
+    "githubReleases": "GitHub Releases",
     "githubFirefoxXpi": "GitHub (Firefox XPI)",
     "installExtension": "Установить расширение",
-    "installExtensionDescription": "Для Chrome: Следуйте инструкциям установки в Chrome Web Store. Для Firefox: Скачайте XPI файл с GitHub и установите его вручную.",
+    "installExtensionDescription": "Для установки через магазины Chrome и Firefox: следуйте инструкциям на странице магазина. Для ручной установки: скачайте последний релиз с GitHub.",
     "connectAccount": "Подключить аккаунт",
     "connectAccountDescription": "Используйте токен расширения выше для подключения вашего аккаунта.",
     "sessionManagement": "Управление сессиями",
@@ -169,7 +172,17 @@
     "refreshSessions": "Обновить сессии",
     "failedToRevokeSession": "Не удалось отозвать сессию",
     "apiNotAvailable": "API еще не доступно",
-    "retry": "Попробовать еще раз"
+    "retry": "Попробовать еще раз",
+    "adminPanel": "Админ-панель",
+    "adminPanelDescription": "Административная статистика базы данных доступна только администраторам.",
+    "adminAccessDenied": "У вас нет доступа к этому разделу.",
+    "loadingAdminStats": "Загрузка админ-статистики...",
+    "failedToLoadAdminStats": "Не удалось загрузить админ-статистику",
+    "refreshAdminStats": "Обновить админ-статистику",
+    "totalCards": "Всего карточек",
+    "totalUsers": "Всего пользователей",
+    "cardsWithStats": "Карточки со статистикой",
+    "statsToday": "Статистика за сегодня"
   },
   "extensionStatus": {
     "connecting": "Подключение...",

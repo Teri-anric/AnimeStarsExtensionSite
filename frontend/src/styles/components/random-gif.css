@@ -17,6 +17,98 @@
   gap: 1.5rem;
 }
 
+
+.card-domain-settings label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: white;
+}
+
+.card-domain-settings p {
+  margin: 0 0 0.75rem 0;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.card-domain-settings select {
+  width: 100%;
+  max-width: 420px;
+  border-radius: var(--main-border-radius);
+  border: 1px solid var(--bdc-2);
+  background-color: var(--ui-bg-2);
+  color: white;
+  padding: 0.55rem 0.75rem;
+}
+
+.card-domain-success-message {
+  margin-top: 0.75rem;
+  color: #4CAF50;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-bottom-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--bdc-3);
+}
+
+.status-bottom-section .card-domain-settings {
+  background-color: var(--ui-bg-2);
+}
+
+.status-download-links {
+  margin-top: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.status-download-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--main-border-radius);
+  border: 1px solid transparent;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.status-download-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  text-decoration: none;
+}
+
+.download-icon,
+.download-icon-svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.chrome-store-button {
+  background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+  border-color: #4285f4;
+}
+
+.firefox-store-button {
+  background: linear-gradient(135deg, #ff7139 0%, #ff4f5e 100%);
+  border-color: #ff7139;
+}
+
+.github-button {
+  background: linear-gradient(135deg, #24292e 0%, #586069 100%);
+  border-color: #24292e;
+}
+
 .status-panel {
   width: 350px;
   background-color: var(--ui-bg);
@@ -299,4 +391,8 @@
   .status-panel {
     padding: 1rem;
   }
-} 
+
+  .card-domain-settings {
+    padding: 0.9rem;
+  }
+}

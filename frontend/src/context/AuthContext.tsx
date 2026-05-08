@@ -7,6 +7,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
   username: string | null;
+  isAdmin: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
@@ -30,20 +31,54 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchCurrentUser = async (accessToken: string): Promise<{ username: string; is_admin: boolean }> => {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch current user');
+    }
+
+    return response.json();
+  };
 
   // Initialize auth state from localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
-    const storedUsername = localStorage.getItem('username');
-    
-    if (storedToken) {
-      setToken(storedToken);
-      setIsAuthenticated(true);
-      setUsername(storedUsername);
-    }
-    
-    setLoading(false);
+
+    const initializeAuth = async () => {
+      if (!storedToken) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const currentUser = await fetchCurrentUser(storedToken);
+        localStorage.setItem('username', currentUser.username);
+        localStorage.setItem('is_admin', String(currentUser.is_admin));
+
+        setToken(storedToken);
+        setIsAuthenticated(true);
+        setUsername(currentUser.username);
+        setIsAdmin(currentUser.is_admin);
+      } catch (error) {
+        console.error('Failed to restore auth state:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('is_admin');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
@@ -59,18 +94,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
       
       const { access_token } = response.data;
+      const currentUser = await fetchCurrentUser(access_token);
       
       // Save token and user info
       localStorage.setItem('token', access_token);
-      localStorage.setItem('username', username);
+      localStorage.setItem('username', currentUser.username);
+      localStorage.setItem('is_admin', String(currentUser.is_admin));
       
       setToken(access_token);
       setIsAuthenticated(true);
-      setUsername(username);
+      setUsername(currentUser.username);
+      setIsAdmin(currentUser.is_admin);
       
       return true;
     } catch (error) {
       console.error('Login failed:', error);
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('is_admin');
       return false;
     }
   };
@@ -91,16 +132,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Clear token and user info
     localStorage.removeItem('token');
     localStorage.removeItem('username');
+    localStorage.removeItem('is_admin');
     
     setToken(null);
     setIsAuthenticated(false);
     setUsername(null);
+    setIsAdmin(false);
   };
 
   const value = {
     isAuthenticated,
     token,
     username,
+    isAdmin,
     login,
     logout,
     loading

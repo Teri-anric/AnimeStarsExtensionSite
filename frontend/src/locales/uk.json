@@ -60,6 +60,7 @@
     "account": "Акаунт",
     "extension": "Розширення браузера",
     "sessions": "Сесії",
+    "admin": "Адмінка",
     "fqa": "FAQ"
   },
   "auth": {
@@ -136,11 +137,13 @@
     "extensionDescription": "Підключіть розширення браузера Anime Stars для синхронізації статистики карток та отримання розширених функцій.",
     "installation": "Встановлення",
     "downloadExtension": "Завантажити розширення",
-    "downloadExtensionDescription": "Завантажте розширення браузера Anime Stars з Chrome Web Store або GitHub releases.",
+    "downloadExtensionDescription": "Завантажте розширення браузера Anime Stars з Chrome Web Store, Firefox Add-ons або GitHub releases.",
     "chromeWebStore": "Chrome Web Store",
+    "firefoxAddons": "Firefox Add-ons",
+    "githubReleases": "GitHub Releases",
     "githubFirefoxXpi": "GitHub (Firefox XPI)",
     "installExtension": "Встановити розширення",
-    "installExtensionDescription": "Для Chrome: Дотримуйтесь інструкцій встановлення в Chrome Web Store. Для Firefox: Завантажте XPI файл з GitHub та встановіть його вручну.",
+    "installExtensionDescription": "Для встановлення через Chrome або Firefox магазин: дотримуйтесь інструкцій на сторінці магазину. Для ручного встановлення: завантажте останній реліз з GitHub.",
     "connectAccount": "Підключити акаунт",
     "connectAccountDescription": "Використовуйте токен розширення вище для підключення вашого акаунту.",
     "sessionManagement": "Управління сесіями",
@@ -169,7 +172,17 @@
     "refreshSessions": "Оновити сесії",
     "failedToRevokeSession": "Не вдалося відкликати сесію",
     "apiNotAvailable": "API ще не доступне",
-    "retry": "Спробувати ще раз"
+    "retry": "Спробувати ще раз",
+    "adminPanel": "Адмін-панель",
+    "adminPanelDescription": "Адміністративна статистика бази даних доступна лише користувачам-адмінам.",
+    "adminAccessDenied": "У вас немає доступу до цього розділу.",
+    "loadingAdminStats": "Завантаження адмін-статистики...",
+    "failedToLoadAdminStats": "Не вдалося завантажити адмін-статистику",
+    "refreshAdminStats": "Оновити адмін-статистику",
+    "totalCards": "Всього карток",
+    "totalUsers": "Всього користувачів",
+    "cardsWithStats": "Картки зі статистикою",
+    "statsToday": "Статистика за сьогодні"
   },
   "extensionStatus": {
     "connecting": "Підключення...",

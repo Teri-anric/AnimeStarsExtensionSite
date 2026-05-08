@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useDomain } from '../../context/DomainContext';
 import { useAuth } from '../../context/AuthContext';
 import { createAuthenticatedClient } from '../../utils/apiClient';
 import { AuthApi, UserResponse } from '../../client';
@@ -12,8 +11,6 @@ import LanguageSwitcher from '../../components/LanguageSwitcher';
 const AccountSettings = () => {
   const { t } = useTranslation();
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { currentDomain, setCurrentDomain, availableDomains } = useDomain();
-  const [successMessage, setSuccessMessage] = useState('');
   const [userInfo, setUserInfo] = useState<UserResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,19 +43,6 @@ const AccountSettings = () => {
 
     fetchUserInfo();
   }, [authLoading, isAuthenticated, t]);
-
-  const handleDomainChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newDomain = e.target.value;
-    setCurrentDomain(newDomain);
-    setSuccessMessage(t('settings.domainSettingsUpdated'));
-    
-    // Clear success message after 3 seconds
-    setTimeout(() => {
-      setSuccessMessage('');
-    }, 3000);
-  };
-
-
 
   const userSection = (() => {
     if (authLoading || (isAuthenticated && loading)) {
@@ -109,35 +93,6 @@ const AccountSettings = () => {
         <h2>{t('settings.userInformation')}</h2>
         {userSection}
       </div>
-      
-      <div className="settings-section">
-        <h2>{t('settings.siteSettings')}</h2>
-        
-        <div className="setting-item">
-          <label htmlFor="domain-setting">{t('settings.cardDomain')}</label>
-          <div className="setting-description">
-            {t('settings.cardDomainDescription')}
-          </div>
-          <select 
-            id="domain-setting" 
-            value={currentDomain}
-            onChange={handleDomainChange}
-            className="setting-input"
-          >
-            {availableDomains.map((domain) => (
-              <option key={domain} value={domain}>
-                {domain}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-      
-      {successMessage && (
-        <div className="success-message">
-          {successMessage}
-        </div>
-      )}
     </div>
   );
 };
