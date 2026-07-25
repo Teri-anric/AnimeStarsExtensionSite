@@ -4,7 +4,9 @@ import html
 import logging
 from collections import defaultdict
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import HTMLResponse
 
 from app.database.enum import CardCollection
@@ -17,10 +19,16 @@ from app.web.deps import (
     CardUsersStatsRepositoryDep,
     ExtensionBannerRepositoryDep,
     ExtensionCardImageCacheServiceDep,
+    ExtensionLabyrinthRoomRepositoryDep,
 )
 from app.web.schema.auth import Token
 from app.web.schema.extension_api import (
     ExtensionBannerConfigResponse,
+    ExtensionLabyrinthBulkRoomsRequest,
+    ExtensionLabyrinthBulkRoomsResponse,
+    ExtensionLabyrinthMapResponse,
+    ExtensionLabyrinthRoomItem,
+    ExtensionLabyrinthSummaryResponse,
     DeckRankHistogram,
     ExtensionCardImageResolveItem,
     ExtensionCardsByImagePathsRequest,
@@ -255,3 +263,54 @@ async def extension_banner_iframe(
         is_active=banner.is_active,
     )
     return HTMLResponse(content=_build_iframe_html(config))
+
+
+@router.get("/labyrinth/map", response_model=ExtensionLabyrinthMapResponse)
+async def extension_labyrinth_map(
+    labyrinth_repo: ExtensionLabyrinthRoomRepositoryDep,
+    min_x: int = Query(..., ge=-100000, le=100000),
+    max_x: int = Query(..., ge=-100000, le=100000),
+    min_y: int = Query(..., ge=-100000, le=100000),
+    max_y: int = Query(..., ge=-100000, le=100000),
+    updated_after: datetime | None = None,
+) -> ExtensionLabyrinthMapResponse:
+    if min_x > max_x or min_y > max_y:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid bounds")
+    if (max_x - min_x + 1) * (max_y - min_y + 1) > 20000:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bounds are too large")
+
+    rooms = await labyrinth_repo.list_map(
+        min_x=min_x,
+        max_x=max_x,
+        min_y=min_y,
+        max_y=max_y,
+        updated_after=updated_after,
+    )
+    return ExtensionLabyrinthMapResponse(
+        rooms=[
+            ExtensionLabyrinthRoomItem(
+                x=room.x,
+                y=room.y,
+                event=room.event,
+                sources_count=room.sources_count,
+                updated_at=room.updated_at,
+            )
+            for room in rooms
+        ]
+    )
+
+
+@router.get("/labyrinth/map/summary", response_model=ExtensionLabyrinthSummaryResponse)
+async def extension_labyrinth_map_summary(
+    labyrinth_repo: ExtensionLabyrinthRoomRepositoryDep,
+) -> ExtensionLabyrinthSummaryResponse:
+    return ExtensionLabyrinthSummaryResponse.model_validate(await labyrinth_repo.summary())
+
+
+@router.post("/labyrinth/rooms/bulk", response_model=ExtensionLabyrinthBulkRoomsResponse)
+async def extension_labyrinth_rooms_bulk(
+    body: ExtensionLabyrinthBulkRoomsRequest,
+    labyrinth_repo: ExtensionLabyrinthRoomRepositoryDep,
+) -> ExtensionLabyrinthBulkRoomsResponse:
+    count = await labyrinth_repo.bulk_upsert([room.model_dump() for room in body.rooms])
+    return ExtensionLabyrinthBulkRoomsResponse(count=count)

@@ -54,3 +54,40 @@ class ExtensionBannerConfigResponse(BaseSchema):
     action_text: str | None = None
     action_url: str | None = None
     is_active: bool
+
+
+class ExtensionLabyrinthRoomItem(BaseSchema):
+    x: int
+    y: int
+    event: str | None = None
+    sources_count: int
+    updated_at: datetime
+
+
+class ExtensionLabyrinthMapResponse(BaseSchema):
+    rooms: list[ExtensionLabyrinthRoomItem]
+
+
+class ExtensionLabyrinthSummaryResponse(BaseSchema):
+    total_rooms: int
+    min_x: int | None = None
+    max_x: int | None = None
+    min_y: int | None = None
+    max_y: int | None = None
+    updated_at: datetime | None = None
+    events: dict[str, int] = Field(default_factory=dict)
+
+
+class ExtensionLabyrinthRoomInput(BaseSchema):
+    x: int
+    y: int
+    event: str | None = Field(default=None, max_length=80)
+
+
+class ExtensionLabyrinthBulkRoomsRequest(BaseSchema):
+    rooms: list[ExtensionLabyrinthRoomInput] = Field(default_factory=list, max_length=_MAX_BATCH)
+
+
+class ExtensionLabyrinthBulkRoomsResponse(BaseSchema):
+    status: str = "ok"
+    count: int

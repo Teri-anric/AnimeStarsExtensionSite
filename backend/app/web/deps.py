@@ -6,6 +6,7 @@ from app.database.repos.card_users_stats import CardUsersStatsRepository
 from app.database.repos.animestars_user import AnimestarsUserRepo
 from app.database.repos.deck import DeckRepository
 from app.database.repos.extension_banner import ExtensionBannerRepository
+from app.database.repos.extension_labyrinth_room import ExtensionLabyrinthRoomRepository
 from app.database.repos.health import HealthRepository
 from app.parser.services import VerificationService
 from app.services import CardBulkBufferService, CardStatsCacheService
@@ -20,6 +21,9 @@ DeckRepositoryDep = Annotated[DeckRepository, Depends(lambda: DeckRepository())]
 HealthRepositoryDep = Annotated[HealthRepository, Depends(lambda: HealthRepository())]
 ExtensionBannerRepositoryDep = Annotated[
     ExtensionBannerRepository, Depends(lambda: ExtensionBannerRepository())
+]
+ExtensionLabyrinthRoomRepositoryDep = Annotated[
+    ExtensionLabyrinthRoomRepository, Depends(lambda: ExtensionLabyrinthRoomRepository())
 ]
 
 VerificationServiceDep = Annotated[VerificationService, Depends(lambda: VerificationService())]
