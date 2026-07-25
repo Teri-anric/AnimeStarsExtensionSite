@@ -9,7 +9,7 @@ from .base import BaseRepository
 from uuid import UUID
 from typing import Iterable
 from collections import defaultdict
-from sqlalchemy import case, func, literal, select, update, delete
+from sqlalchemy import case, func, literal, or_, select, update, delete
 from sqlalchemy.dialects.postgresql import insert
 
 
@@ -106,6 +106,17 @@ class CardRepository(
         await DeckRepository.attach_deck_ids(session, values)
         await AnimestarsUserRepo.ensure_authors_for_card_payloads(session, values)
         stmt = insert(Card).values(values)
+        update_fields = (
+            "name",
+            "rank",
+            "anime_name",
+            "anime_link",
+            "deck_id",
+            "author",
+            "image",
+            "mp4",
+            "webm",
+        )
         stmt = stmt.on_conflict_do_update(
             index_elements=["card_id"],
             set_={
@@ -119,6 +130,12 @@ class CardRepository(
                 "mp4": stmt.excluded.mp4,
                 "webm": stmt.excluded.webm,
             },
+            # Deck sync submits a complete snapshot repeatedly. Avoid rewriting
+            # unchanged cards and creating needless row versions.
+            where=or_(
+                *(getattr(Card, field).is_distinct_from(getattr(stmt.excluded, field))
+                  for field in update_fields)
+            ),
         )
         result = await session.execute(stmt)
         return result.rowcount

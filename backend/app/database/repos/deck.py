@@ -1,7 +1,7 @@
 import uuid
 from typing import Any
 
-from sqlalchemy import func, select, delete, exists, update
+from sqlalchemy import func, or_, select, delete, exists, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -112,9 +112,24 @@ class DeckRepository(PaginationRepository[AnimestarsDeck]):
                 ),
                 "updated_at": func.now(),
             },
+            where=or_(
+                AnimestarsDeck.anime_link.is_distinct_from(insert_stmt.excluded.anime_link),
+                AnimestarsDeck.anime_id.is_distinct_from(insert_stmt.excluded.anime_id),
+            ),
         ).returning(AnimestarsDeck.id, AnimestarsDeck.anime_name)
         result = await session.execute(insert_stmt)
         mapping = {r.anime_name: r.id for r in result.all()}
+
+        # PostgreSQL RETURNING omits rows skipped by the no-op WHERE clause.
+        # Resolve them in one read instead of rewriting their deck rows.
+        missing_keys = set(by_key) - set(mapping)
+        if missing_keys:
+            existing = await session.execute(
+                select(AnimestarsDeck.id, AnimestarsDeck.anime_name).where(
+                    AnimestarsDeck.anime_name.in_(missing_keys)
+                )
+            )
+            mapping.update({row.anime_name: row.id for row in existing.all()})
 
         for v in values:
             if v.get("deck_id"):

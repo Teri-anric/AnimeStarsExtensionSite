@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 from logging import getLogger, INFO
 from datetime import datetime, timedelta
 import traceback
+from time import perf_counter
 
 from app.parser.exception import AnimestarError
 from app.parser.repos.cards import AnimestarCardsRepo
@@ -142,13 +143,15 @@ async def delete_empty_decks():
 async def flush_card_bulk_buffer():
     card_repo = CardRepository()
     buffer_service = CardBulkBufferService()
+    started_at = perf_counter()
     try:
         result = await buffer_service.flush_into_repo(card_repo)
         if result.candidate_count:
             logger.info(
-                "Flushed card bulk buffer: candidates=%s written=%s",
+                "Flushed card bulk buffer: candidates=%s written=%s duration_seconds=%.3f",
                 result.candidate_count,
                 result.written_count,
+                perf_counter() - started_at,
             )
     except Exception as e:
         logger.error(f"Error during card bulk buffer flush: {e}")

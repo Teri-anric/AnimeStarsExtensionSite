@@ -64,7 +64,9 @@ class RedisSettings(BaseSettings):
 
 class CardBulkSettings(BaseSettings):
     flush_interval_seconds: int = 5
-    flush_batch_size: int = 500
+    # Keep each transaction short. Large deck snapshots are drained over several
+    # ticks instead of holding card/deck row locks for a long time.
+    flush_batch_size: int = 100
     key_prefix: str = "card_bulk"
     lock_ttl_seconds: int = 30
 
