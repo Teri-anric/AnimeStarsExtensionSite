@@ -68,7 +68,11 @@ class CardBulkSettings(BaseSettings):
     # ticks instead of holding card/deck row locks for a long time.
     flush_batch_size: int = 100
     key_prefix: str = "card_bulk"
-    lock_ttl_seconds: int = 30
+    # Must exceed flush_timeout_seconds so another scheduler cannot overlap a
+    # still-running flush after the Redis lease expires.
+    lock_ttl_seconds: int = 45
+    flush_timeout_seconds: int = 30
+    database_lock_timeout_seconds: int = 5
 
 
 class CardStatsCacheSettings(BaseSettings):

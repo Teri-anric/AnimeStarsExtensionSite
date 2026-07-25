@@ -2,6 +2,7 @@ from .animestars_user import AnimestarsUserRepo
 from .crud import CRUDRepository
 from .deck import DeckRepository
 from .pagination import PaginationRepository
+from app.config import settings
 from ..enum import CardType
 from ..models.animestars.card import Card
 from ..models.animestars.card_users_stats import CardUsersStats
@@ -9,7 +10,7 @@ from .base import BaseRepository
 from uuid import UUID
 from typing import Iterable
 from collections import defaultdict
-from sqlalchemy import case, func, literal, or_, select, update, delete
+from sqlalchemy import case, func, literal, or_, select, text, update, delete
 from sqlalchemy.dialects.postgresql import insert
 
 
@@ -229,6 +230,12 @@ class CardRepository(
     ) -> int:
         """Apply every queued card operation in one database transaction."""
         async with self.auto_commit() as session:
+            await session.execute(
+                text(
+                    "SET LOCAL lock_timeout = "
+                    f"'{settings.card_bulk.database_lock_timeout_seconds}s'"
+                )
+            )
             total = 0
             delete_ids = [row["card_id"] for row in deleted if row.get("card_id")]
             if delete_ids:

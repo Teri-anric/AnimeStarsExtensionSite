@@ -1,3 +1,4 @@
+import asyncio
 from urllib.parse import urlparse
 from logging import getLogger, INFO
 from datetime import datetime, timedelta
@@ -146,7 +147,8 @@ async def flush_card_bulk_buffer():
     buffer_service = CardBulkBufferService()
     started_at = perf_counter()
     try:
-        result = await buffer_service.flush_into_repo(card_repo)
+        async with asyncio.timeout(settings.card_bulk.flush_timeout_seconds):
+            result = await buffer_service.flush_into_repo(card_repo)
         if result.candidate_count:
             logger.info(
                 "Flushed card bulk buffer: candidates=%s written=%s duration_seconds=%.3f",
@@ -154,6 +156,11 @@ async def flush_card_bulk_buffer():
                 result.written_count,
                 perf_counter() - started_at,
             )
+    except TimeoutError:
+        logger.error(
+            "Card bulk buffer flush timed out after %s seconds; payloads were requeued",
+            settings.card_bulk.flush_timeout_seconds,
+        )
     except Exception as e:
         logger.error(f"Error during card bulk buffer flush: {e}")
         logger.error(traceback.format_exc())

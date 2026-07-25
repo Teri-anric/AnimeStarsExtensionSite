@@ -76,6 +76,8 @@ class CardBulkBufferService:
                 settings.card_bulk.flush_batch_size,
             )
             card_ids = [int(v) for v in raw_ids] if raw_ids else []
+            if card_ids:
+                logger.info("Applying card bulk batch: candidates=%s", len(card_ids))
             payload_by_card_id = {
                 payload["card_id"]: payload
                 for payload in await self._read_payloads(card_ids)
@@ -101,8 +103,10 @@ class CardBulkBufferService:
             if card_ids:
                 await redis.delete(*(self._payload_key(card_id) for card_id in card_ids))
             return FlushResult(candidate_count=len(card_ids), written_count=total)
-        except Exception:
+        except BaseException:
             # Requeue on failure to avoid data loss.
+            # asyncio cancellation is included here: sPOP has already removed
+            # the IDs from the set, while their payload hashes are intact.
             await self._requeue_ids_from_error()
             raise
         finally:
