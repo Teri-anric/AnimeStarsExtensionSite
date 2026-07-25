@@ -115,6 +115,11 @@ class CardBulkUpsertRequest(BaseSchema):
     cards: list[CardUpsertSchema]
 
 
+class CardDeckSnapshotRequest(BaseSchema):
+    anime_id: int
+    cards: list[CardUpsertSchema]
+
+
 class CardBulkUpsertResponse(BaseSchema):
     status: Literal["ok", "error"]
     count: int

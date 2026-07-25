@@ -1,12 +1,12 @@
 import uuid
 from typing import Any
 
-from sqlalchemy import func, select, delete, exists
+from sqlalchemy import func, select, delete, exists, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from ..deck_key import canonical_deck_key
+from ..deck_key import canonical_deck_key, anime_id_from_link
 from .pagination import PaginationRepository
 from ..models.animestars.deck import AnimestarsDeck
 from ..models.animestars.card import Card
@@ -25,14 +25,30 @@ class DeckRepository(PaginationRepository[AnimestarsDeck]):
         session: AsyncSession,
         anime_link: str | None,
         anime_name: str | None,
+        anime_id: int | None = None,
     ) -> uuid.UUID | None:
         key = canonical_deck_key(anime_name, anime_link)
-        if not key:
+        anime_id = anime_id or anime_id_from_link(anime_link)
+        if not key or not anime_id:
             return None
+        existing_id = await session.scalar(
+            select(AnimestarsDeck.id).where(AnimestarsDeck.anime_id == anime_id)
+        )
+        if existing_id:
+            await session.execute(
+                update(AnimestarsDeck)
+                .where(AnimestarsDeck.id == existing_id)
+                .values(
+                    anime_link=func.coalesce(anime_link, AnimestarsDeck.anime_link),
+                    updated_at=func.now(),
+                )
+            )
+            return existing_id
         insert_stmt = pg_insert(AnimestarsDeck).values(
             id=uuid.uuid4(),
             anime_name=key,
             anime_link=anime_link,
+            anime_id=anime_id,
             created_at=func.now(),
             updated_at=func.now(),
         )
@@ -43,6 +59,10 @@ class DeckRepository(PaginationRepository[AnimestarsDeck]):
                     insert_stmt.excluded.anime_link,
                     AnimestarsDeck.anime_link,
                 ),
+                "anime_id": func.coalesce(
+                    insert_stmt.excluded.anime_id,
+                    AnimestarsDeck.anime_id,
+                ),
                 "updated_at": func.now(),
             },
         ).returning(AnimestarsDeck.id)
@@ -52,15 +72,19 @@ class DeckRepository(PaginationRepository[AnimestarsDeck]):
     @staticmethod
     async def attach_deck_ids(session: AsyncSession, values: list[dict[str, Any]]) -> None:
         """Mutates each card dict: sets deck_id from canonical deck key (name or link)."""
-        by_key: dict[str, str | None] = {}
+        by_key: dict[str, tuple[str | None, int]] = {}
         for v in values:
+            if v.get("deck_id"):
+                continue
             key = canonical_deck_key(v.get("anime_name"), v.get("anime_link"))
-            if key:
-                by_key[key] = v.get("anime_link")
+            anime_id = anime_id_from_link(v.get("anime_link"))
+            if key and anime_id:
+                by_key[key] = (v.get("anime_link"), anime_id)
 
         if not by_key:
             for v in values:
-                v["deck_id"] = None
+                if not v.get("deck_id"):
+                    v["deck_id"] = None
             return
 
         rows = [
@@ -68,10 +92,11 @@ class DeckRepository(PaginationRepository[AnimestarsDeck]):
                 "id": uuid.uuid4(),
                 "anime_name": key,
                 "anime_link": link,
+                "anime_id": anime_id,
                 "created_at": func.now(),
                 "updated_at": func.now(),
             }
-            for key, link in by_key.items()
+            for key, (link, anime_id) in by_key.items()
         ]
         insert_stmt = pg_insert(AnimestarsDeck).values(rows)
         insert_stmt = insert_stmt.on_conflict_do_update(
@@ -81,6 +106,10 @@ class DeckRepository(PaginationRepository[AnimestarsDeck]):
                     insert_stmt.excluded.anime_link,
                     AnimestarsDeck.anime_link,
                 ),
+                "anime_id": func.coalesce(
+                    insert_stmt.excluded.anime_id,
+                    AnimestarsDeck.anime_id,
+                ),
                 "updated_at": func.now(),
             },
         ).returning(AnimestarsDeck.id, AnimestarsDeck.anime_name)
@@ -88,6 +117,8 @@ class DeckRepository(PaginationRepository[AnimestarsDeck]):
         mapping = {r.anime_name: r.id for r in result.all()}
 
         for v in values:
+            if v.get("deck_id"):
+                continue
             key = canonical_deck_key(v.get("anime_name"), v.get("anime_link"))
             v["deck_id"] = mapping.get(key) if key else None
 

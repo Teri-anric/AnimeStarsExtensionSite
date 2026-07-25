@@ -1,3 +1,6 @@
+import re
+
+
 """Canonical deck grouping key: unique anime_name in DB matches this value."""
 
 
@@ -11,3 +14,10 @@ def canonical_deck_key(anime_name: str | None, anime_link: str | None) -> str | 
     link_part = (anime_link or "").strip()
     link_part = link_part if link_part else None
     return name_part or link_part
+
+
+def anime_id_from_link(anime_link: str | None) -> int | None:
+    if not anime_link:
+        return None
+    match = re.search(r"/(\d+)-[^/]+(?:\.html)?/?$", anime_link)
+    return int(match.group(1)) if match else None
