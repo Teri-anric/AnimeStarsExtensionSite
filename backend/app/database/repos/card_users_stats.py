@@ -79,7 +79,7 @@ class CardUsersStatsRepository(
                     count,
                     date_trunc('second', created_at) AS created_at_sec
                 FROM animestars_card_users_stats
-                WHERE created_at < now() - (:days || ' days')::interval
+                WHERE created_at < now() - make_interval(days => :days)
             ),
             aggregated AS (
                 SELECT
@@ -110,7 +110,7 @@ class CardUsersStatsRepository(
                 created_at
             FROM aggregated;
             """
-        )
+        ).bindparams(bindparam("days", type_=Integer))
 
         async with self.auto_commit() as session:
             result = await session.execute(sql, {"days": older_than_days})
