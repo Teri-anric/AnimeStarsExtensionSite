@@ -55,6 +55,9 @@ class CardBulkBufferService:
             if not mapping:
                 continue
 
+            if not card.get("deleted"):
+                # A newer source card cancels an older queued deletion for the same ID.
+                pipe.hdel(self._payload_key(card_id), "deleted")
             pipe.hset(self._payload_key(card_id), mapping=mapping)
             pipe.sadd(self._dirty_set_key, card_id)
             buffered += 1
@@ -72,29 +75,31 @@ class CardBulkBufferService:
                 self._dirty_set_key,
                 settings.card_bulk.flush_batch_size,
             )
-            if not raw_ids:
-                return FlushResult(candidate_count=0, written_count=0)
-
-            card_ids = [int(v) for v in raw_ids]
-            payloads = await self._read_payloads(card_ids)
-            if not payloads:
-                return FlushResult(candidate_count=len(card_ids), written_count=0)
+            card_ids = [int(v) for v in raw_ids] if raw_ids else []
+            payload_by_card_id = {
+                payload["card_id"]: payload
+                for payload in await self._read_payloads(card_ids)
+            }
 
             full_upsert_values: list[dict] = []
             partial_update_values: list[dict] = []
-            for payload in payloads:
+            deleted_values: list[dict] = []
+            for card_id, payload in payload_by_card_id.items():
+                if payload.get("deleted"):
+                    deleted_values.append(payload)
+                    continue
                 if all(field in payload for field in _UPSERT_REQUIRED_FIELDS):
                     full_upsert_values.append(payload)
                 else:
                     partial_update_values.append(payload)
 
-            total = 0
-            if full_upsert_values:
-                total += await repo.upsert_bulk(full_upsert_values)
-            if partial_update_values:
-                total += await repo.partial_update_by_card_id_bulk(partial_update_values)
-
-            await redis.delete(*(self._payload_key(card_id) for card_id in card_ids))
+            total = await repo.apply_bulk_changes(
+                full_upsert_values,
+                partial_update_values,
+                deleted_values,
+            )
+            if card_ids:
+                await redis.delete(*(self._payload_key(card_id) for card_id in card_ids))
             return FlushResult(candidate_count=len(card_ids), written_count=total)
         except Exception:
             # Requeue on failure to avoid data loss.
@@ -176,6 +181,13 @@ class CardBulkBufferService:
 
     @staticmethod
     def _to_json_compatible(value):
+        if isinstance(value, dict):
+            return {
+                key: CardBulkBufferService._to_json_compatible(item)
+                for key, item in value.items()
+            }
+        if isinstance(value, (list, tuple)):
+            return [CardBulkBufferService._to_json_compatible(item) for item in value]
         if isinstance(value, Enum):
             return value.value
         if isinstance(value, (datetime, date)):

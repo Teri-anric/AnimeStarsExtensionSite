@@ -83,6 +83,10 @@ class CardRepository(
         return True
 
     async def upsert_bulk(self, cards: Iterable[dict]) -> int:
+        async with self.auto_commit() as session:
+            return await self._upsert_bulk_in_session(session, cards)
+
+    async def _upsert_bulk_in_session(self, session, cards: Iterable[dict]) -> int:
         values = list(cards)
         if not values:
             return 0
@@ -99,25 +103,24 @@ class CardRepository(
             "webm",
         )
         values = [{field: row.get(field) for field in insert_fields} for row in values]
-        async with self.auto_commit() as session:
-            await DeckRepository.attach_deck_ids(session, values)
-            await AnimestarsUserRepo.ensure_authors_for_card_payloads(session, values)
-            stmt = insert(Card).values(values)
-            stmt = stmt.on_conflict_do_update(
-                index_elements=["card_id"],
-                set_={
-                    "name": stmt.excluded.name,
-                    "rank": stmt.excluded.rank,
-                    "anime_name": stmt.excluded.anime_name,
-                    "anime_link": stmt.excluded.anime_link,
-                    "deck_id": stmt.excluded.deck_id,
-                    "author": stmt.excluded.author,
-                    "image": stmt.excluded.image,
-                    "mp4": stmt.excluded.mp4,
-                    "webm": stmt.excluded.webm,
-                },
-            )
-            result = await session.execute(stmt)
+        await DeckRepository.attach_deck_ids(session, values)
+        await AnimestarsUserRepo.ensure_authors_for_card_payloads(session, values)
+        stmt = insert(Card).values(values)
+        stmt = stmt.on_conflict_do_update(
+            index_elements=["card_id"],
+            set_={
+                "name": stmt.excluded.name,
+                "rank": stmt.excluded.rank,
+                "anime_name": stmt.excluded.anime_name,
+                "anime_link": stmt.excluded.anime_link,
+                "deck_id": stmt.excluded.deck_id,
+                "author": stmt.excluded.author,
+                "image": stmt.excluded.image,
+                "mp4": stmt.excluded.mp4,
+                "webm": stmt.excluded.webm,
+            },
+        )
+        result = await session.execute(stmt)
         return result.rowcount
 
     async def partial_update_by_card_id_bulk(self, cards: Iterable[dict]) -> int:
@@ -127,18 +130,6 @@ class CardRepository(
         Only fields provided in each payload will be updated; other fields remain unchanged.
         Cards are not created if they do not already exist.
         """
-        _updatable = {
-            "name",
-            "rank",
-            "anime_name",
-            "anime_link",
-            "deck_id",
-            "author",
-            "image",
-            "mp4",
-            "webm",
-        }
-
         all_cards = [
             {k: v for k, v in d.items()}
             for d in cards
@@ -148,65 +139,88 @@ class CardRepository(
             return 0
 
         async with self.auto_commit() as session:
-            # Batch deck resolution: one SELECT + one INSERT instead of N of each
-            need_deck = [d for d in all_cards if "anime_link" in d or "anime_name" in d]
-            if need_deck:
-                ids = [d["card_id"] for d in need_deck]
-                existing_by_id = {
-                    c.card_id: c
-                    for c in (
-                        await session.scalars(select(Card).where(Card.card_id.in_(ids)))
-                    ).all()
-                }
-                for d in need_deck:
-                    ex = existing_by_id.get(d["card_id"])
-                    if ex:
-                        d.setdefault("anime_link", ex.anime_link)
-                        d.setdefault("anime_name", ex.anime_name)
-                await DeckRepository.attach_deck_ids(session, need_deck)
-                deck_by_card_id = {d["card_id"]: d.get("deck_id") for d in need_deck}
-                for d in all_cards:
-                    if d["card_id"] in deck_by_card_id:
-                        d["deck_id"] = deck_by_card_id[d["card_id"]]
+            return await self._partial_update_by_card_id_bulk_in_session(session, all_cards)
 
-            # Batch author resolution: one call instead of N
-            need_author = [d for d in all_cards if "author" in d]
-            if need_author:
-                await AnimestarsUserRepo.ensure_authors_for_card_payloads(
-                    session, need_author
-                )
-
-            # Batch UPDATE: group by field set → one UPDATE per group via CASE WHEN
-            groups: dict[frozenset, list[dict]] = defaultdict(list)
+    async def _partial_update_by_card_id_bulk_in_session(self, session, all_cards: list[dict]) -> int:
+        _updatable = {
+            "name", "rank", "anime_name", "anime_link", "deck_id", "author", "image", "mp4", "webm",
+        }
+        if not all_cards:
+            return 0
+        need_deck = [d for d in all_cards if "anime_link" in d or "anime_name" in d]
+        if need_deck:
+            ids = [d["card_id"] for d in need_deck]
+            existing_by_id = {
+                c.card_id: c
+                for c in (await session.scalars(select(Card).where(Card.card_id.in_(ids)))).all()
+            }
+            for d in need_deck:
+                ex = existing_by_id.get(d["card_id"])
+                if ex:
+                    d.setdefault("anime_link", ex.anime_link)
+                    d.setdefault("anime_name", ex.anime_name)
+            await DeckRepository.attach_deck_ids(session, need_deck)
+            deck_by_card_id = {d["card_id"]: d.get("deck_id") for d in need_deck}
             for d in all_cards:
-                key = frozenset(k for k in d if k != "card_id" and k in _updatable)
-                if key:
-                    groups[key].append(d)
-
-            total = 0
-            for fields_set, group in groups.items():
-                card_ids = [d["card_id"] for d in group]
-                val_by_id = {d["card_id"]: d for d in group}
-                set_clause = {}
-                for field in fields_set:
-                    whens = []
-                    for cid in card_ids:
-                        value = val_by_id[cid][field]
-                        if field == "deck_id":
-                            value = literal(value, type_=Card.deck_id.type)
-                        whens.append((Card.card_id == cid, value))
-                    expr = (
-                        case(*whens, else_=Card.deck_id)
-                        if field == "deck_id"
-                        else case(*whens)
-                    )
-                    set_clause[field] = expr
-                result = await session.execute(
-                    update(Card).where(Card.card_id.in_(card_ids)).values(**set_clause)
+                if d["card_id"] in deck_by_card_id:
+                    d["deck_id"] = deck_by_card_id[d["card_id"]]
+        need_author = [d for d in all_cards if "author" in d]
+        if need_author:
+            await AnimestarsUserRepo.ensure_authors_for_card_payloads(session, need_author)
+        groups: dict[frozenset, list[dict]] = defaultdict(list)
+        for d in all_cards:
+            key = frozenset(k for k in d if k != "card_id" and k in _updatable)
+            if key:
+                groups[key].append(d)
+        total = 0
+        for fields_set, group in groups.items():
+            card_ids = [d["card_id"] for d in group]
+            val_by_id = {d["card_id"]: d for d in group}
+            set_clause = {}
+            for field in fields_set:
+                whens = []
+                for cid in card_ids:
+                    value = val_by_id[cid][field]
+                    if field == "deck_id":
+                        value = literal(value, type_=Card.deck_id.type)
+                    whens.append((Card.card_id == cid, value))
+                set_clause[field] = (
+                    case(*whens, else_=Card.deck_id) if field == "deck_id" else case(*whens)
                 )
-                total += result.rowcount
-
+            result = await session.execute(
+                update(Card).where(Card.card_id.in_(card_ids)).values(**set_clause)
+            )
+            total += result.rowcount
         return total
+
+    async def get_card_ids_by_deck_anime_id(self, anime_id: int) -> set[int]:
+        from ..models.animestars.deck import AnimestarsDeck
+
+        async with self.session as session:
+            rows = await session.scalars(
+                select(Card.card_id)
+                .join(AnimestarsDeck, Card.deck_id == AnimestarsDeck.id)
+                .where(AnimestarsDeck.anime_id == anime_id)
+            )
+            return set(rows.all())
+
+    async def apply_bulk_changes(
+        self,
+        full_upserts: list[dict],
+        partial_updates: list[dict],
+        deleted: list[dict],
+    ) -> int:
+        """Apply every queued card operation in one database transaction."""
+        async with self.auto_commit() as session:
+            total = 0
+            delete_ids = [row["card_id"] for row in deleted if row.get("card_id")]
+            if delete_ids:
+                await session.execute(delete(CardUsersStats).where(CardUsersStats.card_id.in_(delete_ids)))
+                result = await session.execute(delete(Card).where(Card.card_id.in_(delete_ids)))
+                total += result.rowcount
+            total = await self._upsert_bulk_in_session(session, full_upserts)
+            total += await self._partial_update_by_card_id_bulk_in_session(session, partial_updates)
+            return total
 
     async def get_card_ids_by_image_paths(self, paths: list[str]) -> dict[str, int]:
         """Map normalized image path → card_id (smallest card_id if duplicates)."""

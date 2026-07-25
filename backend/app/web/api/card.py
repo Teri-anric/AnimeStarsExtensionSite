@@ -8,6 +8,7 @@ from app.web.schema.card import (
     CardSchema,
     CardBulkUpsertRequest,
     CardBulkUpsertResponse,
+    CardDeckSnapshotRequest,
 )
 from app.web.deps import CardRepositoryDep, CardBulkBufferServiceDep
 from app.util.media_path import normalize_media_path
@@ -135,6 +136,28 @@ async def report_deleted_card(card_id: int | UUID, repo: CardRepositoryDep) -> N
     deleted = await repo.delete_by_ident(card_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Card not found")
+
+
+@router.post("/bulk/deck-sync")
+async def sync_deck_snapshot(
+    request: CardDeckSnapshotRequest,
+    repo: CardRepositoryDep,
+    buffer_service: CardBulkBufferServiceDep,
+) -> CardBulkUpsertResponse:
+    normalized_cards = [
+        strip_host_from_url_fields(card.model_dump(exclude_none=True))
+        for card in request.cards
+    ]
+    if not normalized_cards:
+        return CardBulkUpsertResponse(status="ok", count=0)
+    existing_ids = await repo.get_card_ids_by_deck_anime_id(request.anime_id)
+    snapshot_ids = {card["card_id"] for card in normalized_cards}
+    deleted_cards = [
+        {"card_id": card_id, "deleted": True}
+        for card_id in existing_ids - snapshot_ids
+    ]
+    accepted = await buffer_service.enqueue_cards(normalized_cards + deleted_cards)
+    return CardBulkUpsertResponse(status="ok", count=accepted)
 
 
 @router.get("/{card_id}")
