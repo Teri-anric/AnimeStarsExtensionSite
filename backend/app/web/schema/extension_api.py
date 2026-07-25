@@ -61,6 +61,9 @@ class ExtensionLabyrinthRoomItem(BaseSchema):
     y: int
     event: str | None = None
     sources_count: int
+    emission_event: str | None = None
+    emission_sources_count: int
+    emission_observed_at: datetime | None = None
     updated_at: datetime
 
 
@@ -82,6 +85,7 @@ class ExtensionLabyrinthRoomInput(BaseSchema):
     x: int
     y: int
     event: str | None = Field(default=None, max_length=80)
+    emission_event: str | None = Field(default=None, max_length=80)
 
 
 class ExtensionLabyrinthBulkRoomsRequest(BaseSchema):

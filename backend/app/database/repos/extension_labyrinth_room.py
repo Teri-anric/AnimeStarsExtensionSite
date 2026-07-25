@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import case, func, select
 from sqlalchemy.dialects.postgresql import insert
 
 from app.database.models.extension_labyrinth_room import ExtensionLabyrinthRoom
@@ -82,6 +82,9 @@ class ExtensionLabyrinthRoomRepository(BaseRepository):
                 "y": room["y"],
                 "event": room.get("event"),
                 "sources_count": 1,
+                "emission_event": room.get("emission_event"),
+                "emission_sources_count": 1 if room.get("emission_event") else 0,
+                "emission_observed_at": now if room.get("emission_event") else None,
             }
             for room in deduped.values()
         ]
@@ -89,8 +92,35 @@ class ExtensionLabyrinthRoomRepository(BaseRepository):
         stmt = stmt.on_conflict_do_update(
             constraint="uq_extension_labyrinth_rooms_xy",
             set_={
-                "event": stmt.excluded.event,
-                "sources_count": ExtensionLabyrinthRoom.sources_count + 1,
+                # Never let an unknown observation erase a known room type.
+                # Emission-only rows have event=NULL and therefore leave it intact.
+                "event": case(
+                    (
+                        (stmt.excluded.event.is_(None))
+                        | (stmt.excluded.event == "unknown"),
+                        ExtensionLabyrinthRoom.event,
+                    ),
+                    else_=stmt.excluded.event,
+                ),
+                "sources_count": case(
+                    (stmt.excluded.event.is_not(None), ExtensionLabyrinthRoom.sources_count + 1),
+                    else_=ExtensionLabyrinthRoom.sources_count,
+                ),
+                "emission_event": case(
+                    (stmt.excluded.emission_event.is_not(None), stmt.excluded.emission_event),
+                    else_=ExtensionLabyrinthRoom.emission_event,
+                ),
+                "emission_sources_count": case(
+                    (
+                        stmt.excluded.emission_event.is_not(None),
+                        ExtensionLabyrinthRoom.emission_sources_count + 1,
+                    ),
+                    else_=ExtensionLabyrinthRoom.emission_sources_count,
+                ),
+                "emission_observed_at": case(
+                    (stmt.excluded.emission_event.is_not(None), now),
+                    else_=ExtensionLabyrinthRoom.emission_observed_at,
+                ),
                 "updated_at": now,
             },
         )

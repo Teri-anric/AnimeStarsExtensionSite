@@ -293,6 +293,9 @@ async def extension_labyrinth_map(
                 y=room.y,
                 event=room.event,
                 sources_count=room.sources_count,
+                emission_event=room.emission_event,
+                emission_sources_count=room.emission_sources_count,
+                emission_observed_at=room.emission_observed_at,
                 updated_at=room.updated_at,
             )
             for room in rooms
