@@ -61,58 +61,57 @@ class CardUsersStatsRepository(
 
     async def aggregate_stats_per_second(self, older_than_days: int = 7) -> int:
         """
-        Aggregate stats so that, for rows older than N days, there is at most
-        one record per (owner_id, card_id, collection, second).
+        Aggregate duplicate stats so that, for rows older than N days, there is
+        at most one record per (owner_id, card_id, collection, second).
 
-        This reduces the number of points when users generate multiple events
-        within the same second.
+        Only duplicate groups are touched. The former DELETE + INSERT rewrote
+        every old row, competed with the card flush for locks, and raw SQL did
+        not have an ORM-generated UUID for the replacement row.
         """
         sql = text(
             """
-            WITH to_aggregate AS (
+            WITH ranked AS (
                 SELECT
                     id,
                     owner_id,
                     card_id,
                     collection,
-                    created_at,
-                    count,
-                    date_trunc('second', created_at) AS created_at_sec
+                    date_trunc('second', created_at) AS created_at_sec,
+                    ROUND(AVG(count) OVER (
+                        PARTITION BY owner_id, card_id, collection, date_trunc('second', created_at)
+                    ))::integer AS avg_count,
+                    COUNT(*) OVER (
+                        PARTITION BY owner_id, card_id, collection, date_trunc('second', created_at)
+                    ) AS group_count,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY owner_id, card_id, collection, date_trunc('second', created_at)
+                        ORDER BY created_at, id
+                    ) AS row_number
                 FROM animestars_card_users_stats
                 WHERE created_at < now() - make_interval(days => :days)
             ),
-            aggregated AS (
-                SELECT
-                    owner_id,
-                    card_id,
-                    collection,
-                    created_at_sec AS created_at,
-                    ROUND(AVG(count)) AS avg_count
-                FROM to_aggregate
-                GROUP BY owner_id, card_id, collection, created_at_sec
+            updated AS (
+                UPDATE animestars_card_users_stats AS stats
+                SET count = ranked.avg_count,
+                    created_at = ranked.created_at_sec
+                FROM ranked
+                WHERE stats.id = ranked.id
+                  AND ranked.row_number = 1
+                  AND ranked.group_count > 1
+                RETURNING stats.id
             ),
             deleted AS (
-                DELETE FROM animestars_card_users_stats
-                WHERE id IN (SELECT id FROM to_aggregate)
-            )
-            INSERT INTO animestars_card_users_stats (
-                owner_id,
-                card_id,
-                collection,
-                count,
-                created_at
+                DELETE FROM animestars_card_users_stats AS stats
+                USING ranked
+                WHERE stats.id = ranked.id
+                  AND ranked.row_number > 1
+                RETURNING stats.id
             )
             SELECT
-                owner_id,
-                card_id,
-                collection,
-                avg_count,
-                created_at
-            FROM aggregated;
+                (SELECT count(*) FROM updated) + (SELECT count(*) FROM deleted) AS affected;
             """
         ).bindparams(bindparam("days", type_=Integer))
 
         async with self.auto_commit() as session:
             result = await session.execute(sql, {"days": older_than_days})
-            # rowcount may be -1 depending on the driver, but return it if available
-            return getattr(result, "rowcount", -1)
+            return int(result.scalar_one())

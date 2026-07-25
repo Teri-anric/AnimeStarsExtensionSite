@@ -63,7 +63,9 @@ class Card(Base, UUIDPKMixin, TimestampMixin):
     webm: str = Column(String, nullable=True)
 
     stats_count = column_property(
-        select(func.count(CardUsersStats.id)).where(CardUsersStats.card_id == card_id),
+        select(func.count(CardUsersStats.id))
+        .where(CardUsersStats.card_id == card_id)
+        .scalar_subquery(),
         deferred=True,
     )
 
