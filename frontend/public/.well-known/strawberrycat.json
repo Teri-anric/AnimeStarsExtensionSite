@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "id": "ass",
+  "name": "AnimeStarsExtensions",
+  "url": "https://ass.strawberrycat.dev/",
+  "group": "private",
+  "description": "Backend admin panel for AnimeStarsExtensions: extensions, APIs, configs, and updates."
+}
