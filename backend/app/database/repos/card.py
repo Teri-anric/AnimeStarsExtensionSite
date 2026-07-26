@@ -216,13 +216,22 @@ class CardRepository(
         return total
 
     async def get_card_ids_by_deck_anime_id(self, anime_id: int) -> set[int]:
+        """Return snapshot-managed cards of a deck.
+
+        SSS cards are assigned to an anime deck for navigation, but are not
+        rendered in the source deck or included in its total.  They therefore
+        must not be treated as absent by a deck snapshot reconciliation.
+        """
         from ..models.animestars.deck import AnimestarsDeck
 
         async with self.session as session:
             rows = await session.scalars(
                 select(Card.card_id)
                 .join(AnimestarsDeck, Card.deck_id == AnimestarsDeck.id)
-                .where(AnimestarsDeck.anime_id == anime_id)
+                .where(
+                    AnimestarsDeck.anime_id == anime_id,
+                    Card.rank != CardType.SSS,
+                )
             )
             return set(rows.all())
 
