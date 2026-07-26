@@ -13,6 +13,7 @@ import {
   FQAPage
 } from './pages';
 import { DecksListPage, DeckDetailPage } from './pages/decks';
+import LabyrinthMapPage from './pages/labyrinth/LabyrinthMapPage';
 import Header from './components/Header';
 import ExtensionTokenModal from './components/ExtensionTokenModal';
 
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/card/:cardId" element={<CardDetailPage />} />
                 <Route path="/decks" element={<DecksListPage />} />
                 <Route path="/deck/:deck_id" element={<DeckDetailPage />} />
+                <Route path="/labyrinth" element={<LabyrinthMapPage />} />
                 <Route path="/settings/*" element={<SettingsPage />} />
                 <Route path="/admin/*" element={<AdminPage />} />
                 <Route path="/fqa" element={<FQAPage />} />

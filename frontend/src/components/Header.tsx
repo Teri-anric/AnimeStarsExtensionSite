@@ -21,6 +21,9 @@ const Header = () => {
         <NavLink to="/decks" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
           {t('navigation.decks')}
         </NavLink>
+        <NavLink to="/labyrinth" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+          {t('navigation.labyrinth')}
+        </NavLink>
         <NavLink to="/random-gif" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
           {t('navigation.randomGif')}
         </NavLink>
@@ -61,4 +64,4 @@ const Header = () => {
   );
 };
 
-export default Header; 
+export default Header;
