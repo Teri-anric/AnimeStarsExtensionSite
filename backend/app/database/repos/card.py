@@ -12,6 +12,10 @@ from typing import Iterable
 from collections import defaultdict
 from sqlalchemy import case, func, literal, or_, select, text, update, delete
 from sqlalchemy.dialects.postgresql import insert
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class CardRepository(
@@ -229,13 +233,22 @@ class CardRepository(
         deleted: list[dict],
     ) -> int:
         """Apply every queued card operation in one database transaction."""
+        logger.info("Card bulk: acquiring database transaction")
         async with self.auto_commit() as session:
+            logger.info("Card bulk: configuring database timeouts")
             await session.execute(
                 text(
                     "SET LOCAL lock_timeout = "
                     f"'{settings.card_bulk.database_lock_timeout_seconds}s'"
                 )
             )
+            await session.execute(
+                text(
+                    "SET LOCAL statement_timeout = "
+                    f"'{settings.card_bulk.database_statement_timeout_seconds}s'"
+                )
+            )
+            logger.info("Card bulk: applying database changes")
             total = 0
             delete_ids = [row["card_id"] for row in deleted if row.get("card_id")]
             if delete_ids:

@@ -73,6 +73,7 @@ class CardBulkSettings(BaseSettings):
     lock_ttl_seconds: int = 45
     flush_timeout_seconds: int = 30
     database_lock_timeout_seconds: int = 5
+    database_statement_timeout_seconds: int = 25
 
 
 class CardStatsCacheSettings(BaseSettings):
