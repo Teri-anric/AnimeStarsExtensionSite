@@ -234,7 +234,7 @@ const LabyrinthMapPage = () => {
                 </defs>
                 <rect className="labyrinth-grid" x={minX} y={minY} width={viewport.span} height={viewport.span} fill="url(#labyrinth-grid)" />
                 {rooms.map((room) => (
-                  <g className={`labyrinth-room${selectedRoom?.x === room.x && selectedRoom?.y === room.y ? ' is-selected' : ''}`} key={`${room.x}:${room.y}`} onClick={() => {
+                  <g className={`labyrinth-room${selectedRoom?.x === room.x && selectedRoom?.y === room.y ? ' is-selected' : ''}`} key={`${room.x}:${room.y}`} onPointerDown={(event) => event.stopPropagation()} onClick={() => {
                     if (dragMoved.current) {
                       dragMoved.current = false;
                       return;
