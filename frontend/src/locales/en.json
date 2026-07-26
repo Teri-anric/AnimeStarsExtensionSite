@@ -66,6 +66,7 @@
   },
   "labyrinth": {
     "title": "Labyrinth map",
+    "communityMap": "Community map",
     "description": "Rooms observed by extension users. Hover a cell to see its type and coordinates.",
     "loadError": "Failed to load the labyrinth map.",
     "observedRooms": "known rooms",
@@ -82,7 +83,10 @@
     "emission": "Emission",
     "mapLabel": "Labyrinth map",
     "coordinates": "X: {{x}}, Y: {{y}}",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "selectedRoom": "Selected room",
+    "selectRoom": "Click a known room on the map to see its details.",
+    "sources": "Observations: {{count}}"
   },
   "auth": {
     "login": "Login",
