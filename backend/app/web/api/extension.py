@@ -27,6 +27,8 @@ from app.web.schema.extension_api import (
     ExtensionLabyrinthBulkRoomsRequest,
     ExtensionLabyrinthBulkRoomsResponse,
     ExtensionLabyrinthMapResponse,
+    ExtensionLabyrinthRoomHistoryItem,
+    ExtensionLabyrinthRoomHistoryResponse,
     ExtensionLabyrinthRoomItem,
     ExtensionLabyrinthSummaryResponse,
     DeckRankHistogram,
@@ -308,6 +310,25 @@ async def extension_labyrinth_map_summary(
     labyrinth_repo: ExtensionLabyrinthRoomRepositoryDep,
 ) -> ExtensionLabyrinthSummaryResponse:
     return ExtensionLabyrinthSummaryResponse.model_validate(await labyrinth_repo.summary())
+
+
+@router.get("/labyrinth/rooms/{x}/{y}/history", response_model=ExtensionLabyrinthRoomHistoryResponse)
+async def extension_labyrinth_room_history(
+    x: int,
+    y: int,
+    labyrinth_repo: ExtensionLabyrinthRoomRepositoryDep,
+) -> ExtensionLabyrinthRoomHistoryResponse:
+    history = await labyrinth_repo.history(x=x, y=y)
+    return ExtensionLabyrinthRoomHistoryResponse(
+        history=[
+            ExtensionLabyrinthRoomHistoryItem(
+                event=item.event,
+                is_emission=item.is_emission,
+                created_at=item.created_at,
+            )
+            for item in history
+        ]
+    )
 
 
 @router.post("/labyrinth/rooms/bulk", response_model=ExtensionLabyrinthBulkRoomsResponse)

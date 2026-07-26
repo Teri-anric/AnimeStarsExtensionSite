@@ -86,7 +86,9 @@
     "unknown": "Unknown",
     "selectedRoom": "Selected room",
     "selectRoom": "Click a known room on the map to see its details.",
-    "sources": "Observations: {{count}}"
+    "sources": "Observations: {{count}}",
+    "history": "Room history",
+    "noHistory": "There is no history for this room yet."
   },
   "auth": {
     "login": "Login",

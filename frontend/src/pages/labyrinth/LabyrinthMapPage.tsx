@@ -24,6 +24,12 @@ type LabyrinthSummary = {
   events: Record<string, number>;
 };
 
+type LabyrinthRoomHistoryItem = {
+  event: string;
+  is_emission: boolean;
+  created_at: string;
+};
+
 type Viewport = { centerX: number; centerY: number; span: number };
 
 const MIN_SPAN = 24;
@@ -77,6 +83,8 @@ const LabyrinthMapPage = () => {
   const [viewport, setViewport] = useState<Viewport>({ centerX: 0, centerY: 0, span: 48 });
   const [rooms, setRooms] = useState<LabyrinthRoom[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<LabyrinthRoom | null>(null);
+  const [history, setHistory] = useState<LabyrinthRoomHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [mapLoading, setMapLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -125,6 +133,26 @@ const LabyrinthMapPage = () => {
     });
     return () => controller.abort();
   }, [summary, t, viewport]);
+
+  useEffect(() => {
+    if (!selectedRoom) {
+      setHistory([]);
+      return;
+    }
+    const controller = new AbortController();
+    setHistoryLoading(true);
+    axios.get<{ history: LabyrinthRoomHistoryItem[] }>(
+      apiUrl(`/api/extension/labyrinth/rooms/${selectedRoom.x}/${selectedRoom.y}/history`),
+      { signal: controller.signal },
+    ).then((response) => {
+      setHistory(response.data.history);
+    }).catch((requestError) => {
+      if (!axios.isCancel(requestError)) setHistory([]);
+    }).finally(() => {
+      if (!controller.signal.aborted) setHistoryLoading(false);
+    });
+    return () => controller.abort();
+  }, [selectedRoom]);
 
   const move = (x: number, y: number) => {
     const step = Math.max(1, Math.floor(viewport.span * 0.7));
@@ -200,7 +228,11 @@ const LabyrinthMapPage = () => {
               <svg className="labyrinth-map" viewBox={`${minX} ${minY} ${viewport.span} ${viewport.span}`} role="img" aria-label={t('labyrinth.mapLabel')} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerEnd} onPointerCancel={onPointerEnd} onWheel={onWheel}>
                 <defs>
                   <filter id="labyrinth-glow"><feGaussianBlur stdDeviation="0.11" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+                  <pattern id="labyrinth-grid" width="1" height="1" patternUnits="userSpaceOnUse">
+                    <path d="M 1 0 L 0 0 0 1" fill="none" stroke="rgba(255,255,255,.14)" strokeWidth="0.03" />
+                  </pattern>
                 </defs>
+                <rect className="labyrinth-grid" x={minX} y={minY} width={viewport.span} height={viewport.span} fill="url(#labyrinth-grid)" />
                 {rooms.map((room) => (
                   <g className={`labyrinth-room${selectedRoom?.x === room.x && selectedRoom?.y === room.y ? ' is-selected' : ''}`} key={`${room.x}:${room.y}`} onClick={() => {
                     if (dragMoved.current) {
@@ -227,6 +259,19 @@ const LabyrinthMapPage = () => {
                 <div className="labyrinth-event-title"><span style={{ color: eventColor(selectedRoom.event) }}>{eventIcon(selectedRoom.event)}</span> {selectedRoom.event ?? t('labyrinth.unknown')}</div>
                 <div className="labyrinth-event-text">{t('labyrinth.sources', { count: selectedRoom.sources_count })}</div>
                 {selectedRoom.emission_event && <div className="labyrinth-emission-card">⚡ <strong>{t('labyrinth.emission')}</strong><br />{selectedRoom.emission_event}</div>}
+                <div className="labyrinth-history">
+                  <div className="labyrinth-event-label">{t('labyrinth.history')}</div>
+                  {historyLoading ? <div className="labyrinth-history-empty">{t('common.loading')}</div> : history.length ? (
+                    <ol>
+                      {history.map((item, index) => (
+                        <li key={`${item.created_at}:${item.event}:${index}`}>
+                          <span className="labyrinth-history-icon" style={{ color: eventColor(item.event) }}>{item.is_emission ? '⚡' : eventIcon(item.event)}</span>
+                          <span><strong>{item.event}</strong>{item.is_emission && ` · ${t('labyrinth.emission')}`}<small>{new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(item.created_at))}</small></span>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : <div className="labyrinth-history-empty">{t('labyrinth.noHistory')}</div>}
+                </div>
               </> : <div className="labyrinth-event-text">{t('labyrinth.selectRoom')}</div>}
             </div>
 

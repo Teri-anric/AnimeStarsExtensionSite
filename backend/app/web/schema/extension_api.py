@@ -71,6 +71,16 @@ class ExtensionLabyrinthMapResponse(BaseSchema):
     rooms: list[ExtensionLabyrinthRoomItem]
 
 
+class ExtensionLabyrinthRoomHistoryItem(BaseSchema):
+    event: str
+    is_emission: bool
+    created_at: datetime
+
+
+class ExtensionLabyrinthRoomHistoryResponse(BaseSchema):
+    history: list[ExtensionLabyrinthRoomHistoryItem]
+
+
 class ExtensionLabyrinthSummaryResponse(BaseSchema):
     total_rooms: int
     min_x: int | None = None

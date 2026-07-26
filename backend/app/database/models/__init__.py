@@ -4,6 +4,7 @@ from .user import User, Token
 from .verification_code import VerificationCode
 from .extension_banner import ExtensionBanner
 from .extension_labyrinth_room import ExtensionLabyrinthRoom
+from .extension_labyrinth_room_history import ExtensionLabyrinthRoomHistory
 
 __all__ = [
     "Base",
@@ -13,4 +14,5 @@ __all__ = [
     "VerificationCode",
     "ExtensionBanner",
     "ExtensionLabyrinthRoom",
+    "ExtensionLabyrinthRoomHistory",
 ]
