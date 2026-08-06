@@ -59,5 +59,5 @@ async def add_card_users_stats(
     await repo.add_stats_and_update_current(normalized_events)
     return CardUsersStatsAddResponse(
         status="ok",
-        message=f"Added {len(request.stats)} card users stats",
+        message=f"Added {len(normalized_events)} card users stats",
     )
