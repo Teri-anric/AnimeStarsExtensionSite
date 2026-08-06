@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiClock } from 'react-icons/fi';
-import { CardUsersStatsSchema, CardStatsApi, CardCollection } from '../client';
+import { CardUsersStatsCurrentSchema, CardStatsApi, CardCollection } from '../client';
 import { useTranslation } from 'react-i18next';
 import { createAuthenticatedClient } from '../utils/apiClient';
 import { formatTimeAgo } from '../utils/dateUtils';
@@ -12,7 +12,7 @@ interface CardStatsDisplayProps {
 }
 
 const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className = '' }) => {
-  const [statsData, setStatsData] = useState<CardUsersStatsSchema[]>([]);
+  const [statsData, setStatsData] = useState<CardUsersStatsCurrentSchema[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const { t } = useTranslation();
@@ -28,7 +28,7 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
       setLoading(true);
       setError('');
       const cardStatsApi = createAuthenticatedClient(CardStatsApi);
-      
+
       const response = await cardStatsApi.getLastCardUsersStatsApiCardStatsLastGet(cardId);
       setStatsData(response.data || []);
     } catch (err) {
@@ -124,16 +124,16 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
           <span>{t('cardStatsDisplay.lastUpdated')}</span>
         </div>
       </div>
-      
+
       <div className="stats-grid">
         {statsData.map((stat) => (
-          <div key={`${stat.collection}-${stat.id}`} className="stat-item">
+          <div key={`${stat.card_id}-${stat.collection}`} className="stat-item">
             <div className="stat-header">
               <span className="stat-icon">{getCollectionIcon(stat.collection)}</span>
               <span className="stat-label">{getCollectionDisplayName(stat.collection)}</span>
             </div>
             <div className="stat-value">{stat.count}</div>
-            <div 
+            <div
               className="stat-freshness"
               style={{ color: getFreshnessColor(stat.updated_at) }}
             >
@@ -147,4 +147,4 @@ const CardStatsDisplay: React.FC<CardStatsDisplayProps> = ({ cardId, className =
   );
 };
 
-export default CardStatsDisplay; 
+export default CardStatsDisplay;

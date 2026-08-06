@@ -3,7 +3,7 @@ from .crud import CRUDRepository
 from .deck import DeckRepository
 from .pagination import PaginationRepository
 from app.config import settings
-from ..enum import CardType
+from ..enum import CardCollection, CardType
 from ..models.animestars.card import Card
 from ..models.animestars.card_users_stats import CardUsersStats
 from .base import BaseRepository
@@ -13,7 +13,6 @@ from collections import defaultdict
 from sqlalchemy import case, func, literal, or_, select, text, update, delete
 from sqlalchemy.dialects.postgresql import insert
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +65,39 @@ class CardRepository(
 
     async def get_by_card_id(self, card_id: int) -> Card | None:
         return await self.scalar(select(Card).where(Card.card_id == card_id))
+
+    async def get_current_stats(self, card_ids: list[int]) -> list[dict]:
+        if not card_ids:
+            return []
+        cards = await self.scalars(select(Card).where(Card.card_id.in_(set(card_ids))))
+        by_id = {card.card_id: card for card in cards}
+        result = []
+        fields = (
+            (CardCollection.TRADE, "trade_count", "trade_updated_at"),
+            (CardCollection.NEED, "need_count", "need_updated_at"),
+            (CardCollection.OWNED, "owned_count", "owned_updated_at"),
+            (
+                CardCollection.UNLOCKED_OWNED,
+                "unlocked_owned_count",
+                "unlocked_owned_updated_at",
+            ),
+        )
+        for card_id in card_ids:
+            card = by_id.get(card_id)
+            if card is None:
+                continue
+            for collection, count_field, timestamp_field in fields:
+                count = getattr(card, count_field)
+                if count is not None:
+                    result.append(
+                        {
+                            "card_id": card_id,
+                            "collection": collection,
+                            "count": count,
+                            "updated_at": getattr(card, timestamp_field),
+                        }
+                    )
+        return result
 
     async def get_by_ident(self, ident: int | UUID) -> Card | None:
         if isinstance(ident, int):
@@ -138,8 +170,10 @@ class CardRepository(
             # Deck sync submits a complete snapshot repeatedly. Avoid rewriting
             # unchanged cards and creating needless row versions.
             where=or_(
-                *(getattr(Card, field).is_distinct_from(getattr(stmt.excluded, field))
-                  for field in update_fields)
+                *(
+                    getattr(Card, field).is_distinct_from(getattr(stmt.excluded, field))
+                    for field in update_fields
+                )
             ),
         )
         result = await session.execute(stmt)
@@ -161,11 +195,23 @@ class CardRepository(
             return 0
 
         async with self.auto_commit() as session:
-            return await self._partial_update_by_card_id_bulk_in_session(session, all_cards)
+            return await self._partial_update_by_card_id_bulk_in_session(
+                session, all_cards
+            )
 
-    async def _partial_update_by_card_id_bulk_in_session(self, session, all_cards: list[dict]) -> int:
+    async def _partial_update_by_card_id_bulk_in_session(
+        self, session, all_cards: list[dict]
+    ) -> int:
         _updatable = {
-            "name", "rank", "anime_name", "anime_link", "deck_id", "author", "image", "mp4", "webm",
+            "name",
+            "rank",
+            "anime_name",
+            "anime_link",
+            "deck_id",
+            "author",
+            "image",
+            "mp4",
+            "webm",
         }
         if not all_cards:
             return 0
@@ -174,7 +220,9 @@ class CardRepository(
             ids = [d["card_id"] for d in need_deck]
             existing_by_id = {
                 c.card_id: c
-                for c in (await session.scalars(select(Card).where(Card.card_id.in_(ids)))).all()
+                for c in (
+                    await session.scalars(select(Card).where(Card.card_id.in_(ids)))
+                ).all()
             }
             for d in need_deck:
                 ex = existing_by_id.get(d["card_id"])
@@ -188,7 +236,9 @@ class CardRepository(
                     d["deck_id"] = deck_by_card_id[d["card_id"]]
         need_author = [d for d in all_cards if "author" in d]
         if need_author:
-            await AnimestarsUserRepo.ensure_authors_for_card_payloads(session, need_author)
+            await AnimestarsUserRepo.ensure_authors_for_card_payloads(
+                session, need_author
+            )
         groups: dict[frozenset, list[dict]] = defaultdict(list)
         for d in all_cards:
             key = frozenset(k for k in d if k != "card_id" and k in _updatable)
@@ -207,7 +257,9 @@ class CardRepository(
                         value = literal(value, type_=Card.deck_id.type)
                     whens.append((Card.card_id == cid, value))
                 set_clause[field] = (
-                    case(*whens, else_=Card.deck_id) if field == "deck_id" else case(*whens)
+                    case(*whens, else_=Card.deck_id)
+                    if field == "deck_id"
+                    else case(*whens)
                 )
             result = await session.execute(
                 update(Card).where(Card.card_id.in_(card_ids)).values(**set_clause)
@@ -261,11 +313,17 @@ class CardRepository(
             total = 0
             delete_ids = [row["card_id"] for row in deleted if row.get("card_id")]
             if delete_ids:
-                await session.execute(delete(CardUsersStats).where(CardUsersStats.card_id.in_(delete_ids)))
-                result = await session.execute(delete(Card).where(Card.card_id.in_(delete_ids)))
+                await session.execute(
+                    delete(CardUsersStats).where(CardUsersStats.card_id.in_(delete_ids))
+                )
+                result = await session.execute(
+                    delete(Card).where(Card.card_id.in_(delete_ids))
+                )
                 total += result.rowcount
             total = await self._upsert_bulk_in_session(session, full_upserts)
-            total += await self._partial_update_by_card_id_bulk_in_session(session, partial_updates)
+            total += await self._partial_update_by_card_id_bulk_in_session(
+                session, partial_updates
+            )
             return total
 
     async def get_card_ids_by_image_paths(self, paths: list[str]) -> dict[str, int]:

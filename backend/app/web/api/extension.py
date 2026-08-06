@@ -10,13 +10,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import HTMLResponse
 
 from app.database.enum import CardCollection
-from app.database.models.animestars.card_users_stats import CardUsersStats
 from app.database.repos.user import TokenRepository
 from app.web.auth.deps import UserDep
 from app.web.deps import (
     CardRepositoryDep,
-    CardStatsCacheServiceDep,
-    CardUsersStatsRepositoryDep,
     ExtensionBannerRepositoryDep,
     ExtensionCardImageCacheServiceDep,
     ExtensionLabyrinthRoomRepositoryDep,
@@ -43,16 +40,12 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/extension", tags=["extension"])
 
 
-def _owner_item_from_stats(
+def _owner_item_from_current(
     card_id: int,
-    stats_for_card: list[CardUsersStats],
+    stats_for_card: list[dict],
     include_unlocked: bool,
 ) -> ExtensionOwnerCountsLastItem:
-    by_col: dict[CardCollection, CardUsersStats] = {}
-    for s in stats_for_card:
-        cur = by_col.get(s.collection)
-        if cur is None or s.created_at >= cur.created_at:
-            by_col[s.collection] = s
+    by_col = {stat["collection"]: stat for stat in stats_for_card}
 
     need = by_col.get(CardCollection.NEED)
     owned = by_col.get(CardCollection.OWNED)
@@ -61,17 +54,17 @@ def _owner_item_from_stats(
 
     item = ExtensionOwnerCountsLastItem(card_id=card_id)
     if need is not None:
-        item.need = need.count
-        item.need_updated_at = need.updated_at
+        item.need = need["count"]
+        item.need_updated_at = need["updated_at"]
     if owned is not None:
-        item.owner = owned.count
-        item.owner_updated_at = owned.updated_at
+        item.owner = owned["count"]
+        item.owner_updated_at = owned["updated_at"]
     if trade is not None:
-        item.trade = trade.count
-        item.trade_updated_at = trade.updated_at
+        item.trade = trade["count"]
+        item.trade_updated_at = trade["updated_at"]
     if include_unlocked and unlocked_s is not None:
-        item.unlocked = unlocked_s.count
-        item.unlocked_updated_at = unlocked_s.updated_at
+        item.unlocked = unlocked_s["count"]
+        item.unlocked_updated_at = unlocked_s["updated_at"]
     return item
 
 
@@ -191,7 +184,9 @@ async def get_extension_token(
         ) from e
 
 
-@router.post("/cards/by-image-paths", response_model=list[ExtensionCardImageResolveItem])
+@router.post(
+    "/cards/by-image-paths", response_model=list[ExtensionCardImageResolveItem]
+)
 async def extension_cards_by_image_paths(
     body: ExtensionCardsByImagePathsRequest,
     card_repo: CardRepositoryDep,
@@ -199,7 +194,9 @@ async def extension_cards_by_image_paths(
 ) -> list[ExtensionCardImageResolveItem]:
     """Resolve `card_id` from stored image paths (Redis + DB)."""
     resolved = await img_cache.resolve_images(card_repo, body.images)
-    return [ExtensionCardImageResolveItem(image=img, card_id=cid) for img, cid in resolved]
+    return [
+        ExtensionCardImageResolveItem(image=img, card_id=cid) for img, cid in resolved
+    ]
 
 
 @router.post(
@@ -222,16 +219,15 @@ async def extension_deck_rank_counts(
 )
 async def extension_owner_counts_last_bulk_post(
     body: ExtensionOwnerCountsBulkBody,
-    stats_repo: CardUsersStatsRepositoryDep,
-    cache_service: CardStatsCacheServiceDep,
+    card_repo: CardRepositoryDep,
 ) -> list[ExtensionOwnerCountsLastItem]:
     """Same as GET bulk when the ID list is too long for a query string."""
-    stats = await cache_service.get_last_bulk(stats_repo, body.card_ids)
-    by_card: dict[int, list[CardUsersStats]] = defaultdict(list)
-    for s in stats:
-        by_card[s.card_id].append(s)
+    stats = await card_repo.get_current_stats(body.card_ids)
+    by_card: dict[int, list[dict]] = defaultdict(list)
+    for stat in stats:
+        by_card[stat["card_id"]].append(stat)
     return [
-        _owner_item_from_stats(cid, by_card.get(cid, []), body.unlocked)
+        _owner_item_from_current(cid, by_card.get(cid, []), body.unlocked)
         for cid in body.card_ids
     ]
 
@@ -256,7 +252,9 @@ async def extension_banner_iframe(
 ) -> HTMLResponse:
     banner = await banner_repo.get_or_create()
     if not banner.is_active:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Banner is not active")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Banner is not active"
+        )
     config = ExtensionBannerConfigResponse(
         title=banner.title,
         message=banner.message,
@@ -277,9 +275,13 @@ async def extension_labyrinth_map(
     updated_after: datetime | None = None,
 ) -> ExtensionLabyrinthMapResponse:
     if min_x > max_x or min_y > max_y:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid bounds")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid bounds"
+        )
     if (max_x - min_x + 1) * (max_y - min_y + 1) > 20000:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bounds are too large")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Bounds are too large"
+        )
 
     rooms = await labyrinth_repo.list_map(
         min_x=min_x,
@@ -309,10 +311,15 @@ async def extension_labyrinth_map(
 async def extension_labyrinth_map_summary(
     labyrinth_repo: ExtensionLabyrinthRoomRepositoryDep,
 ) -> ExtensionLabyrinthSummaryResponse:
-    return ExtensionLabyrinthSummaryResponse.model_validate(await labyrinth_repo.summary())
+    return ExtensionLabyrinthSummaryResponse.model_validate(
+        await labyrinth_repo.summary()
+    )
 
 
-@router.get("/labyrinth/rooms/{x}/{y}/history", response_model=ExtensionLabyrinthRoomHistoryResponse)
+@router.get(
+    "/labyrinth/rooms/{x}/{y}/history",
+    response_model=ExtensionLabyrinthRoomHistoryResponse,
+)
 async def extension_labyrinth_room_history(
     x: int,
     y: int,
@@ -331,7 +338,9 @@ async def extension_labyrinth_room_history(
     )
 
 
-@router.post("/labyrinth/rooms/bulk", response_model=ExtensionLabyrinthBulkRoomsResponse)
+@router.post(
+    "/labyrinth/rooms/bulk", response_model=ExtensionLabyrinthBulkRoomsResponse
+)
 async def extension_labyrinth_rooms_bulk(
     body: ExtensionLabyrinthBulkRoomsRequest,
     labyrinth_repo: ExtensionLabyrinthRoomRepositoryDep,

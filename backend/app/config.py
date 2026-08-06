@@ -76,8 +76,7 @@ class CardBulkSettings(BaseSettings):
     database_statement_timeout_seconds: int = 25
 
 
-class CardStatsCacheSettings(BaseSettings):
-    key_prefix: str = "card_stats:last"
+class CacheSettings(BaseSettings):
     ttl_seconds: int = 2_880_000  # 800 hours
 
 
@@ -98,7 +97,7 @@ class Settings(BaseSettings):
     db_metrics_pg_stats: bool = True
     redis: RedisSettings = Field(default_factory=RedisSettings)
     card_bulk: CardBulkSettings = Field(default_factory=CardBulkSettings)
-    card_stats_cache: CardStatsCacheSettings = Field(default_factory=CardStatsCacheSettings)
+    cache: CacheSettings = Field(default_factory=CacheSettings)
     admin_username: str = "Teri"
 
 

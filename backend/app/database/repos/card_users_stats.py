@@ -1,6 +1,8 @@
 from uuid import UUID
-from sqlalchemy import select, text, bindparam, ARRAY, Integer
+from sqlalchemy import select, text, bindparam, Integer, case, update
 from ..models.animestars.card_users_stats import CardUsersStats
+from ..models.animestars.card import Card
+from ..enum import CardCollection
 from .base import BaseRepository
 from .crud import CRUDRepository
 from .pagination import PaginationRepository
@@ -19,45 +21,94 @@ class CardUsersStatsRepository(
     def entry_code(self) -> str:
         return "card_users_stats"
 
-    async def get_last_card_users_stats(
-        self, card_id: int
-    ) -> list[CardUsersStats]:        
-        results = await self.scalars(
-            select(
-                CardUsersStats
-            )
-            .where(
-                CardUsersStats.card_id == card_id
-            )
-            .order_by(CardUsersStats.collection, CardUsersStats.created_at.desc())
-            .distinct(CardUsersStats.collection)
-        )
-        return results
+    async def add_stats_and_update_current(self, events: list[dict]) -> None:
+        """Append the batch and atomically advance each card's current snapshot."""
+        if not events:
+            return
+        latest: dict[tuple[int, CardCollection], dict] = {}
+        for event in events:
+            key = (event["card_id"], event["collection"])
+            previous = latest.get(key)
+            if previous is None or event["created_at"] >= previous["created_at"]:
+                latest[key] = event
+        normalized = list(latest.values())
+        card_ids = sorted({event["card_id"] for event in normalized})
 
-    # Optimized query: LATERAL per (card_id, collection) → 160 index seeks vs full scan
-    # Benchmark: ~3ms vs ~670ms (239x) for a 40-card batch
-    _BULK_SQL = text("""
-        SELECT s.*
-        FROM unnest(:card_ids) AS c(cid)
-        CROSS JOIN unnest(ARRAY['NEED','OWNED','TRADE','UNLOCKED_OWNED']::card_collection[]) AS col(coll)
-        CROSS JOIN LATERAL (
-            SELECT *
-            FROM animestars_card_users_stats
-            WHERE card_id = c.cid AND collection = col.coll
-            ORDER BY created_at DESC
-            LIMIT 1
-        ) s
-    """).bindparams(bindparam("card_ids", type_=ARRAY(Integer)))
+        async with self.auto_commit() as session:
+            cards = list(
+                (
+                    await session.scalars(
+                        select(Card)
+                        .where(Card.card_id.in_(card_ids))
+                        .order_by(Card.card_id)
+                        .with_for_update()
+                    )
+                ).all()
+            )
+            found = {card.card_id for card in cards}
+            missing = sorted(set(card_ids) - found)
+            if missing:
+                raise ValueError(f"Unknown card_id(s): {missing}")
 
-    async def get_last_card_users_stats_bulk(
-        self, card_ids: list[int]
-    ) -> list[CardUsersStats]:
-        if not card_ids:
-            return []
-        stmt = select(CardUsersStats).from_statement(self._BULK_SQL)
-        async with self.session as session:
-            result = await session.execute(stmt, {"card_ids": card_ids})
-            return list(result.scalars().all())
+            session.add_all(
+                CardUsersStats(owner_id=None, **event) for event in normalized
+            )
+
+            values = {}
+            for collection, count_field, timestamp_field in (
+                (CardCollection.TRADE, Card.trade_count, Card.trade_updated_at),
+                (CardCollection.NEED, Card.need_count, Card.need_updated_at),
+                (CardCollection.OWNED, Card.owned_count, Card.owned_updated_at),
+                (
+                    CardCollection.UNLOCKED_OWNED,
+                    Card.unlocked_owned_count,
+                    Card.unlocked_owned_updated_at,
+                ),
+            ):
+                collection_events = {
+                    event["card_id"]: event
+                    for event in normalized
+                    if event["collection"] == collection
+                }
+                if not collection_events:
+                    continue
+                values[count_field] = case(
+                    *(
+                        (
+                            Card.card_id == card_id,
+                            case(
+                                (timestamp_field.is_(None), event["count"]),
+                                (
+                                    timestamp_field <= event["created_at"],
+                                    event["count"],
+                                ),
+                                else_=count_field,
+                            ),
+                        )
+                        for card_id, event in collection_events.items()
+                    ),
+                    else_=count_field,
+                )
+                values[timestamp_field] = case(
+                    *(
+                        (
+                            Card.card_id == card_id,
+                            case(
+                                (timestamp_field.is_(None), event["created_at"]),
+                                (
+                                    timestamp_field <= event["created_at"],
+                                    event["created_at"],
+                                ),
+                                else_=timestamp_field,
+                            ),
+                        )
+                        for card_id, event in collection_events.items()
+                    ),
+                    else_=timestamp_field,
+                )
+            await session.execute(
+                update(Card).where(Card.card_id.in_(card_ids)).values(values)
+            )
 
     async def aggregate_stats_per_second(self, older_than_days: int = 7) -> int:
         """
@@ -68,8 +119,7 @@ class CardUsersStatsRepository(
         every old row, competed with the card flush for locks, and raw SQL did
         not have an ORM-generated UUID for the replacement row.
         """
-        sql = text(
-            """
+        sql = text("""
             WITH ranked AS (
                 SELECT
                     id,
@@ -109,8 +159,7 @@ class CardUsersStatsRepository(
             )
             SELECT
                 (SELECT count(*) FROM updated) + (SELECT count(*) FROM deleted) AS affected;
-            """
-        ).bindparams(bindparam("days", type_=Integer))
+            """).bindparams(bindparam("days", type_=Integer))
 
         async with self.auto_commit() as session:
             result = await session.execute(sql, {"days": older_than_days})

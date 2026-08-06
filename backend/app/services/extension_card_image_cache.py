@@ -14,7 +14,7 @@ class ExtensionCardImageCacheService:
 
     def __init__(self) -> None:
         self._key_prefix = "extension:card_image"
-        self._ttl_seconds = settings.card_stats_cache.ttl_seconds
+        self._ttl_seconds = settings.cache.ttl_seconds
 
     def _key(self, normalized_path: str) -> str:
         return f"{self._key_prefix}:{normalized_path}"

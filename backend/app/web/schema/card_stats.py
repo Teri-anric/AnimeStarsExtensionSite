@@ -5,7 +5,14 @@ from typing import Literal
 from ...database.enum import CardCollection
 from .pagination import BasePaginationQuery, BasePaginationResponse
 from uuid import UUID
-from ...filters import BaseFilter, UUIDEntryFilter, IntegerEntryFilter, EnumEntryFilter, DateTimeEntryFilter
+from ...filters import (
+    BaseFilter,
+    UUIDEntryFilter,
+    IntegerEntryFilter,
+    EnumEntryFilter,
+    DateTimeEntryFilter,
+)
+
 
 class CardUsersStatsSchema(BaseSchema):
     id: UUID
@@ -16,23 +23,37 @@ class CardUsersStatsSchema(BaseSchema):
     updated_at: datetime
 
 
+class CardUsersStatsCurrentSchema(BaseSchema):
+    card_id: int
+    collection: CardCollection
+    count: int
+    updated_at: datetime
+
+
 class CardUsersStatsAddSchema(BaseSchema):
     card_id: int
     collection: CardCollection
     count: int
     created_at: datetime = Field(default_factory=datetime.now, le=datetime.now())
 
+
 class CardUsersStatsAddRequest(BaseSchema):
     stats: list[CardUsersStatsAddSchema]
+
 
 class CardUsersStatsAddResponse(BaseSchema):
     status: Literal["ok", "error"]
     message: str | None = None
 
-CardUsersStatsSort = Literal["id", "card_id", "collection", "count", "created_at", "updated_at"] 
+
+CardUsersStatsSort = Literal[
+    "id", "card_id", "collection", "count", "created_at", "updated_at"
+]
+
 
 class CardUsersStatsFilter(BaseFilter):
     """Filter schema for CardUsersStats model"""
+
     id: UUIDEntryFilter | None = None
     card_id: IntegerEntryFilter | None = None
     collection: EnumEntryFilter[CardCollection] | None = None
@@ -41,8 +62,11 @@ class CardUsersStatsFilter(BaseFilter):
     updated_at: DateTimeEntryFilter | None = None
 
 
-class CardUsersStatsQuery(BasePaginationQuery[CardUsersStatsFilter, CardUsersStatsSort]):
+class CardUsersStatsQuery(
+    BasePaginationQuery[CardUsersStatsFilter, CardUsersStatsSort]
+):
     pass
+
 
 class CardUsersStatsResponse(BasePaginationResponse[CardUsersStatsSchema]):
     items: list[CardUsersStatsSchema]

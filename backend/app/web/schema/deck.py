@@ -5,7 +5,13 @@ from typing import List, Literal
 from .card import CardSchema, CardFilter
 from .base import BaseSchema
 from .pagination import BasePaginationResponse, BasePaginationQuery
-from app.filters.types import ArrayEntryFilter, StringFilter, IntFilter, BaseFilter, UUIDEntryFilter
+from app.filters.types import (
+    ArrayEntryFilter,
+    StringFilter,
+    IntFilter,
+    BaseFilter,
+    UUIDEntryFilter,
+)
 
 
 class DeckSummarySchema(BaseSchema):
@@ -14,6 +20,7 @@ class DeckSummarySchema(BaseSchema):
     id: UUID
     anime_name: str
     anime_link: str | None = None
+    card_count: int = 0
     cards: List[CardSchema] = Field(default_factory=list)
 
 
