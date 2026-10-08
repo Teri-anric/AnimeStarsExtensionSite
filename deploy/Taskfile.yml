@@ -1,0 +1,120 @@
+version: "3"
+
+vars:
+  TF_ROOT: ./terraform
+  TAG:
+    sh: |
+      if [[ -n "${IMAGE_TAG:-}" ]]; then
+        echo "${IMAGE_TAG}"
+      else
+        git rev-parse --short HEAD
+      fi
+
+tasks:
+  tf:cli:
+    desc: Run Terraform with the explicit K3s kubeconfig and context
+    cmds:
+      - |
+        set -euo pipefail
+        if [[ -z "{{.CLI_ARGS}}" ]]; then
+          echo "Usage: task tf:cli -- <terraform arguments>" >&2
+          exit 2
+        fi
+        ./scripts/terraform.sh {{.CLI_ARGS}}
+
+  tf:fmt:
+    desc: Format AnimeStarsExtensionSite Terraform files
+    cmds: ["terraform fmt -recursive {{.TF_ROOT}}"]
+
+  tf:validate:
+    desc: Validate Terraform and dashboard assets without connecting to K3s
+    cmds: ["./scripts/validate.sh"]
+
+  prod:tf:init:
+    desc: Initialize the dedicated remote state key for this application
+    cmds:
+      - |
+        set -euo pipefail
+        test -f "{{.TF_ROOT}}/backend.hcl" || { echo "Copy backend.hcl.example to backend.hcl and configure S3 credentials first." >&2; exit 2; }
+        ./scripts/terraform.sh init -input=false -backend-config=backend.hcl
+
+  prod:tf:import:
+    desc: Import all existing app-owned Kubernetes resources into this project's Terraform state (one time)
+    cmds: ["./scripts/prod-tf-import.sh"]
+
+  prod:tf:plan:
+    desc: Save and display a plan for all app-owned Kubernetes resources
+    deps: [prod:tf:init]
+    cmds: ["./scripts/prod-plan.sh"]
+
+  prod:tf:apply:
+    desc: Apply only the saved, reviewed Terraform plan
+    deps: [prod:tf:init]
+    cmds: ["./scripts/prod-apply.sh"]
+
+  prod:push:
+    desc: Build backend and frontend, then push both through the SSH-forwarded s1 registry
+    cmds:
+      - IMAGE_TAG="{{.TAG}}" ./scripts/prod-push.sh
+
+  prod:apply:
+    desc: Apply app-owned Kubernetes resources through Terraform (interactive approval)
+    deps: [prod:tf:init]
+    cmds:
+      - IMAGE_TAG="{{.TAG}}" ./scripts/prod-deploy.sh
+
+  prod:deploy:
+    desc: Build/push both images, then apply the app through Terraform
+    cmds:
+      - task: prod:push
+      - task: prod:apply
+
+  prod:destroy:
+    desc: Destroy app-owned Kubernetes resources through Terraform; retained host data stays on s0
+    deps: [prod:tf:init]
+    cmds:
+      - |
+        set -euo pipefail
+        test -f "{{.TF_ROOT}}/terraform.tfvars" || { echo "{{.TF_ROOT}}/terraform.tfvars is required for the app Terraform configuration." >&2; exit 2; }
+        ./scripts/terraform.sh destroy
+
+  prod:status:
+    desc: Show app workloads, services, PV/PVC, and Traefik route in K3s
+    cmds:
+      - |
+        set -euo pipefail
+        kubeconfig_path="${KUBECONFIG_PATH:-$HOME/.kube/k3s-s1.yaml}"
+        case "$kubeconfig_path" in
+          "~/"*) kubeconfig_path="$HOME/${kubeconfig_path#\~/}" ;;
+          "~") kubeconfig_path="$HOME" ;;
+        esac
+        kubectl --kubeconfig "$kubeconfig_path" --context "${KUBE_CONTEXT:-k3s}" -n animestars-extension-site get deployments,statefulsets,jobs,services,pvc,ingressroutes.traefik.io
+        kubectl --kubeconfig "$kubeconfig_path" --context "${KUBE_CONTEXT:-k3s}" get pv animestars-extension-site-postgres-s0 animestars-extension-site-postgres-restore-s0
+
+  prod:logs:
+    desc: Follow logs from a selected site workload (default backend)
+    vars:
+      TARGET: { sh: 'echo "${PROD_LOG_TARGET:-deployment/backend}"' }
+      TAIL: { sh: 'echo "${PROD_LOG_TAIL:-200}"' }
+    cmds:
+      - |
+        set -euo pipefail
+        kubeconfig_path="${KUBECONFIG_PATH:-$HOME/.kube/k3s-s1.yaml}"
+        case "$kubeconfig_path" in
+          "~/"*) kubeconfig_path="$HOME/${kubeconfig_path#\~/}" ;;
+          "~") kubeconfig_path="$HOME" ;;
+        esac
+        kubectl --kubeconfig "$kubeconfig_path" --context "${KUBE_CONTEXT:-k3s}" -n animestars-extension-site logs -f "{{.TARGET}}" --tail "{{.TAIL}}"
+
+  prod:ctl:
+    desc: Run kubectl scoped to the AnimeStarsExtensionSite namespace
+    cmds:
+      - |
+        set -euo pipefail
+        kubeconfig_path="${KUBECONFIG_PATH:-$HOME/.kube/k3s-s1.yaml}"
+        case "$kubeconfig_path" in
+          "~/"*) kubeconfig_path="$HOME/${kubeconfig_path#\~/}" ;;
+          "~") kubeconfig_path="$HOME" ;;
+        esac
+        [[ -n "{{.CLI_ARGS}}" ]] || { echo "Usage: task prod:ctl -- <kubectl arguments>" >&2; exit 2; }
+        exec kubectl --kubeconfig "$kubeconfig_path" --context "${KUBE_CONTEXT:-k3s}" -n animestars-extension-site {{.CLI_ARGS}}

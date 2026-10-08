@@ -10,8 +10,8 @@ Welcome!  This document gives both human contributors and code-generation agents
 |------|---------|
 | `backend/` | Python backend (FastAPI), DB models, migrations, scheduled tasks |
 | `frontend/` | React + Vite SPA that consumes the backend OpenAPI |
-| `docker/`, `docker-compose*.yaml` | Local dev & production container definitions |
-| `caddy/` | Caddy web-server config used in production |
+| `docker/` | Local development Compose stack, environment files, and container build files |
+| `deploy/` | Kubernetes production manifests, Terraform-owned app infrastructure, and manual deployment tooling |
 
 Key entry points:
 * **API** – `backend/app/web/main.py` (FastAPI app)
@@ -24,13 +24,15 @@ When adding or editing code, stay inside the relevant folder and keep the existi
 
 ## Dev Environment
 
-1. **Prerequisites**  
-   * Docker & Docker Compose (preferred) **or**  
+1. **Prerequisites**
+   * Docker & Docker Compose (preferred) **or**
    * Python 3.11 + Node 18
-2. **Spin-up with Docker (recommended)**
+2. **Spin up the local development stack with Docker**
    ```bash
-   make up  # builds & starts the full stack on http://localhost:8000
+   cp docker/.env.example docker/.env
+   task dev:up  # builds & starts the local stack on http://localhost:8000
    ```
+   Compose runs only the local application services. Production observability is managed by the shared K3s infrastructure.
 3. **Manual setup**
    ```bash
    # backend
@@ -51,24 +53,29 @@ When adding or editing code, stay inside the relevant folder and keep the existi
 
 | Area | Formatter / Linter | How to run |
 |------|--------------------|-----------|
-| Python | black, isort, flake8, mypy | `make black` |
+| Python | black, isort, flake8, mypy | `python -m black backend` |
 | SQL   | sqlfluff (coming soon) |  |
 | TypeScript/JS | ESLint, TypeScript | `cd frontend && npm run lint` |
 | CSS | Stylelint (via ESLint) | |
 
-CI enforces the same tooling, so run the commands locally before opening a PR.
+Run the relevant tooling locally before opening a PR.
 
 ---
 
 ## Testing & Validation
 
-* **Python** – `pytest` lives under `backend/`  
-  Run: `make test` or `pytest backend`
-* **Frontend** – Vitest unit tests (configuration in progress)  
+* **Python** – `pytest` lives under `backend/`
+  Run: `python -m pytest backend`
+* **Frontend** – Vitest unit tests (configuration in progress)
   Run: `cd frontend && npm run test`
 * **End-to-end** – (WIP) Playwright tests under `e2e/`
 
 All tests plus type & lint checks must pass before merge.
+
+Production runs on the existing K3s cluster. Use `Taskfile.yml` and the
+`deploy/` scripts for manual releases; production is not deployed from GitHub
+Actions. Shared Traefik, registry, Prometheus, Loki, and Grafana resources are
+managed by the cluster infrastructure project, not by this repository.
 
 ---
 
@@ -88,9 +95,9 @@ npm run generate-api-client-local
 
 ## Database Migrations
 
-1. Generate: `make migration-autogenerate`
-2. Apply: `make migration-upgrade`
-3. Rollback: `make migration-down`
+1. Generate: `docker compose --env-file docker/.env -f docker/docker-compose.yaml run --rm backend python -m alembic revision --autogenerate`
+2. Apply: `task dev:migrate`
+3. Rollback: `docker compose --env-file docker/.env -f docker/docker-compose.yaml run --rm backend python -m alembic downgrade -1`
 
 ---
 
@@ -112,15 +119,15 @@ When generating code or docs:
 2. Generate **small, incremental edits** with clear intent – one logical change per commit.
 3. Use `backend/` or `frontend/` context to decide where to place new code.
 4. Update or add tests when you change behaviour.
-5. Never break CI – run `make black` and other relevant checks before merge.
+5. Never break CI – run `python -m black backend` and other relevant checks before merge.
 
 ---
 
 ## FAQ / Tips
 
-* Need to inspect the DB?  Use `make logs` to view container logs or `make psql` to access the database.
+* Need to inspect local services? Use `task dev:logs` to follow Compose logs.
 * To create a new scheduled task, add it to `backend/app/scheduler/tasks.py` and import in `scheduler.py`.
 * Static assets live in `frontend/public/` – reference them with `/assets/...` in code.
 * To regenerate the API client, use the npm scripts mentioned in the API Client Generation section.
 
-Happy coding! :tada: 
+Happy coding! :tada:

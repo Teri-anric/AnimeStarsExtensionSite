@@ -87,9 +87,9 @@ class Settings(BaseSettings):
     parser: ParserSettings = Field(default_factory=ParserSettings)
     pm: PMSettings = Field(default_factory=PMSettings)
     auth: AuthSettings = Field(default_factory=AuthSettings)
-    # LOG_JSON — one JSON object per line (uvicorn, app loggers, http audit). See .env.exemple.
+    # LOG_JSON — one JSON object per line (uvicorn, app loggers, http audit). See docker/.env.example.
     log_json: bool = True
-    # LOG_HTTP_BODIES / LOG_HTTP_BODY_MAX_BYTES — see .env.exemple (security-sensitive)
+    # LOG_HTTP_BODIES / LOG_HTTP_BODY_MAX_BYTES — see docker/.env.example (security-sensitive)
     log_http_bodies: bool = False
     log_http_body_max_bytes: int = Field(default=4096, ge=256, le=1_048_576)
     # SQLAlchemy / Postgres metrics → Prometheus (/metrics) for Grafana

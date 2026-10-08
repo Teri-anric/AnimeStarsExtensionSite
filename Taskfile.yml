@@ -1,0 +1,45 @@
+version: "3"
+
+includes:
+  deploy:
+    taskfile: ./deploy/Taskfile.yml
+    dir: ./deploy
+    flatten: true
+
+tasks:
+  default:
+    cmds: ["task -l"]
+
+  dev:config:
+    desc: Validate the local development Compose configuration
+    cmds: ["docker compose --env-file docker/.env -f docker/docker-compose.yaml config --quiet"]
+
+  dev:build:
+    desc: Build the local development images
+    cmds: ["docker compose --env-file docker/.env -f docker/docker-compose.yaml build"]
+
+  dev:up:
+    desc: Build and start the local development stack
+    cmds: ["docker compose --env-file docker/.env -f docker/docker-compose.yaml up --build -d"]
+
+  dev:down:
+    desc: Stop the local development stack
+    cmds: ["docker compose --env-file docker/.env -f docker/docker-compose.yaml down"]
+
+  dev:restart:
+    desc: Recreate the local development stack
+    cmds:
+      - task: dev:down
+      - task: dev:up
+
+  dev:logs:
+    desc: Follow logs from local development services
+    cmds: ["docker compose --env-file docker/.env -f docker/docker-compose.yaml logs -f {{.CLI_ARGS}}"]
+
+  dev:ps:
+    desc: Show local development service status
+    cmds: ["docker compose --env-file docker/.env -f docker/docker-compose.yaml ps"]
+
+  dev:migrate:
+    desc: Apply Alembic migrations to the local development database
+    cmds: ["docker compose --env-file docker/.env -f docker/docker-compose.yaml run --build --rm backend python -m alembic upgrade head"]

@@ -1,0 +1,18 @@
+# Authorized workstation kubeconfig for the existing s1 K3s cluster.
+kubeconfig_path = "~/.kube/k3s-s1.yaml"
+kube_context    = "k3s"
+
+# The PostgreSQL PVs are node-local and Retain. These are Kubernetes capacity
+# declarations only; they do not resize or reserve host disk space.
+node_name               = "s0.teri"
+preserved_database_path = "/root/Teri-anric/AnimeStarsExtensionSite/db"
+kubernetes_database_path = "/root/Teri-anric/AnimeStarsExtensionSite/db-k8s"
+volume_capacity         = "10Gi"
+
+# Replace these placeholders with the live Secret values in an ignored local
+# terraform.tfvars file. This Secret's values are stored in remote TF state.
+runtime_secret_data = {
+  DATABASE__USER     = "REPLACE_WITH_LIVE_VALUE"
+  DATABASE__PASSWORD = "REPLACE_WITH_LIVE_VALUE"
+  DATABASE__DB       = "REPLACE_WITH_LIVE_VALUE"
+}

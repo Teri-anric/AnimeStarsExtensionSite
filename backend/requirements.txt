@@ -3,7 +3,7 @@ prometheus-client>=0.20.0,<1
 prometheus-fastapi-instrumentator>=7.0.0,<8
 uvicorn
 alembic
-sqlalchemy
+sqlalchemy[asyncio]
 psycopg2-binary
 pydantic-settings
 python-dotenv
