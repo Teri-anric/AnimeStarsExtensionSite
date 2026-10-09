@@ -14,7 +14,7 @@ resource "kubernetes_config_map_v1" "domain_index_project" {
       domain      = "ass.strawberrycat.dev"
       url         = "https://ass.strawberrycat.dev"
       description = "AnimeStars browser extension site."
-      group       = "apps"
+      group       = "private"
       rank        = 2
     })
   }
