@@ -17,7 +17,7 @@ resource "kubernetes_config_map_v1" "runtime" {
   }
 
   data = {
-    DATABASE__HOST  = "postgres"
+    DATABASE__HOST  = "postgres-migration-target"
     DATABASE__PORT  = "5432"
     REDIS__HOST     = "redis"
     REDIS__PORT     = "6379"
@@ -27,16 +27,16 @@ resource "kubernetes_config_map_v1" "runtime" {
   }
 }
 
-resource "kubernetes_service_v1" "postgres" {
+resource "kubernetes_service_v1" "migration_target_postgres" {
   metadata {
-    name      = "postgres"
+    name      = "postgres-migration-target"
     namespace = kubernetes_namespace_v1.site.metadata[0].name
-    labels    = local.labels.postgres
+    labels    = merge(local.common_labels, { "app.kubernetes.io/name" = "postgres-migration-target" })
   }
 
   spec {
     type     = "ClusterIP"
-    selector = { "app.kubernetes.io/name" = "postgres" }
+    selector = { "app.kubernetes.io/name" = "postgres-migration-target" }
 
     port {
       name        = "postgres"
@@ -46,22 +46,22 @@ resource "kubernetes_service_v1" "postgres" {
   }
 }
 
-resource "kubernetes_stateful_set_v1" "postgres" {
+resource "kubernetes_stateful_set_v1" "migration_target_postgres" {
   metadata {
-    name      = "postgres"
+    name      = "postgres-migration-target"
     namespace = kubernetes_namespace_v1.site.metadata[0].name
-    labels    = local.labels.postgres
+    labels    = merge(local.common_labels, { "app.kubernetes.io/name" = "postgres-migration-target" })
   }
 
   spec {
-    service_name = kubernetes_service_v1.postgres.metadata[0].name
+    service_name = kubernetes_service_v1.migration_target_postgres.metadata[0].name
     replicas     = 1
 
-    selector { match_labels = { "app.kubernetes.io/name" = "postgres" } }
+    selector { match_labels = { "app.kubernetes.io/name" = "postgres-migration-target" } }
 
     template {
       metadata {
-        labels = merge(local.labels.postgres, { "app.kubernetes.io/name" = "postgres" })
+        labels = merge(local.common_labels, { "app.kubernetes.io/name" = "postgres-migration-target" })
       }
 
       spec {
@@ -138,18 +138,23 @@ resource "kubernetes_stateful_set_v1" "postgres" {
         volume {
           name = "postgres-data"
           persistent_volume_claim {
-            claim_name = kubernetes_persistent_volume_claim_v1.active_postgres.metadata[0].name
+            claim_name = kubernetes_persistent_volume_claim_v1.migration_target_postgres.metadata[0].name
           }
         }
       }
     }
   }
 
-  wait_for_rollout = false
+  wait_for_rollout = true
+
+  timeouts {
+    create = "15m"
+    update = "15m"
+  }
 
   depends_on = [
     kubernetes_secret_v1.runtime,
-    kubernetes_persistent_volume_claim_v1.active_postgres,
+    kubernetes_persistent_volume_claim_v1.migration_target_postgres,
   ]
 }
 

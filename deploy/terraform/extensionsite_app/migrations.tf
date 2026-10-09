@@ -23,7 +23,7 @@ resource "kubernetes_job_v1" "alembic" {
           name              = "wait-for-postgres"
           image             = var.postgres_image
           image_pull_policy = "IfNotPresent"
-          command           = ["sh", "-c", "until pg_isready -h postgres -p 5432 -U \"$DATABASE__USER\" -d \"$DATABASE__DB\"; do sleep 2; done"]
+          command           = ["sh", "-c", "until pg_isready -h postgres-migration-target -p 5432 -U \"$DATABASE__USER\" -d \"$DATABASE__DB\"; do sleep 2; done"]
           env_from {
             config_map_ref { name = kubernetes_config_map_v1.runtime.metadata[0].name }
           }
@@ -57,7 +57,7 @@ resource "kubernetes_job_v1" "alembic" {
 
   timeouts { create = "15m" }
   depends_on = [
-    kubernetes_stateful_set_v1.postgres,
+    kubernetes_stateful_set_v1.migration_target_postgres,
     kubernetes_deployment_v1.redis,
   ]
 }

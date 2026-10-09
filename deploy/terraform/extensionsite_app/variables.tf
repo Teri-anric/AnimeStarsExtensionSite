@@ -5,22 +5,12 @@ variable "namespace" {
 
 variable "node_name" {
   type        = string
-  description = "Node hosting the site's local PostgreSQL directories and workloads."
-}
-
-variable "preserved_database_path" {
-  type        = string
-  description = "Preserved original PostgreSQL data path on the selected node."
-}
-
-variable "kubernetes_database_path" {
-  type        = string
-  description = "Active PostgreSQL data path on the selected node."
+  description = "Node hosting the PostgreSQL workload and application workloads."
 }
 
 variable "volume_capacity" {
   type        = string
-  description = "Kubernetes capacity metadata for the static local PVs."
+  description = "Requested capacity for the PostgreSQL PVC."
 }
 
 variable "runtime_secret_data" {

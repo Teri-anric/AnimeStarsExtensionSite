@@ -25,6 +25,11 @@ resource "kubernetes_deployment_v1" "backend" {
 
   wait_for_rollout = false
 
+  # KEDA owns the live replica count after creation, including scale-to-zero.
+  lifecycle {
+    ignore_changes = [spec[0].replicas]
+  }
+
   spec {
     replicas = 1
     selector { match_labels = { "app.kubernetes.io/name" = "backend" } }
@@ -32,22 +37,23 @@ resource "kubernetes_deployment_v1" "backend" {
     template {
       metadata {
         labels = local.labels.backend
-        annotations = {
+        annotations = merge({
           "prometheus.io/scrape" = "true"
           "prometheus.io/port"   = "8000"
           "prometheus.io/path"   = "/metrics"
-        }
+        }, local.runtime_config_checksum_annotation)
       }
 
       spec {
-        node_selector = { "kubernetes.io/hostname" = var.node_name }
+        # These HTTP workloads must be schedulable on either node when KEDA
+        # wakes them; pinning them to the busy worker can leave cold requests pending.
 
         container {
           name              = "backend"
           image             = var.backend_image
           image_pull_policy = "IfNotPresent"
           command           = ["sh", "-c"]
-          args              = ["mkdir -p /tmp/prometheus_multiproc && rm -f /tmp/prometheus_multiproc/* && python -m uvicorn app.web:app --host 0.0.0.0 --port 8000 --workers 5"]
+          args              = ["mkdir -p /tmp/prometheus_multiproc && rm -f /tmp/prometheus_multiproc/* && python -m uvicorn app.web:app --host 0.0.0.0 --port 8000 --workers 2"]
 
           port {
             name           = "http"
@@ -136,13 +142,21 @@ resource "kubernetes_deployment_v1" "frontend" {
 
   wait_for_rollout = false
 
+  # KEDA owns the live replica count after creation, including scale-to-zero.
+  lifecycle {
+    ignore_changes = [spec[0].replicas]
+  }
+
   spec {
     replicas = 1
     selector { match_labels = { "app.kubernetes.io/name" = "frontend" } }
     template {
-      metadata { labels = local.labels.frontend }
+      metadata {
+        labels      = local.labels.frontend
+        annotations = length(local.runtime_config_checksum_annotation) > 0 ? local.runtime_config_checksum_annotation : null
+      }
       spec {
-        node_selector = { "kubernetes.io/hostname" = var.node_name }
+        # Keep the scale-to-zero frontend schedulable on either node at wake-up.
         container {
           name              = "frontend"
           image             = var.frontend_image
@@ -176,7 +190,6 @@ resource "kubernetes_deployment_v1" "frontend" {
     }
   }
 
-  depends_on = [kubernetes_job_v1.alembic]
 }
 
 resource "kubernetes_deployment_v1" "scheduler" {
@@ -194,7 +207,10 @@ resource "kubernetes_deployment_v1" "scheduler" {
     strategy { type = "Recreate" }
 
     template {
-      metadata { labels = local.labels.scheduler }
+      metadata {
+        labels      = local.labels.scheduler
+        annotations = length(local.runtime_config_checksum_annotation) > 0 ? local.runtime_config_checksum_annotation : null
+      }
       spec {
         node_selector                    = { "kubernetes.io/hostname" = var.node_name }
         termination_grace_period_seconds = 60

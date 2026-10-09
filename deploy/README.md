@@ -4,17 +4,13 @@ Deployment is manual from the workstation to the existing two-node s1 K3s cluste
 
 ## Terraform ownership
 
-Terraform owns the application namespace and its Kubernetes resources: PostgreSQL PV/PVC pairs, runtime Secret and ConfigMap, PostgreSQL and Redis services/workloads, backend/frontend/scheduler/mitmproxy services/workloads, the Alembic Job, the app's Traefik IngressRoute, and a ConfigMap containing this project's Grafana dashboards. Shared Grafana infrastructure provisions dashboards from labeled ConfigMaps; the dashboard JSON remains in this repository.
+Terraform owns the application namespace and its Kubernetes resources: the PostgreSQL StorageClass, PVC, Service and StatefulSet, runtime Secret and ConfigMap, Redis service/workload, backend/frontend/scheduler/mitmproxy services/workloads, the Alembic Job, the app's Traefik IngressRoute, and a ConfigMap containing this project's Grafana dashboards. Shared Grafana infrastructure provisions dashboards from labeled ConfigMaps; the dashboard JSON remains in this repository.
 
 The existing Traefik controller and its `IngressRoute` CRD, registry, Prometheus, Loki, and Grafana remain shared infrastructure. This project creates no copies of those services and manages no DNS records. The Traefik CRD must already be installed and available while Terraform plans the IngressRoute.
 
-Both static PostgreSQL PVs are pinned to `s0.teri` and use reclaim policy `Retain`. Terraform destroy removes the Kubernetes PV/PVC objects and workloads, while the host directories remain on s0:
+PostgreSQL now uses the project-owned `animestars-postgres-retain` StorageClass backed by K3s `rancher.io/local-path`. K3s provisions and manages its node-local data; Terraform does not specify a host filesystem path. The PVC is protected by `prevent_destroy`, and the StorageClass reclaim policy is `Retain`. The database StatefulSet and Service keep their existing Kubernetes names to preserve the verified cutover.
 
-- Preserved Compose database: `/root/Teri-anric/AnimeStarsExtensionSite/db`
-- Active restored database: `/root/Teri-anric/AnimeStarsExtensionSite/db-k8s`
-- Pre-cutover dump: `/root/Teri-anric/AnimeStarsExtensionSite/pre-k3s-backup/animestars-20261008T190657Z.dump`
-
-The database restore from the pre-cutover dump is complete. Future schema changes use only the Alembic Job; no restore Job is part of normal deployment. The dashboard JSON files are the source of truth for the three AnimeStars dashboards. Terraform stores them in a ConfigMap labeled `grafana_dashboard=1`; its `k8s-sidecar-target-directory` annotation places the dashboards in the Grafana root folder `Anime Stars`. The shared Grafana sidecar discovers and provisions them. The dashboards keep stable UIDs and refer to the shared Prometheus and Loki datasource UIDs.
+The old source PostgreSQL workloads and static PV/PVC declarations have been removed from the Terraform configuration. The next reviewed apply will remove those old Kubernetes objects; their Retain policy preserves their data. No old server directory is referenced by this deployment configuration. The current runtime ConfigMap points the application to `postgres-migration-target`; future schema changes use the Alembic Job. The dashboard JSON files are the source of truth for the three AnimeStars dashboards. Terraform stores them in a ConfigMap labeled `grafana_dashboard=1`; its `k8s-sidecar-target-directory` annotation places the dashboards in the Grafana root folder `Anime Stars`. The shared Grafana sidecar discovers and provisions them. The dashboards keep stable UIDs and refer to the shared Prometheus and Loki datasource UIDs.
 
 Terraform manages the `runtime-secrets` Secret. Its values are marked sensitive in Terraform input/output, but Kubernetes provider state still contains the values. The remote state backend and local plan files must be access-controlled; do not commit `terraform.tfvars`, state, or plan files.
 
@@ -55,7 +51,7 @@ For a reviewed plan and separate apply, use `task prod:tf:plan` followed by `tas
 task prod:destroy
 ```
 
-Terraform prompts before deleting this application's resources. It removes the dashboard ConfigMap along with the application's Kubernetes objects; the shared Grafana sidecar then removes the provisioned dashboard files. The namespace and PV/PVC objects are deleted, while the PV `Retain` policy leaves both PostgreSQL host directories and the pre-cutover dump on s0. The shared Traefik, registry, Prometheus, Loki, and Grafana services remain outside this project's Terraform state.
+Terraform destroy is blocked while the PostgreSQL PVC's `prevent_destroy` guard is present. The database must be explicitly retired before removing that guard. The shared Traefik, registry, Prometheus, Loki, and Grafana services remain outside this project's Terraform state.
 
 ## Operations
 

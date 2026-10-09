@@ -70,7 +70,7 @@ tasks:
       - task: prod:apply
 
   prod:destroy:
-    desc: Destroy app-owned Kubernetes resources through Terraform; retained host data stays on s0
+    desc: Destroy app resources through Terraform; the retained PostgreSQL PVC blocks a full destroy
     deps: [prod:tf:init]
     cmds:
       - |
@@ -89,7 +89,10 @@ tasks:
           "~") kubeconfig_path="$HOME" ;;
         esac
         kubectl --kubeconfig "$kubeconfig_path" --context "${KUBE_CONTEXT:-k3s}" -n animestars-extension-site get deployments,statefulsets,jobs,services,pvc,ingressroutes.traefik.io
-        kubectl --kubeconfig "$kubeconfig_path" --context "${KUBE_CONTEXT:-k3s}" get pv animestars-extension-site-postgres-s0 animestars-extension-site-postgres-restore-s0
+        postgres_pv="$(kubectl --kubeconfig "$kubeconfig_path" --context "${KUBE_CONTEXT:-k3s}" -n animestars-extension-site get pvc postgres-migration-target-data -o jsonpath='{.spec.volumeName}')"
+        if [[ -n "$postgres_pv" ]]; then
+          kubectl --kubeconfig "$kubeconfig_path" --context "${KUBE_CONTEXT:-k3s}" get pv "$postgres_pv"
+        fi
 
   prod:logs:
     desc: Follow logs from a selected site workload (default backend)

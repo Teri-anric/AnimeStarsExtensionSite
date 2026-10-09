@@ -57,16 +57,14 @@ import_if_exists() {
 
 namespace="animestars-extension-site"
 import_if_exists kubernetes_namespace_v1.site namespace "$namespace" "" "$namespace"
-import_if_exists kubernetes_persistent_volume_v1.preserved_postgres pv animestars-extension-site-postgres-s0 "" animestars-extension-site-postgres-s0
-import_if_exists kubernetes_persistent_volume_claim_v1.preserved_postgres pvc postgres-data "$namespace" "$namespace/postgres-data"
-import_if_exists kubernetes_persistent_volume_v1.active_postgres pv animestars-extension-site-postgres-restore-s0 "" animestars-extension-site-postgres-restore-s0
-import_if_exists kubernetes_persistent_volume_claim_v1.active_postgres pvc postgres-restore-data "$namespace" "$namespace/postgres-restore-data"
+import_if_exists kubernetes_storage_class_v1.postgres_retained storageclass animestars-postgres-retain "" animestars-postgres-retain
+import_if_exists kubernetes_persistent_volume_claim_v1.migration_target_postgres pvc postgres-migration-target-data "$namespace" "$namespace/postgres-migration-target-data"
 
 import_if_exists kubernetes_secret_v1.runtime secret runtime-secrets "$namespace" "$namespace/runtime-secrets"
 import_if_exists kubernetes_config_map_v1.runtime configmap runtime-config "$namespace" "$namespace/runtime-config"
 
-import_if_exists kubernetes_service_v1.postgres service postgres "$namespace" "$namespace/postgres"
-import_if_exists kubernetes_stateful_set_v1.postgres statefulset postgres "$namespace" "$namespace/postgres"
+import_if_exists kubernetes_service_v1.migration_target_postgres service postgres-migration-target "$namespace" "$namespace/postgres-migration-target"
+import_if_exists kubernetes_stateful_set_v1.migration_target_postgres statefulset postgres-migration-target "$namespace" "$namespace/postgres-migration-target"
 import_if_exists kubernetes_service_v1.redis service redis "$namespace" "$namespace/redis"
 import_if_exists kubernetes_deployment_v1.redis deployment redis "$namespace" "$namespace/redis"
 import_if_exists kubernetes_service_v1.mitmproxy service mitmproxy "$namespace" "$namespace/mitmproxy"

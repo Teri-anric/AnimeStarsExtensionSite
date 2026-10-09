@@ -1,6 +1,10 @@
 # Traefik is installed and managed by infra-s1. This resource owns only the
 # project's route object inside its existing CRD API.
 resource "kubernetes_manifest" "site_ingress_route" {
+  field_manager {
+    force_conflicts = true
+  }
+
   manifest = {
     apiVersion = "traefik.io/v1alpha1"
     kind       = "IngressRoute"
@@ -16,7 +20,7 @@ resource "kubernetes_manifest" "site_ingress_route" {
           match = "Host(`ass.strawberrycat.dev`)"
           kind  = "Rule"
           services = [{
-            name = kubernetes_service_v1.frontend.metadata[0].name
+            name = kubernetes_service_v1.keda_http.metadata[0].name
             port = 8080
           }]
         },
@@ -24,8 +28,8 @@ resource "kubernetes_manifest" "site_ingress_route" {
           match = "Host(`ass-api.strawberrycat.dev`)"
           kind  = "Rule"
           services = [{
-            name = kubernetes_service_v1.backend.metadata[0].name
-            port = 8000
+            name = kubernetes_service_v1.keda_http.metadata[0].name
+            port = 8080
           }]
         },
       ]
@@ -34,8 +38,7 @@ resource "kubernetes_manifest" "site_ingress_route" {
   }
 
   depends_on = [
-    kubernetes_deployment_v1.backend,
-    kubernetes_deployment_v1.frontend,
-    kubernetes_deployment_v1.scheduler,
+    kubernetes_manifest.backend_scaled_object,
+    kubernetes_manifest.frontend_scaled_object,
   ]
 }

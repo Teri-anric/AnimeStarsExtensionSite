@@ -18,25 +18,13 @@ variable "namespace" {
 
 variable "node_name" {
   type        = string
-  description = "Kubernetes node hosting this project's local PostgreSQL directories."
+  description = "Kubernetes node hosting this project's PostgreSQL and application workloads."
   default     = "s0.teri"
-}
-
-variable "preserved_database_path" {
-  type        = string
-  description = "Preserved original PostgreSQL data path on the selected node."
-  default     = "/root/Teri-anric/AnimeStarsExtensionSite/db"
-}
-
-variable "kubernetes_database_path" {
-  type        = string
-  description = "Active PostgreSQL data path on the selected node."
-  default     = "/root/Teri-anric/AnimeStarsExtensionSite/db-k8s"
 }
 
 variable "volume_capacity" {
   type        = string
-  description = "Kubernetes capacity metadata; does not resize host filesystems."
+  description = "Requested capacity for the PostgreSQL PVC."
   default     = "10Gi"
 }
 
