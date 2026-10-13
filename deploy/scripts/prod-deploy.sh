@@ -42,7 +42,7 @@ export TF_VAR_migration_job_name="animestars-extension-site-alembic-${tag_slug}-
 echo "Terraform will show the plan and ask before applying app-owned Kubernetes changes."
 "${script_dir}/terraform.sh" apply
 
-for workload in statefulset/postgres deployment/redis deployment/mitmproxy deployment/backend deployment/scheduler deployment/frontend; do
+for workload in statefulset/postgres-migration-target deployment/redis deployment/mitmproxy deployment/backend deployment/scheduler deployment/frontend; do
   kubectl --kubeconfig "$kubeconfig_path" --context "$kube_context" -n "$namespace" \
     rollout status "$workload" --timeout=10m
 done
