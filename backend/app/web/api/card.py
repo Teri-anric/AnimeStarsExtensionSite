@@ -9,9 +9,14 @@ from app.web.schema.card import (
     CardBulkUpsertRequest,
     CardBulkUpsertResponse,
     CardDeckSnapshotRequest,
+    CardUpsertSchema,
 )
 from app.web.deps import CardRepositoryDep, CardBulkBufferServiceDep
 from app.util.media_path import normalize_media_path
+from app.services.card_ingest_policy import (
+    MAX_INGESTED_CARD_ID,
+    is_card_id_ingestible,
+)
 
 router = APIRouter(prefix="/card", tags=["card"])
 logger = logging.getLogger(__name__)
@@ -38,6 +43,18 @@ def clear_cards_data_without_stars(cards: list[dict]):
         yield card
 
 
+def filter_cards_by_id(cards: list[CardUpsertSchema]) -> list[CardUpsertSchema]:
+    accepted = [card for card in cards if is_card_id_ingestible(card.card_id)]
+    skipped_count = len(cards) - len(accepted)
+    if skipped_count:
+        logger.warning(
+            "Ignoring %s card payloads with card_id above %s",
+            skipped_count,
+            MAX_INGESTED_CARD_ID,
+        )
+    return accepted
+
+
 async def _write_cards_directly(
     repo,
     cards: list,
@@ -45,7 +62,7 @@ async def _write_cards_directly(
     full_upsert_values: list[dict] = []
     partial_update_values: list[dict] = []
 
-    for card in cards:
+    for card in filter_cards_by_id(cards):
         data = strip_host_from_url_fields(card.model_dump(exclude_none=True))
         # Separate cards that have enough data to be fully upserted
         # from those that should only partially update existing records.
@@ -111,11 +128,14 @@ async def bulk_upsert_cards(
         ]
     }
     """
+    accepted_cards = filter_cards_by_id(request.cards)
     normalized_cards: list[dict] = []
-    for card in request.cards:
+    for card in accepted_cards:
         data = strip_host_from_url_fields(card.model_dump(exclude_none=True))
         normalized_cards.append(data)
     normalized_cards = list(clear_cards_data_without_stars(normalized_cards))
+    if not normalized_cards:
+        return CardBulkUpsertResponse(status="ok", count=0)
 
     try:
         accepted = await buffer_service.enqueue_cards(normalized_cards)
@@ -124,7 +144,7 @@ async def bulk_upsert_cards(
         if not buffer_service.is_redis_error(exc):
             raise
         logger.exception("Redis is unavailable for /card/bulk, using direct DB fallback")
-        total_count = await _write_cards_directly(repo, request.cards)
+        total_count = await _write_cards_directly(repo, accepted_cards)
         return CardBulkUpsertResponse(status="ok", count=total_count)
 
 
@@ -144,9 +164,10 @@ async def sync_deck_snapshot(
     repo: CardRepositoryDep,
     buffer_service: CardBulkBufferServiceDep,
 ) -> CardBulkUpsertResponse:
+    accepted_cards = filter_cards_by_id(request.cards)
     normalized_cards = [
         strip_host_from_url_fields(card.model_dump(exclude_none=True))
-        for card in request.cards
+        for card in accepted_cards
     ]
     if not normalized_cards:
         return CardBulkUpsertResponse(status="ok", count=0)
@@ -155,6 +176,7 @@ async def sync_deck_snapshot(
     deleted_cards = [
         {"card_id": card_id, "deleted": True}
         for card_id in existing_ids - snapshot_ids
+        if is_card_id_ingestible(card_id)
     ]
     accepted = await buffer_service.enqueue_cards(normalized_cards + deleted_cards)
     return CardBulkUpsertResponse(status="ok", count=accepted)

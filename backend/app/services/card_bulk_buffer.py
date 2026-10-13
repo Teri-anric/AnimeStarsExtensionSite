@@ -12,6 +12,7 @@ from redis.exceptions import RedisError
 from app.config import settings
 from app.database.enum import CardType
 from app.redis_client import get_redis
+from app.services.card_ingest_policy import is_card_id_ingestible
 
 logger = logging.getLogger(__name__)
 
@@ -86,14 +87,24 @@ class CardBulkBufferService:
             full_upsert_values: list[dict] = []
             partial_update_values: list[dict] = []
             deleted_values: list[dict] = []
+            skipped_count = 0
             for card_id, payload in payload_by_card_id.items():
                 if payload.get("deleted"):
                     deleted_values.append(payload)
+                    continue
+                if not is_card_id_ingestible(card_id):
+                    skipped_count += 1
                     continue
                 if all(field in payload for field in _UPSERT_REQUIRED_FIELDS):
                     full_upsert_values.append(payload)
                 else:
                     partial_update_values.append(payload)
+
+            if skipped_count:
+                logger.warning(
+                    "Ignoring %s buffered card payloads with card_id above the ingest limit",
+                    skipped_count,
+                )
 
             total = await repo.apply_bulk_changes(
                 full_upsert_values,

@@ -24,9 +24,12 @@ from app.web.schema.extension_api import (
     ExtensionLabyrinthBulkRoomsRequest,
     ExtensionLabyrinthBulkRoomsResponse,
     ExtensionLabyrinthMapResponse,
+    ExtensionLabyrinthOverviewCell,
+    ExtensionLabyrinthOverviewResponse,
     ExtensionLabyrinthRoomHistoryItem,
     ExtensionLabyrinthRoomHistoryResponse,
     ExtensionLabyrinthRoomItem,
+    ExtensionLabyrinthSearchResponse,
     ExtensionLabyrinthSummaryResponse,
     DeckRankHistogram,
     ExtensionCardImageResolveItem,
@@ -313,6 +316,65 @@ async def extension_labyrinth_map_summary(
 ) -> ExtensionLabyrinthSummaryResponse:
     return ExtensionLabyrinthSummaryResponse.model_validate(
         await labyrinth_repo.summary()
+    )
+
+
+@router.get("/labyrinth/map/overview", response_model=ExtensionLabyrinthOverviewResponse)
+async def extension_labyrinth_map_overview(
+    labyrinth_repo: ExtensionLabyrinthRoomRepositoryDep,
+    bucket_size: int = Query(..., ge=1, le=200000),
+    min_x: int = Query(..., ge=-100000, le=100000),
+    max_x: int = Query(..., ge=-100000, le=100000),
+    min_y: int = Query(..., ge=-100000, le=100000),
+    max_y: int = Query(..., ge=-100000, le=100000),
+) -> ExtensionLabyrinthOverviewResponse:
+    if min_x > max_x or min_y > max_y:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid bounds"
+        )
+    bucket_columns = (max_x - min_x + bucket_size) // bucket_size
+    bucket_rows = (max_y - min_y + bucket_size) // bucket_size
+    if bucket_columns * bucket_rows > 20000:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Overview resolution is too high for these bounds",
+        )
+    cells = await labyrinth_repo.overview(
+        bucket_size=bucket_size,
+        min_x=min_x,
+        max_x=max_x,
+        min_y=min_y,
+        max_y=max_y,
+    )
+    return ExtensionLabyrinthOverviewResponse(
+        bucket_size=bucket_size,
+        cells=[ExtensionLabyrinthOverviewCell.model_validate(cell) for cell in cells],
+    )
+
+
+@router.get("/labyrinth/map/search", response_model=ExtensionLabyrinthSearchResponse)
+async def extension_labyrinth_map_search(
+    labyrinth_repo: ExtensionLabyrinthRoomRepositoryDep,
+    q: str = Query(..., min_length=1, max_length=80),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+) -> ExtensionLabyrinthSearchResponse:
+    page = await labyrinth_repo.search(query=q, limit=limit + 1, offset=offset)
+    return ExtensionLabyrinthSearchResponse(
+        has_more=len(page) > limit,
+        rooms=[
+            ExtensionLabyrinthRoomItem(
+                x=room.x,
+                y=room.y,
+                event=room.event,
+                sources_count=room.sources_count,
+                emission_event=room.emission_event,
+                emission_sources_count=room.emission_sources_count,
+                emission_observed_at=room.emission_observed_at,
+                updated_at=room.updated_at,
+            )
+            for room in page[:limit]
+        ]
     )
 
 

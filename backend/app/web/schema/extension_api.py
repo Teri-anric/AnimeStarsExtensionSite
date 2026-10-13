@@ -71,6 +71,22 @@ class ExtensionLabyrinthMapResponse(BaseSchema):
     rooms: list[ExtensionLabyrinthRoomItem]
 
 
+class ExtensionLabyrinthSearchResponse(BaseSchema):
+    rooms: list[ExtensionLabyrinthRoomItem]
+    has_more: bool
+
+
+class ExtensionLabyrinthOverviewCell(BaseSchema):
+    x: int
+    y: int
+    room_count: int
+
+
+class ExtensionLabyrinthOverviewResponse(BaseSchema):
+    bucket_size: int
+    cells: list[ExtensionLabyrinthOverviewCell]
+
+
 class ExtensionLabyrinthRoomHistoryItem(BaseSchema):
     event: str
     is_emission: bool

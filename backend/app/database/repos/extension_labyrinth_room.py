@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import case, func, select, tuple_
+from sqlalchemy import Integer, case, func, or_, select, tuple_
 from sqlalchemy.dialects.postgresql import insert
 
 from app.database.models.extension_labyrinth_room import ExtensionLabyrinthRoom
@@ -33,6 +33,71 @@ class ExtensionLabyrinthRoomRepository(BaseRepository):
         )
         if updated_after is not None:
             stmt = stmt.where(ExtensionLabyrinthRoom.updated_at > updated_after)
+        return await self.scalars(stmt)
+
+    async def overview(
+        self,
+        *,
+        bucket_size: int,
+        min_x: int | None = None,
+        max_x: int | None = None,
+        min_y: int | None = None,
+        max_y: int | None = None,
+    ) -> list[dict[str, int]]:
+        x_bucket = (
+            func.floor(ExtensionLabyrinthRoom.x / float(bucket_size)) * bucket_size
+        ).cast(Integer)
+        y_bucket = (
+            func.floor(ExtensionLabyrinthRoom.y / float(bucket_size)) * bucket_size
+        ).cast(Integer)
+        stmt = (
+            select(
+                x_bucket.label("x"),
+                y_bucket.label("y"),
+                func.count(ExtensionLabyrinthRoom.id).label("room_count"),
+            )
+            .group_by(x_bucket, y_bucket)
+            .order_by(x_bucket, y_bucket)
+        )
+        if min_x is not None:
+            stmt = stmt.where(
+                ExtensionLabyrinthRoom.x >= min_x,
+                ExtensionLabyrinthRoom.x <= max_x,
+                ExtensionLabyrinthRoom.y >= min_y,
+                ExtensionLabyrinthRoom.y <= max_y,
+            )
+        async with self.session as session:
+            rows = (await session.execute(stmt)).all()
+        return [
+            {"x": x, "y": y, "room_count": room_count}
+            for x, y, room_count in rows
+        ]
+
+    async def search(
+        self, *, query: str, limit: int = 50, offset: int = 0
+    ) -> list[ExtensionLabyrinthRoom]:
+        normalized = query.strip().lower()
+        if not normalized:
+            return []
+        event = func.lower(func.coalesce(ExtensionLabyrinthRoom.event, ""))
+        emission = func.lower(func.coalesce(ExtensionLabyrinthRoom.emission_event, ""))
+        stmt = (
+            select(ExtensionLabyrinthRoom)
+            .where(
+                or_(
+                    event.contains(normalized, autoescape=True),
+                    emission.contains(normalized, autoescape=True),
+                )
+            )
+            .order_by(
+                case((event == normalized, 0), (emission == normalized, 0), else_=1),
+                ExtensionLabyrinthRoom.updated_at.desc(),
+                ExtensionLabyrinthRoom.x,
+                ExtensionLabyrinthRoom.y,
+            )
+            .limit(limit)
+            .offset(offset)
+        )
         return await self.scalars(stmt)
 
     async def summary(self) -> dict:
