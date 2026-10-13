@@ -1,6 +1,6 @@
 # AnimeStarsExtensionSite deployment
 
-Deployment is manual from the workstation to the existing two-node s1 K3s cluster. Docker builds run locally and image pushes go through an SSH local forward to the private registry on s1. No GitHub Actions workflow deploys this application.
+Deployment is manual from the workstation to the existing two-node s1 K3s cluster. Docker builds run locally and image pushes use the authenticated HTTPS endpoint `registry.strawberrycat.dev`. No GitHub Actions workflow deploys this application.
 
 ## Terraform ownership
 
@@ -16,7 +16,7 @@ Terraform manages the `runtime-secrets` Secret. Its values are marked sensitive 
 
 ## Workstation setup
 
-1. Copy `deploy/.env.example` to `deploy/.env` and configure the SSH target for s1. The file is ignored by Git. Use the workstation kubeconfig for the s1 cluster, whose context includes s0; defaults are `~/.kube/k3s-s1.yaml` and context `k3s`.
+1. Copy `deploy/.env.example` to `deploy/.env` and configure the SSH target for deployment operations. Set `REGISTRY_ACCESS_TOKEN` from the sensitive Terraform output in `infra-s1`; keep it only in this ignored file or the process environment. `prod:push` logs in through Docker's `--password-stdin` interface and uses a temporary Docker config directory removed on exit. Use the workstation kubeconfig for the s1 cluster, whose context includes s0; defaults are `~/.kube/k3s-s1.yaml` and context `k3s`.
 2. Copy `deploy/terraform/backend.hcl.example` to `deploy/terraform/backend.hcl`. It uses the shared Terraform state bucket `terraform-state` at `https://s3.strawberrycat.dev`, with this application's isolated key: `animestars-extensionsite/prod/terraform.tfstate`. Export `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` for that backend.
 3. Copy `deploy/terraform/terraform.tfvars.example` to `deploy/terraform/terraform.tfvars`. Replace the runtime Secret placeholders with all current `runtime-secrets` keys and values. Keep the file private and ignored by Git.
 4. Run `task tf:validate` for offline Terraform and dashboard-asset validation.
@@ -37,7 +37,7 @@ Review the saved plan before applying it. Existing Kubernetes objects should be 
 
 ## Application release
 
-The image tag defaults to `git rev-parse --short HEAD`, matching the other Strawberry projects. `prod:deploy` builds and pushes both images, then runs Terraform with interactive approval. Terraform applies the runtime, waits for the Alembic Job to succeed, rolls out backend/frontend/scheduler, and applies the app IngressRoute. The migration Job receives a unique Kubernetes name for each deployment run.
+The image tag defaults to `git rev-parse --short HEAD`, matching the other Strawberry projects. `prod:push` checks that neither immutable tag already exists, then builds and pushes both images to the authenticated HTTPS registry. Kubernetes image references remain on the internal `localhost:5000/...` registry mirror. `prod:deploy` builds and pushes both images, then runs Terraform with interactive approval. Terraform applies the runtime, waits for the Alembic Job to succeed, rolls out backend/frontend/scheduler, and applies the app IngressRoute. The migration Job receives a unique Kubernetes name for each deployment run.
 
 ```sh
 task prod:deploy
@@ -61,4 +61,4 @@ task prod:logs
 task prod:ctl -- get pods
 ```
 
-Kubernetes context and registry routing can be overridden per invocation with `KUBECONFIG_PATH`, `KUBE_CONTEXT`, `SSH_TARGET`, `REGISTRY_LOCAL_PORT`, and `REGISTRY_REMOTE_PORT`. Never put kubeconfig data, tokens, database credentials, Terraform state, or plans in this repository.
+Registry routing can be overridden for pushes with `REGISTRY_HOST`; the token is supplied in `REGISTRY_ACCESS_TOKEN`. Deployment operations can use `KUBECONFIG_PATH`, `KUBE_CONTEXT`, and `SSH_TARGET`. Never put kubeconfig data, tokens, database credentials, Terraform state, or plans in this repository.
